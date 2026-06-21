@@ -91,7 +91,6 @@ export default function ContactPage() {
                 </h2>
 
                 <ul className="space-y-4">
-                  {/* Address — [EDIT] Pratik: replace with exact office address */}
                   <li className="flex items-start gap-3">
                     <div
                       className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
@@ -103,17 +102,14 @@ export default function ContactPage() {
                       <p className="text-sm font-semibold mb-0.5" style={{ color: 'var(--ls-text)' }}>
                         Office
                       </p>
-                      {/* [EDIT] Replace with exact office address before launch */}
                       <p className="text-sm" style={{ color: 'var(--ls-muted)', lineHeight: 1.6 }}>
-                        LearnSynaptic<br />
-                        [EDIT: Street / Area, Building]<br />
-                        Pune, Maharashtra 411XXX<br />
-                        India
+                        Office No. 201, Success Square<br />
+                        Karve Rd, near Karve Statue<br />
+                        Kothrud, Pune, Maharashtra 411038
                       </p>
                     </div>
                   </li>
 
-                  {/* Phone — [EDIT] Replace with real number */}
                   <li className="flex items-start gap-3">
                     <div
                       className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
@@ -125,18 +121,16 @@ export default function ContactPage() {
                       <p className="text-sm font-semibold mb-0.5" style={{ color: 'var(--ls-text)' }}>
                         Phone / WhatsApp
                       </p>
-                      {/* [EDIT] Replace with Pratik's real WhatsApp/phone number */}
                       <a
-                        href="tel:+910000000000"
+                        href="tel:+919119421237"
                         className="text-sm"
                         style={{ color: 'var(--ls-blue-primary)', fontWeight: 500 }}
                       >
-                        +91 [EDIT: 98XXX XXXXX]
+                        +91 91194 21237
                       </a>
                     </div>
                   </li>
 
-                  {/* Email — [EDIT] Replace with real email */}
                   <li className="flex items-start gap-3">
                     <div
                       className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
@@ -148,13 +142,12 @@ export default function ContactPage() {
                       <p className="text-sm font-semibold mb-0.5" style={{ color: 'var(--ls-text)' }}>
                         Email
                       </p>
-                      {/* [EDIT] Replace with real contact email address */}
                       <a
                         href="mailto:hello@learnsynaptic.com"
                         className="text-sm"
                         style={{ color: 'var(--ls-blue-primary)', fontWeight: 500 }}
                       >
-                        hello@learnsynaptic.com {/* [EDIT] */}
+                        hello@learnsynaptic.com
                       </a>
                     </div>
                   </li>
@@ -165,18 +158,18 @@ export default function ContactPage() {
                     style={{ borderTop: '1px solid var(--ls-border)' }}
                   >
                     <p className="text-sm font-semibold mb-3" style={{ color: 'var(--ls-text)' }}>
-                      Follow Pratik
+                      Follow us
                     </p>
                     <div className="flex items-center gap-4">
                       <a
-                        href="https://instagram.com/pratiksabale.ai"
+                        href="https://instagram.com/learnsynaptic"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 text-sm font-medium"
                         style={{ color: 'var(--ls-blue-primary)' }}
                       >
                         <InstagramIcon size={16} />
-                        @pratiksabale.ai
+                        @learnsynaptic
                       </a>
                       <a
                         href="https://pratiksabale.com"
@@ -193,33 +186,21 @@ export default function ContactPage() {
                 </ul>
               </div>
 
-              {/* Google Maps placeholder */}
+              {/* Google Maps — Success Square, Karve Rd, Kothrud, Pune */}
               <div
                 className="rounded-2xl border overflow-hidden"
                 style={{ borderColor: 'var(--ls-border)' }}
               >
-                {/*
-                  [EDIT] Replace this placeholder with a Google Maps embed iframe.
-                  Example:
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=..."
-                    width="100%"
-                    height="220"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                  />
-                */}
-                <div
-                  className="h-48 flex flex-col items-center justify-center gap-2"
-                  style={{ background: 'var(--ls-bg-alt)' }}
-                >
-                  <MapPin size={24} style={{ color: 'var(--ls-muted)' }} />
-                  <p className="text-sm" style={{ color: 'var(--ls-muted)' }}>
-                    Map embed — add Google Maps iframe here
-                  </p>
-                </div>
+                <iframe
+                  src="https://maps.google.com/maps?q=Success+Square,+Karve+Rd,+near+Karve+Statue,+Kothrud,+Pune,+Maharashtra+411038&t=m&z=16&ie=UTF8&iwloc=B&output=embed"
+                  width="100%"
+                  height="220"
+                  style={{ border: 0, display: 'block' }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="LearnSynaptic office location"
+                />
               </div>
             </div>
           </div>

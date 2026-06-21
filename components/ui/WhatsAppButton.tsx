@@ -1,10 +1,7 @@
 'use client'
 
 export function WhatsAppButton() {
-  // [EDIT] Replace with Pratik's real WhatsApp Business number
-  // Format: country code + number with no +, spaces, or dashes
-  // Example for +91 98765 43210 → '919876543210'
-  const phone = '919999999999'
+  const phone = '919119421237'
   const message = encodeURIComponent("Hi! I'm interested in LearnSynaptic programs.")
   const href = `https://wa.me/${phone}?text=${message}`
 

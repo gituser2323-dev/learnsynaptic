@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { Zap, MapPin, Mail, Phone } from 'lucide-react';
+import Image from 'next/image';
+import { MapPin, Mail, Phone } from 'lucide-react';
 
 const programs = [
   { name: 'AI Full Stack Dev + DevOps', href: '/programs/full-stack-devops' },
@@ -33,16 +34,13 @@ export default function Footer() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           {/* Brand column */}
           <div className="lg:col-span-1">
-            <Link href="/" className="flex items-center gap-2 font-bold text-[1.05rem] mb-3">
-              <span
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: 'var(--ls-blue-primary)' }}
-              >
-                <Zap size={16} color="#fff" strokeWidth={2.5} />
-              </span>
-              <span style={{ color: 'var(--ls-text)' }}>
-                Learn<span style={{ color: 'var(--ls-blue-primary)' }}>Synaptic</span>
-              </span>
+            <Link href="/" className="flex items-center mb-3">
+              <Image
+                src="/logo-wordmark.png"
+                alt="LearnSynaptic"
+                height={32}
+                width={99}
+              />
             </Link>
             <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--ls-muted)' }}>
               India&apos;s emerging tech training platform. From Pune, training students and
@@ -52,15 +50,16 @@ export default function Footer() {
               <div className="flex items-start gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>
                 <MapPin size={14} className="mt-0.5 shrink-0" style={{ color: 'var(--ls-blue-primary)' }} />
                 <span>
-                  Baner, Pune, Maharashtra — 411045
+                  Office No. 201, Success Square, Karve Rd<br />
+                  Kothrud, Pune, Maharashtra 411038
                   <br />
                   <span className="text-xs">Based in Pune. Training pan-India.</span>
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>
                 <Phone size={14} style={{ color: 'var(--ls-blue-primary)' }} />
-                <a href="tel:+919876543210" className="hover:text-ls-text transition-colors">
-                  +91 98765 43210
+                <a href="tel:+919119421237" className="hover:text-ls-text transition-colors">
+                  +91 91194 21237
                 </a>
               </div>
               <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>

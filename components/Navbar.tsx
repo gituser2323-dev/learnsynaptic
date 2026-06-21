@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown, Zap } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const programs = [
@@ -48,16 +49,14 @@ export default function Navbar() {
       <div className="ls-container">
         <nav className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-[1.1rem] text-ls-text">
-            <span
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ background: 'var(--ls-blue-primary)' }}
-            >
-              <Zap size={16} color="#fff" strokeWidth={2.5} />
-            </span>
-            <span style={{ color: 'var(--ls-text)' }}>
-              Learn<span style={{ color: 'var(--ls-blue-primary)' }}>Synaptic</span>
-            </span>
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/logo-wordmark.png"
+              alt="LearnSynaptic"
+              height={36}
+              width={111}
+              priority
+            />
           </Link>
 
           {/* Desktop Nav */}

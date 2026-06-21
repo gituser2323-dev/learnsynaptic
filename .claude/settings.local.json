@@ -47,7 +47,19 @@
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/programs/genai-builder)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/programs/data-science)",
       "Bash(curl *)",
-      "Bash(npx --yes playwright --version)"
+      "Bash(npx --yes playwright --version)",
+      "Bash(python3 -c ' *)",
+      "Bash(sips -g pixelWidth -g pixelHeight -g hasAlpha public/logo.png)",
+      "Bash(python3 *)",
+      "Bash(convert --version)",
+      "Bash(sips --version)",
+      "Bash(rm /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/icon-test-*.png)",
+      "Bash(rm /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/icon-mark.png)",
+      "Bash(rm /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/app/favicon.ico)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless=new --screenshot=/tmp/nav-screenshot.png --window-size=1440,900 --hide-scrollbars http://localhost:3001)",
+      "Bash(echo \"exit: $?\")",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless=new --screenshot=/tmp/footer-screenshot.png --window-size=1440,900 --hide-scrollbars http://localhost:3001/about)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless=new --run-to-element-string=/footer --screenshot=/tmp/footer-screenshot.png --window-size=1440,2400 --hide-scrollbars --virtual-time-budget=3000 http://localhost:3001/about)"
     ]
   }
 }

@@ -64,12 +64,12 @@ export function ContactForm() {
             We typically respond within a few hours. If you&apos;d like a quicker response,
             reach out on Instagram{' '}
             <a
-              href="https://instagram.com/pratiksabale.ai"
+              href="https://instagram.com/learnsynaptic"
               target="_blank"
               rel="noopener noreferrer"
               style={{ color: 'var(--ls-blue-primary)', fontWeight: 600 }}
             >
-              @pratiksabale.ai
+              @learnsynaptic
             </a>
             .
           </p>
