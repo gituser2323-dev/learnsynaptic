@@ -191,6 +191,48 @@ p {
   transform: translateZ(8px);
 }
 
+/* ─── WhatsApp float button ──────────────────────────────────────────────── */
+.wa-float {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 50;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #25D366;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
+  transition: transform 150ms ease;
+}
+.wa-float:hover {
+  transform: scale(1.08);
+}
+/* Ripple ring — expands outward every 4.5 s, then rests */
+.wa-float::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid #25D366;
+  animation: wa-ring 4.5s ease-out infinite;
+}
+@keyframes wa-ring {
+  0%, 35%, 100% { transform: scale(1); opacity: 0.55; }
+  17%            { transform: scale(1.8); opacity: 0; }
+}
+
+/* ─── Custom cursor ──────────────────────────────────────────────────────── */
+/* Applied via JS when a fine-pointer mouse is detected */
+html.custom-cursor-active,
+html.custom-cursor-active * {
+  cursor: none !important;
+}
+
 /* ─── Reduce motion ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -200,4 +242,5 @@ p {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+  .wa-float::after { animation: none; }
 }

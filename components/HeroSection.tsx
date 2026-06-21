@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { motion, useReducedMotion, type Transition } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Calendar } from 'lucide-react';
+import { SplineScene } from '@/components/ui/spline-scene';
 
 const trustStats = [
   '500+ Students Trained',
@@ -53,10 +54,23 @@ export default function HeroSection() {
 
   return (
     <section
-      className="pt-32 pb-20 sm:pt-36 sm:pb-24 lg:pt-40 lg:pb-28"
+      className="relative overflow-hidden pt-32 pb-20 sm:pt-36 sm:pb-24 lg:pt-40 lg:pb-28"
       style={{ background: 'var(--ls-hero-bg)' }}
     >
-      <div className="ls-container flex flex-col items-center text-center">
+      {/* Spline 3D — decorative background layer, right-side weighted, low visual weight */}
+      {/* TODO: Replace with custom LearnSynaptic Spline scene from spline.design */}
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 w-full lg:w-3/5"
+        aria-hidden="true"
+        style={{ opacity: 0.35 }}
+      >
+        <SplineScene
+          scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+          className="w-full h-full"
+        />
+      </div>
+
+      <div className="ls-container relative z-10 flex flex-col items-center text-center">
         {/* Badge — Framer Motion fade in */}
         <motion.div {...fadeIn(0.1)}>
           <span className="ls-badge mb-6 inline-flex">

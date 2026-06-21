@@ -15,6 +15,7 @@ import {
   Quote,
 } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
+import { LeadCapturePopup } from '@/components/LeadCapturePopup';
 import {
   AnimateOnScroll,
   StaggerContainer,
@@ -167,6 +168,8 @@ const hiringPartners = [
 export default function HomePage() {
   return (
     <>
+      <LeadCapturePopup />
+
       {/* ── 1. Hero ──────────────────────────────────────────────────────── */}
       <HeroSection />
 
