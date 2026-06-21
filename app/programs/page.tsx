@@ -276,12 +276,9 @@ export default function ProgramsPage() {
                       className="mt-auto p-6 pt-4 border-t"
                       style={{ borderColor: 'var(--ls-border)' }}
                     >
-                      <div className="flex items-center justify-between mb-4 text-xs" style={{ color: 'var(--ls-muted)' }}>
+                      <div className="mb-4 text-xs" style={{ color: 'var(--ls-muted)' }}>
                         <span>
                           Next batch: <strong style={{ color: 'var(--ls-text)' }}>{p.nextBatch}</strong>
-                        </span>
-                        <span className="font-semibold" style={{ color: '#dc2626' }}>
-                          {p.seats} seats left
                         </span>
                       </div>
                       <div className="flex gap-2">

@@ -341,7 +341,7 @@ export function LeadCapturePopup() {
                       className="ls-btn-primary"
                       style={{ marginTop: 6, justifyContent: 'center', width: '100%', padding: '13px 24px' }}
                     >
-                      Get Free Consultation
+                      Schedule My Free Call
                     </button>
 
                     <p style={{ fontSize: '0.76rem', color: 'var(--ls-muted)', textAlign: 'center', lineHeight: 1.5 }}>

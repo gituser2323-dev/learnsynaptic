@@ -16,6 +16,7 @@ const programs = [
 const navLinks = [
   { name: 'About', href: '/about' },
   { name: 'Placements', href: '/placements' },
+  { name: 'Internship', href: '/internship' },
   { name: 'Pricing', href: '/pricing' },
   { name: 'Blog', href: '/blog' },
   { name: 'FAQ', href: '/faq' },

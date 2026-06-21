@@ -361,8 +361,8 @@ export default function AboutPage() {
               className="text-lg mb-8"
               style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto 2rem' }}
             >
-              The next batch starts soon. If you want to build real things and get real outcomes,
-              that&apos;s what we do here.
+              Batches run regularly — check the programs page for current start dates. If you want
+              to build real things and get real outcomes, that&apos;s what we do here.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link

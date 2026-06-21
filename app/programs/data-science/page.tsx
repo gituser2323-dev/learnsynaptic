@@ -230,7 +230,6 @@ export default function DataSciencePage() {
               {[
                 { label: 'Duration', value: '5 Months', Icon: Clock },
                 { label: 'Next Batch', value: 'Jul 21, 2025', Icon: Calendar },
-                { label: 'Seats Left', value: '6 only', Icon: Users },
                 { label: 'Price', value: '₹39,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">
@@ -295,7 +294,7 @@ export default function DataSciencePage() {
                   </div>
                   <p className="text-xs mb-4" style={{ color: 'var(--ls-muted)' }}>or ₹4,444/month × 9 (0% EMI)</p>
                   <Link href="/contact" className="ls-btn-primary w-full justify-center text-sm">
-                    Apply Now — 6 Seats Left
+                    Apply for This Program
                   </Link>
                 </div>
               </div>
@@ -477,7 +476,7 @@ export default function DataSciencePage() {
         <div className="ls-container text-center">
           <AnimateOnScroll>
             <h2 className="mb-4" style={{ color: '#fff', maxWidth: 620, margin: '0 auto 1rem' }}>
-              July 21 batch. 6 seats left. Your data career starts here.
+              Join the July 21 batch — your data career starts here.
             </h2>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto 2rem' }}>
               5 months of structured learning that gives you the portfolio and the language to walk into any data interview.

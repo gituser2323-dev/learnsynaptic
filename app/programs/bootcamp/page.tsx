@@ -206,7 +206,6 @@ export default function BootcampPage() {
               {[
                 { label: 'Duration', value: '8 Weeks', Icon: Clock },
                 { label: 'Next Batch', value: 'Jul 7, 2025', Icon: Calendar },
-                { label: 'Seats Left', value: '12 seats', Icon: Users },
                 { label: 'Price', value: '₹12,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">
@@ -475,7 +474,7 @@ export default function BootcampPage() {
               July 7 batch. 8 weeks. Your first AI app goes live.
             </h2>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto 2rem' }}>
-              At ₹12,999 this is the most accessible way to start a career in tech. Seats go quickly — especially for the weekday batch.
+              At ₹12,999 this is the most accessible way to start building in tech — 8 weeks to your first deployed AI app.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/contact" className="inline-flex items-center gap-2 bg-white font-semibold px-6 py-3 rounded-xl hover:-translate-y-0.5 transition-transform" style={{ color: 'var(--ls-blue-primary)', fontSize: '0.9375rem' }}>

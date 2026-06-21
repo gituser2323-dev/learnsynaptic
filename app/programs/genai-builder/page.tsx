@@ -221,7 +221,6 @@ export default function GenAIBuilderPage() {
               {[
                 { label: 'Duration', value: '3 Months', Icon: Clock },
                 { label: 'Next Batch', value: 'Aug 5, 2025', Icon: Calendar },
-                { label: 'Seats Left', value: '8 only', Icon: Users },
                 { label: 'Price', value: '₹29,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">
@@ -287,7 +286,7 @@ export default function GenAIBuilderPage() {
                   </div>
                   <p className="text-xs mb-4" style={{ color: 'var(--ls-muted)' }}>or ₹3,333/month × 9 (0% EMI)</p>
                   <Link href="/contact" className="ls-btn-primary w-full justify-center text-sm">
-                    Apply Now — 8 Seats Left
+                    Apply for This Program
                   </Link>
                 </div>
               </div>
@@ -476,10 +475,10 @@ export default function GenAIBuilderPage() {
         <div className="ls-container text-center">
           <AnimateOnScroll>
             <h2 className="mb-4" style={{ color: '#fff', maxWidth: 620, margin: '0 auto 1rem' }}>
-              August 5 batch. 8 seats left. Start earning faster.
+              Join the August 5 batch — build a client-ready portfolio in 3 months.
             </h2>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto 2rem' }}>
-              3 months to a portfolio that generates inquiries on its own. The fastest ROI of any program we run.
+              3 months to a portfolio that generates client inquiries on its own.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/contact" className="inline-flex items-center gap-2 bg-white font-semibold px-6 py-3 rounded-xl hover:-translate-y-0.5 transition-transform" style={{ color: 'var(--ls-blue-primary)', fontSize: '0.9375rem' }}>

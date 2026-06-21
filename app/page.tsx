@@ -15,7 +15,6 @@ import {
   Quote,
 } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
-import { LeadCapturePopup } from '@/components/LeadCapturePopup';
 import {
   AnimateOnScroll,
   StaggerContainer,
@@ -39,10 +38,10 @@ export const metadata: Metadata = {
 /* ── Data ─────────────────────────────────────────────────────────────────── */
 
 const stats = [
-  { value: '500+', label: 'Students Trained', Icon: Users },
+  { value: '200+', label: 'Students Trained', Icon: Users },
   { value: '85%', label: 'Placement Rate', Icon: TrendingUp, green: true },
   { value: '60+', label: 'Hiring Partners', Icon: Building2 },
-  { value: '12', label: 'Batches Completed', Icon: BookOpen },
+  { value: '5+', label: 'Batches Completed', Icon: BookOpen },
 ];
 
 const programs = [
@@ -168,8 +167,6 @@ const hiringPartners = [
 export default function HomePage() {
   return (
     <>
-      <LeadCapturePopup />
-
       {/* ── 1. Hero ──────────────────────────────────────────────────────── */}
       <HeroSection />
 
@@ -288,17 +285,14 @@ export default function HomePage() {
                       </ol>
                     </div>
 
-                    {/* Batch + urgency */}
+                    {/* Batch date */}
                     <div
-                      className="flex items-center justify-between mb-4 px-3 py-2 rounded-lg text-xs"
+                      className="mb-4 px-3 py-2 rounded-lg text-xs"
                       style={{ background: 'var(--ls-bg-alt)' }}
                     >
                       <span style={{ color: 'var(--ls-muted)' }}>
                         Next batch:{' '}
                         <strong style={{ color: 'var(--ls-text)' }}>{program.batchDate}</strong>
-                      </span>
-                      <span className="font-semibold" style={{ color: '#dc2626' }}>
-                        {program.seatLabel}
                       </span>
                     </div>
 
@@ -438,8 +432,8 @@ export default function HomePage() {
               <div className="flex flex-wrap gap-6 mt-6">
                 {[
                   { value: '5+', label: 'Years Industry Exp.' },
-                  { value: '12', label: 'Batches Delivered' },
-                  { value: '500+', label: 'Students Mentored' },
+                  { value: '5+', label: 'Batches Delivered' },
+                  { value: '200+', label: 'Students Mentored' },
                 ].map(({ value, label }) => (
                   <div key={label}>
                     <p
@@ -599,7 +593,7 @@ export default function HomePage() {
               className="mb-4"
               style={{ color: '#fff', maxWidth: 700, margin: '0 auto 1rem' }}
             >
-              Your next cohort starts July 7. Don&apos;t wait.
+              The July cohort is open. Your next career step starts here.
             </h2>
             <p
               className="text-lg mb-8"
@@ -610,8 +604,8 @@ export default function HomePage() {
                 lineHeight: 1.7,
               }}
             >
-              Seats fill fast. Reserve yours today and get a free 30-minute career
-              counselling session with our team.
+              Enroll in any program and get a free 30-minute career counselling session
+              with our team — no commitment needed.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link

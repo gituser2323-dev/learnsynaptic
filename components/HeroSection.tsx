@@ -8,15 +8,14 @@ import { ArrowRight, CheckCircle2, Calendar } from 'lucide-react';
 import { SplineScene } from '@/components/ui/spline-scene';
 
 const trustStats = [
-  '500+ Students Trained',
+  '200+ Students Trained',
   '85% Placement Rate',
   'Pune-based, Pan-India Reach',
 ];
 
 const ease = [0.0, 0.0, 0.2, 1.0] as const;
 
-const words = ['Build', 'Your', 'Career', 'in', 'AI', '&', 'Technology'];
-const line2 = ['With', 'Real', 'Projects', 'and', 'Expert', 'Mentorship'];
+const headlineWords = ['BUILD', 'THE', 'SKILLS', 'COMPANIES', 'WILL', 'HIRE', 'FOR', 'IN', '2027'];
 
 export default function HeroSection() {
   const shouldReduce = useReducedMotion();
@@ -29,13 +28,13 @@ export default function HeroSection() {
     if (!h1) return;
     const spans = h1.querySelectorAll<HTMLElement>('.hero-word');
     const ctx = gsap.context(() => {
-      // set initial state before paint to avoid flash
       gsap.set(spans, { opacity: 0, y: 20 });
       gsap.to(spans, {
         opacity: 1,
         y: 0,
-        stagger: 0.04,   // 40ms — 13 words × 40ms + 500ms = 980ms total ✓
+        stagger: 0.05,
         duration: 0.5,
+        delay: 0.2,
         ease: 'power3.out',
       });
     });
@@ -71,56 +70,47 @@ export default function HeroSection() {
       </div>
 
       <div className="ls-container relative z-10 flex flex-col items-center text-center">
-        {/* Badge — Framer Motion fade in */}
+        {/* Batch badge */}
         <motion.div {...fadeIn(0.1)}>
-          <span className="ls-badge mb-6 inline-flex">
+          <span className="ls-badge mb-4 inline-flex">
             <Calendar size={13} />
-            Next Batch: July 7, 2025 — Limited Seats
+            Next Batch: July 7, 2025
           </span>
         </motion.div>
 
         {/* H1 — GSAP word reveal */}
         <h1
           ref={headlineRef}
-          className="mb-2"
-          style={{ maxWidth: 900, color: 'var(--ls-text)' }}
+          className="mb-4"
+          style={{ maxWidth: 900, color: 'var(--ls-text)', letterSpacing: '-0.025em' }}
         >
-          {words.map((word, i) => (
+          {headlineWords.map((word, i) => (
             <span
-              key={`line1-${i}`}
+              key={i}
               className="hero-word inline-block mr-[0.28em]"
             >
-              {word === 'AI' ? (
+              {word === '2027' ? (
                 <span style={{ color: 'var(--ls-blue-primary)' }}>{word}</span>
               ) : (
                 word
               )}
             </span>
           ))}
-          <br />
-          {line2.map((word, i) => (
-            <span
-              key={`line2-${i}`}
-              className="hero-word inline-block mr-[0.28em]"
-            >
-              {word}
-            </span>
-          ))}
         </h1>
 
-        {/* Subheadline — Framer Motion fade in */}
+        {/* Subheadline */}
         <motion.p
-          {...fadeIn(0.55)}
-          className="text-lg sm:text-xl mb-8 mt-4"
+          {...fadeIn(0.6)}
+          className="text-lg sm:text-xl mb-8 mt-2"
           style={{ maxWidth: 640, color: 'var(--ls-muted)', lineHeight: 1.7 }}
         >
-          India&apos;s fast-growing tech training platform for students and early professionals.
-          Structured programs, hands-on projects, placement support — from Pune to the whole country.
+          The market has already moved on — master in-demand technologies, build real-world
+          projects, and land your dream job with personalized mentorship and placement support.
         </motion.p>
 
-        {/* CTAs — Framer Motion fade in */}
+        {/* CTAs */}
         <motion.div
-          {...fadeIn(0.7)}
+          {...fadeIn(0.8)}
           className="flex flex-col sm:flex-row items-center gap-3 mb-8"
         >
           <Link href="/programs" className="ls-btn-primary">
@@ -132,9 +122,9 @@ export default function HeroSection() {
           </Link>
         </motion.div>
 
-        {/* Trust stats — Framer Motion fade in */}
+        {/* Trust stats */}
         <motion.div
-          {...fadeIn(0.85)}
+          {...fadeIn(0.95)}
           className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-8"
         >
           {trustStats.map((stat) => (

@@ -27,6 +27,10 @@ const faqGroups = [
         q: 'How large are the batches? Will I get individual feedback on my work?',
         a: 'Batches are deliberately kept small — 15 to 25 students per cohort. Pratik personally reviews project submissions and is active in the dedicated group for each batch throughout the program. Project review is scheduled into every program, not treated as an add-on. The batch size limit is how we protect that quality as we grow.',
       },
+      {
+        q: 'What happens if the batch I want to join is full?',
+        a: "If a batch is full before you complete enrollment, we will add you to the waitlist for that cohort and guarantee your spot in the next one at the same price. Waitlist position is based on when your registration fee is received. We will always confirm batch availability before you pay — we do not take payment for a full batch without telling you first.",
+      },
     ],
   },
   {
@@ -39,7 +43,7 @@ const faqGroups = [
       },
       {
         q: 'Do you offer EMI or instalment payment options?',
-        a: 'Yes. All programs support split payments — typically 50% at enrolment and the remaining 50% before the midpoint of the batch. If you need a longer instalment plan, reach out directly; we handle those case-by-case. Cost should not be the only thing stopping a serious candidate from starting.',
+        a: 'Yes. All programs offer 0% interest EMI via Razorpay — 9 equal monthly instalments with no processing fee. Per-program breakdown: AI Full Stack Dev + DevOps: ₹5,555/month × 9. GenAI Builder: ₹3,333/month × 9. Data Science AI/ML: ₹4,444/month × 9. AI Beginner Bootcamp: ₹1,444/month × 9. A ₹5,000 (or ₹2,000 for the Bootcamp) registration fee is required upfront to reserve your seat and is adjusted against the total. If you need a custom arrangement, reach out directly — cost should not be the only thing stopping a serious candidate from starting.',
       },
       {
         q: 'What is the refund policy if I need to leave the program?',

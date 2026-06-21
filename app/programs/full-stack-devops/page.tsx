@@ -264,7 +264,6 @@ export default function FullStackDevOpsPage() {
               {[
                 { label: 'Duration', value: '6 Months', Icon: Clock },
                 { label: 'Next Batch', value: 'Jul 14, 2025', Icon: Calendar },
-                { label: 'Seats Left', value: '4 only', Icon: Users },
                 { label: 'Price', value: '₹49,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">
@@ -368,7 +367,7 @@ export default function FullStackDevOpsPage() {
                   </div>
                   <p className="text-xs mb-4" style={{ color: 'var(--ls-muted)' }}>or ₹5,555/month × 9 (0% EMI)</p>
                   <Link href="/contact" className="ls-btn-primary w-full justify-center text-sm">
-                    Apply Now — 4 Seats Left
+                    Apply for This Program
                   </Link>
                 </div>
               </div>
@@ -653,7 +652,7 @@ export default function FullStackDevOpsPage() {
         <div className="ls-container text-center">
           <AnimateOnScroll>
             <h2 className="mb-4" style={{ color: '#fff', maxWidth: 620, margin: '0 auto 1rem' }}>
-              July 14 batch. 4 seats left. Don&apos;t wait on this one.
+              Join the July 14 batch — 6 months to a deployed AI application.
             </h2>
             <p
               className="text-lg mb-8"

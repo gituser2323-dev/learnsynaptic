@@ -31,7 +31,23 @@
       "Bash(npm ls *)",
       "Bash(chromium-cli *)",
       "Bash(npx playwright *)",
-      "Read(//usr/bin/**)"
+      "Read(//usr/bin/**)",
+      "Bash(echo \"PID=$!\")",
+      "Bash(npm init *)",
+      "Bash(lsof -i :3001 -sTCP:LISTEN)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/blog)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/blog/mern-developer-to-ai-developer-skills-gap)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/blog/ai-bootcamp-vs-full-program-how-to-choose)",
+      "Bash(curl -s http://localhost:3001/blog/what-is-rag-retrieval-augmented-generation-explained)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/internship)",
+      "Bash(curl -s http://localhost:3001/internship)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/programs)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/programs/full-stack-devops)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/programs/genai-builder)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/programs/data-science)",
+      "Bash(curl *)",
+      "Bash(npx --yes playwright --version)"
     ]
   }
 }
