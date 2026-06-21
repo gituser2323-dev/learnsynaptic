@@ -7,7 +7,27 @@
       "Bash(node *)",
       "Bash(curl -s http://localhost:3000)",
       "Bash(curl -s http://localhost:3001)",
-      "Bash(kill %1)"
+      "Bash(kill %1)",
+      "Bash(npx tsc *)",
+      "Skill(run)",
+      "Bash(PORT=3001 npm run dev)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(chromium-cli screenshot *)",
+      "Bash(open http://localhost:3001)",
+      "Bash(curl -s http://localhost:3001/_next/static/chunks/components_04vgvhe._.js)",
+      "Bash(lsof -ti:3001)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/faq)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001/contact)",
+      "Bash(curl -s http://localhost:3001/faq)",
+      "Bash(curl -s http://localhost:3001/contact)",
+      "Bash(open http://localhost:3001/faq)",
+      "Bash(open http://localhost:3001/contact)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3001)",
+      "Bash(xargs ps -p)",
+      "Bash(kill -0 15189)",
+      "Bash(curl -s \"http://localhost:3001/_next/static/chunks/app_page_tsx_10dzvhy._.js\")",
+      "Bash(kill 15189)",
+      "Read(//tmp/**)"
     ]
   }
 }

@@ -1,5 +1,7 @@
 'use client';
 
+import { useLayoutEffect, useRef } from 'react';
+import { gsap } from 'gsap';
 import { motion, useReducedMotion, type Transition } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Calendar } from 'lucide-react';
@@ -12,24 +14,32 @@ const trustStats = [
 
 const ease = [0.0, 0.0, 0.2, 1.0] as const;
 
+const words = ['Build', 'Your', 'Career', 'in', 'AI', '&', 'Technology'];
+const line2 = ['With', 'Real', 'Projects', 'and', 'Expert', 'Mentorship'];
+
 export default function HeroSection() {
   const shouldReduce = useReducedMotion();
+  const headlineRef = useRef<HTMLHeadingElement>(null);
 
-  const words = ['Build', 'Your', 'Career', 'in', 'AI', '&', 'Technology'];
-  const line2 = ['With', 'Real', 'Projects', 'and', 'Expert', 'Mentorship'];
-
-  const wordVariants = {
-    hidden: { opacity: 0, y: 14 },
-    visible: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.45,
-        ease,
-        delay: shouldReduce ? 0 : i * 0.05,
-      } satisfies Transition,
-    }),
-  };
+  // GSAP: one-shot word reveal on mount, never replays
+  useLayoutEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const h1 = headlineRef.current;
+    if (!h1) return;
+    const spans = h1.querySelectorAll<HTMLElement>('.hero-word');
+    const ctx = gsap.context(() => {
+      // set initial state before paint to avoid flash
+      gsap.set(spans, { opacity: 0, y: 20 });
+      gsap.to(spans, {
+        opacity: 1,
+        y: 0,
+        stagger: 0.04,   // 40ms — 13 words × 40ms + 500ms = 980ms total ✓
+        duration: 0.5,
+        ease: 'power3.out',
+      });
+    });
+    return () => ctx.revert();
+  }, []);
 
   const fadeIn = (delay: number) => ({
     initial: { opacity: 0, y: 12 },
@@ -47,7 +57,7 @@ export default function HeroSection() {
       style={{ background: 'var(--ls-hero-bg)' }}
     >
       <div className="ls-container flex flex-col items-center text-center">
-        {/* Badge */}
+        {/* Badge — Framer Motion fade in */}
         <motion.div {...fadeIn(0.1)}>
           <span className="ls-badge mb-6 inline-flex">
             <Calendar size={13} />
@@ -55,42 +65,38 @@ export default function HeroSection() {
           </span>
         </motion.div>
 
-        {/* H1 — word reveal on page load */}
-        <h1 className="mb-2" style={{ maxWidth: 900, color: 'var(--ls-text)' }}>
+        {/* H1 — GSAP word reveal */}
+        <h1
+          ref={headlineRef}
+          className="mb-2"
+          style={{ maxWidth: 900, color: 'var(--ls-text)' }}
+        >
           {words.map((word, i) => (
-            <motion.span
+            <span
               key={`line1-${i}`}
-              custom={i + 1}
-              variants={wordVariants}
-              initial="hidden"
-              animate="visible"
-              className="inline-block mr-[0.28em]"
+              className="hero-word inline-block mr-[0.28em]"
             >
               {word === 'AI' ? (
                 <span style={{ color: 'var(--ls-blue-primary)' }}>{word}</span>
               ) : (
                 word
               )}
-            </motion.span>
+            </span>
           ))}
           <br />
           {line2.map((word, i) => (
-            <motion.span
+            <span
               key={`line2-${i}`}
-              custom={words.length + i + 1}
-              variants={wordVariants}
-              initial="hidden"
-              animate="visible"
-              className="inline-block mr-[0.28em]"
+              className="hero-word inline-block mr-[0.28em]"
             >
               {word}
-            </motion.span>
+            </span>
           ))}
         </h1>
 
-        {/* Subheadline */}
+        {/* Subheadline — Framer Motion fade in */}
         <motion.p
-          {...fadeIn(0.6)}
+          {...fadeIn(0.55)}
           className="text-lg sm:text-xl mb-8 mt-4"
           style={{ maxWidth: 640, color: 'var(--ls-muted)', lineHeight: 1.7 }}
         >
@@ -98,9 +104,9 @@ export default function HeroSection() {
           Structured programs, hands-on projects, placement support — from Pune to the whole country.
         </motion.p>
 
-        {/* CTAs */}
+        {/* CTAs — Framer Motion fade in */}
         <motion.div
-          {...fadeIn(0.75)}
+          {...fadeIn(0.7)}
           className="flex flex-col sm:flex-row items-center gap-3 mb-8"
         >
           <Link href="/programs" className="ls-btn-primary">
@@ -112,9 +118,9 @@ export default function HeroSection() {
           </Link>
         </motion.div>
 
-        {/* Trust stats */}
+        {/* Trust stats — Framer Motion fade in */}
         <motion.div
-          {...fadeIn(0.9)}
+          {...fadeIn(0.85)}
           className="flex flex-col sm:flex-row items-center justify-center gap-5 sm:gap-8"
         >
           {trustStats.map((stat) => (

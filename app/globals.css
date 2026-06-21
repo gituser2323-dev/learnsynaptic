@@ -148,6 +148,49 @@ p {
   padding: 0 24px;
 }
 
+/* ─── Stat card hover effects (CSS-only, no client component needed) ────────── */
+.stat-cell {
+  border-radius: 12px;
+  padding: 12px 8px;
+  cursor: default;
+}
+.stat-number {
+  display: inline-block;
+  transform-origin: center;
+}
+.stat-accent {
+  height: 2px;
+  width: 0%;
+  border-radius: 999px;
+  margin-top: 3px;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .stat-cell            { transition: background 150ms ease; }
+  .stat-number          { transition: transform 150ms ease; }
+  .stat-accent          { transition: width 200ms ease; }
+
+  .stat-cell:hover                  { background: rgba(255,255,255,0.1); }
+  .stat-cell:hover .stat-number     { transform: scale(1.08); }
+  .stat-cell:hover .stat-accent     { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Static feedback only — no animation */
+  .stat-cell:hover { background: rgba(255,255,255,0.06); }
+}
+
+/* ─── TiltCard inner depth elements ────────────────────────────────────────── */
+/* translateZ only has visible effect inside a preserve-3d parent */
+.tilt-inner-icon,
+.tilt-inner-title {
+  transition: transform 0.1s ease-out;
+}
+[data-tilt="true"] .tilt-inner-icon {
+  transform: translateZ(16px);
+}
+[data-tilt="true"] .tilt-inner-title {
+  transform: translateZ(8px);
+}
+
 /* ─── Reduce motion ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,

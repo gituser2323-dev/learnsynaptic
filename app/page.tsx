@@ -19,8 +19,10 @@ import {
   AnimateOnScroll,
   StaggerContainer,
   StaggerItem,
-  HoverCard,
 } from '@/components/ui/AnimateOnScroll';
+import { TiltCard } from '@/components/ui/TiltCard';
+import { TestimonialCard } from '@/components/TestimonialCard';
+import { StatCard } from '@/components/StatCard';
 
 export const metadata: Metadata = {
   title: 'LearnSynaptic — AI, Full Stack & Data Science Training in India',
@@ -174,26 +176,7 @@ export default function HomePage() {
           <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {stats.map(({ value, label, Icon, green }) => (
               <StaggerItem key={label}>
-                <div className="flex flex-col items-center text-center">
-                  <div
-                    className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-                    style={{ background: 'rgba(255,255,255,0.15)' }}
-                  >
-                    <Icon size={20} color={green ? '#86efac' : '#fff'} />
-                  </div>
-                  <span
-                    className="block text-4xl lg:text-5xl font-bold mb-1"
-                    style={{
-                      color: green ? '#86efac' : '#fff',
-                      letterSpacing: '-0.02em',
-                    }}
-                  >
-                    {value}
-                  </span>
-                  <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>
-                    {label}
-                  </span>
-                </div>
+                <StatCard value={value} label={label} Icon={Icon} green={green} />
               </StaggerItem>
             ))}
           </StaggerContainer>
@@ -219,14 +202,14 @@ export default function HomePage() {
               const Icon = program.icon;
               return (
                 <StaggerItem key={program.href}>
-                  <HoverCard
+                  <TiltCard
                     className="bg-white rounded-2xl border p-6 h-full flex flex-col"
                     style={{ borderColor: 'var(--ls-border)' }}
                   >
                     {/* Card header */}
                     <div className="flex items-start justify-between mb-4">
                       <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                        className="tilt-inner-icon w-10 h-10 rounded-xl flex items-center justify-center"
                         style={{ background: 'var(--ls-blue-tint)' }}
                       >
                         <Icon size={20} style={{ color: 'var(--ls-blue-primary)' }} />
@@ -243,7 +226,7 @@ export default function HomePage() {
                     </div>
 
                     <h3
-                      className="mb-3"
+                      className="tilt-inner-title mb-3"
                       style={{ color: 'var(--ls-text)', fontSize: '1.05rem', fontWeight: 700 }}
                     >
                       {program.title}
@@ -331,7 +314,7 @@ export default function HomePage() {
                         Brochure
                       </Link>
                     </div>
-                  </HoverCard>
+                  </TiltCard>
                 </StaggerItem>
               );
             })}
@@ -523,44 +506,13 @@ export default function HomePage() {
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map((t) => (
               <StaggerItem key={t.name}>
-                <div
-                  className="bg-white rounded-2xl border p-6 h-full flex flex-col"
-                  style={{ borderColor: 'var(--ls-border)' }}
-                >
-                  <Quote
-                    size={20}
-                    className="mb-4"
-                    style={{ color: 'var(--ls-blue-tint)' }}
-                  />
-                  <p
-                    className="text-sm leading-relaxed flex-1 mb-5"
-                    style={{ color: 'var(--ls-text)' }}
-                  >
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-3 mt-auto pt-4" style={{ borderTop: '1px solid var(--ls-border)' }}>
-                    <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-                      style={{ background: 'var(--ls-blue-primary)' }}
-                    >
-                      {t.initials}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-sm" style={{ color: 'var(--ls-text)' }}>
-                        {t.name}
-                      </p>
-                      <p className="text-xs" style={{ color: 'var(--ls-muted)' }}>
-                        {t.role}
-                      </p>
-                    </div>
-                    <span
-                      className="shrink-0 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap"
-                      style={{ background: '#dcfce7', color: 'var(--ls-success)' }}
-                    >
-                      {t.badge}
-                    </span>
-                  </div>
-                </div>
+                <TestimonialCard
+                  name={t.name}
+                  role={t.role}
+                  quote={t.quote}
+                  badge={t.badge}
+                  initials={t.initials}
+                />
               </StaggerItem>
             ))}
           </StaggerContainer>
