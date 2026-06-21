@@ -1,7 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle2, ArrowRight, Loader2 } from 'lucide-react';
+import emailjs from '@emailjs/browser';
+import { CheckCircle2, ArrowRight, Loader2, AlertTriangle } from 'lucide-react';
+
+const EJS_SERVICE = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!;
+const EJS_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!;
+const EJS_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!;
 
 const programs = [
   { value: '', label: 'Which program are you interested in?' },
@@ -27,8 +32,7 @@ export function ContactForm() {
   const [fields, setFields] = useState({
     name: '', email: '', phone: '', program: '', message: '',
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const set = (k: keyof typeof fields) =>
@@ -37,14 +41,27 @@ export function ContactForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    // TODO: wire up to API route or form service (e.g. Resend, Formspree) before launch
-    await new Promise((r) => setTimeout(r, 900));
-    setSubmitted(true);
-    setSubmitting(false);
+    setStatus('sending');
+    try {
+      await emailjs.send(
+        EJS_SERVICE,
+        EJS_TEMPLATE,
+        {
+          name: fields.name,
+          email: fields.email,
+          phone: fields.phone,
+          program: fields.program || 'Not specified',
+          message: fields.message,
+        },
+        EJS_KEY,
+      );
+      setStatus('success');
+    } catch {
+      setStatus('error');
+    }
   };
 
-  if (submitted) {
+  if (status === 'success') {
     return (
       <div
         className="rounded-2xl border p-8 flex flex-col items-start gap-4"
@@ -58,7 +75,7 @@ export function ContactForm() {
         </div>
         <div>
           <h3 className="mb-1" style={{ fontSize: '1.125rem', fontWeight: 700 }}>
-            Message received
+            Thanks! We&apos;ll be in touch within 24 hours.
           </h3>
           <p style={{ color: 'var(--ls-muted)', maxWidth: 420, lineHeight: 1.7 }}>
             We typically respond within a few hours. If you&apos;d like a quicker response,
@@ -88,6 +105,32 @@ export function ContactForm() {
       <h2 className="mb-6" style={{ fontSize: 'clamp(1.25rem, 2.5vw, 1.5rem)', letterSpacing: '-0.01em' }}>
         Send us a message
       </h2>
+
+      {status === 'error' && (
+        <div
+          className="flex items-start gap-3 rounded-xl p-4 mb-5"
+          style={{ background: '#fef2f2', border: '1px solid #fecaca' }}
+        >
+          <AlertTriangle size={18} style={{ color: '#dc2626', flexShrink: 0, marginTop: 1 }} />
+          <div>
+            <p style={{ color: '#dc2626', fontWeight: 600, fontSize: '0.9rem' }}>
+              Something went wrong — please try again.
+            </p>
+            <p style={{ color: '#b91c1c', fontSize: '0.825rem', marginTop: 2 }}>
+              Or{' '}
+              <a
+                href="https://wa.me/919119421237"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontWeight: 600, textDecoration: 'underline' }}
+              >
+                WhatsApp us directly
+              </a>
+              .
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
         <div>
@@ -214,11 +257,11 @@ export function ContactForm() {
 
       <button
         type="submit"
-        disabled={submitting}
+        disabled={status === 'sending'}
         className="ls-btn-primary w-full justify-center"
-        style={{ opacity: submitting ? 0.7 : 1 }}
+        style={{ opacity: status === 'sending' ? 0.7 : 1 }}
       >
-        {submitting ? (
+        {status === 'sending' ? (
           <>
             <Loader2 size={16} className="animate-spin" />
             Sending…
@@ -245,8 +288,7 @@ const timeslots = [
 
 export function CallbackForm() {
   const [fields, setFields] = useState({ name: '', phone: '', time: '' });
-  const [submitted, setSubmitted] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const set = (k: keyof typeof fields) =>
@@ -255,14 +297,27 @@ export function CallbackForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
-    // TODO: wire up to API route or form service before launch
-    await new Promise((r) => setTimeout(r, 800));
-    setSubmitted(true);
-    setSubmitting(false);
+    setStatus('sending');
+    try {
+      await emailjs.send(
+        EJS_SERVICE,
+        EJS_TEMPLATE,
+        {
+          name: fields.name,
+          phone: fields.phone,
+          message: `Callback request — preferred time: ${fields.time || 'Any time'}`,
+          email: '',
+          program: '',
+        },
+        EJS_KEY,
+      );
+      setStatus('success');
+    } catch {
+      setStatus('error');
+    }
   };
 
-  if (submitted) {
+  if (status === 'success') {
     return (
       <div className="flex items-start gap-4">
         <div
@@ -285,6 +340,26 @@ export function CallbackForm() {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
+      {status === 'error' && (
+        <div
+          className="flex items-start gap-3 rounded-xl p-3 mb-4"
+          style={{ background: '#fef2f2', border: '1px solid #fecaca' }}
+        >
+          <AlertTriangle size={16} style={{ color: '#dc2626', flexShrink: 0, marginTop: 1 }} />
+          <p style={{ color: '#dc2626', fontSize: '0.85rem' }}>
+            Something went wrong.{' '}
+            <a
+              href="https://wa.me/919119421237"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontWeight: 600, textDecoration: 'underline' }}
+            >
+              WhatsApp us directly
+            </a>
+            .
+          </p>
+        </div>
+      )}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
         <div>
           <label htmlFor="cb-name" className="block text-sm font-medium mb-1.5" style={{ color: 'var(--ls-text)' }}>
@@ -341,11 +416,11 @@ export function CallbackForm() {
       </div>
       <button
         type="submit"
-        disabled={submitting}
+        disabled={status === 'sending'}
         className="ls-btn-primary"
-        style={{ opacity: submitting ? 0.7 : 1 }}
+        style={{ opacity: status === 'sending' ? 0.7 : 1 }}
       >
-        {submitting ? (
+        {status === 'sending' ? (
           <><Loader2 size={15} className="animate-spin" />Requesting…</>
         ) : (
           <>Request Callback<ArrowRight size={15} /></>

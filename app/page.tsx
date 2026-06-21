@@ -52,7 +52,7 @@ const programs = [
     rating: 4.9,
     reviews: 128,
     duration: '6 Months',
-    batchDate: 'Jul 14, 2025',
+    batchDate: 'Jul 14, 2026',
     builds: [
       'AI-powered e-commerce app with React & Node.js',
       'Automated CI/CD pipeline deployed on AWS',
@@ -68,7 +68,7 @@ const programs = [
     rating: 4.8,
     reviews: 96,
     duration: '3 Months',
-    batchDate: 'Aug 5, 2025',
+    batchDate: 'Aug 5, 2026',
     builds: [
       'Custom AI chatbot with your own knowledge base',
       'RAG-powered document Q&A system',
@@ -84,7 +84,7 @@ const programs = [
     rating: 4.8,
     reviews: 84,
     duration: '5 Months',
-    batchDate: 'Jul 21, 2025',
+    batchDate: 'Jul 21, 2026',
     builds: [
       'Predictive ML model with 90%+ accuracy on real data',
       'Interactive Power BI dashboard from scratch',
@@ -100,7 +100,7 @@ const programs = [
     rating: 4.7,
     reviews: 156,
     duration: '8 Weeks',
-    batchDate: 'Jul 7, 2025',
+    batchDate: 'Jul 7, 2026',
     builds: [
       'First Python automation script (0 experience needed)',
       'AI chatbot using the ChatGPT API',

@@ -179,9 +179,9 @@ const faqs = [
 ];
 
 const batches = [
-  { date: 'July 7, 2025', type: 'Weekday Batch', time: 'Mon–Fri, 7–9 PM IST', seats: 12 },
-  { date: 'August 18, 2025', type: 'Weekend Batch', time: 'Saturdays, 10 AM–6 PM IST', seats: 20 },
-  { date: 'September 29, 2025', type: 'Weekend Batch', time: 'Saturdays, 10 AM–6 PM IST', seats: 25 },
+  { date: 'July 7, 2026', type: 'Weekday Batch', time: 'Mon–Fri, 7–9 PM IST', seats: 12 },
+  { date: 'August 18, 2026', type: 'Weekend Batch', time: 'Saturdays, 10 AM–6 PM IST', seats: 20 },
+  { date: 'September 29, 2026', type: 'Weekend Batch', time: 'Saturdays, 10 AM–6 PM IST', seats: 25 },
 ];
 
 export default function BootcampPage() {
@@ -205,7 +205,7 @@ export default function BootcampPage() {
             <div className="flex flex-wrap gap-6 mb-8">
               {[
                 { label: 'Duration', value: '8 Weeks', Icon: Clock },
-                { label: 'Next Batch', value: 'Jul 7, 2025', Icon: Calendar },
+                { label: 'Next Batch', value: 'Jul 7, 2026', Icon: Calendar },
                 { label: 'Price', value: '₹12,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">

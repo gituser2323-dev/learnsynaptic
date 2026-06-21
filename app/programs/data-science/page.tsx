@@ -203,9 +203,9 @@ const faqs = [
 ];
 
 const batches = [
-  { date: 'July 21, 2025', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 6 },
-  { date: 'September 1, 2025', type: 'Weekend Batch', time: 'Sat–Sun, 10 AM–6 PM IST', seats: 14 },
-  { date: 'October 20, 2025', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 20 },
+  { date: 'July 21, 2026', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 6 },
+  { date: 'September 1, 2026', type: 'Weekend Batch', time: 'Sat–Sun, 10 AM–6 PM IST', seats: 14 },
+  { date: 'October 20, 2026', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 20 },
 ];
 
 export default function DataSciencePage() {
@@ -229,7 +229,7 @@ export default function DataSciencePage() {
             <div className="flex flex-wrap gap-6 mb-8">
               {[
                 { label: 'Duration', value: '5 Months', Icon: Clock },
-                { label: 'Next Batch', value: 'Jul 21, 2025', Icon: Calendar },
+                { label: 'Next Batch', value: 'Jul 21, 2026', Icon: Calendar },
                 { label: 'Price', value: '₹39,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">

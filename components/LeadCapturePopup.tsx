@@ -2,9 +2,14 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence, type Transition } from 'framer-motion'
-import { X } from 'lucide-react'
+import { X, Loader2, AlertTriangle } from 'lucide-react'
+import emailjs from '@emailjs/browser'
 
 const STORAGE_KEY = 'ls_lead_popup_shown'
+
+const EJS_SERVICE = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!
+const EJS_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!
+const EJS_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
 
 const programs = [
   'AI Powered Full Stack Dev + DevOps',
@@ -18,7 +23,7 @@ const ease = [0.0, 0.0, 0.2, 1.0] as const
 
 export function LeadCapturePopup() {
   const [visible, setVisible] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const [form, setForm] = useState({ name: '', phone: '', program: '' })
   const firedRef = useRef(false)
 
@@ -70,11 +75,26 @@ export function LeadCapturePopup() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    // TODO: wire up to your CRM / email integration here
-    // console.log('Lead captured:', form)
-    setSubmitted(true)
+    setStatus('sending')
+    try {
+      await emailjs.send(
+        EJS_SERVICE,
+        EJS_TEMPLATE,
+        {
+          name: form.name,
+          phone: form.phone,
+          program: form.program || 'Not specified',
+          email: '',
+          message: `Lead popup enquiry — program interest: ${form.program || 'Not specified'}`,
+        },
+        EJS_KEY,
+      )
+      setStatus('success')
+    } catch {
+      setStatus('error')
+    }
   }
 
   const backdropTransition: Transition = { duration: 0.2, ease }
@@ -165,7 +185,7 @@ export function LeadCapturePopup() {
                 <X size={15} />
               </button>
 
-              {submitted ? (
+              {status === 'success' ? (
                 /* Success state */
                 <div style={{ textAlign: 'center', padding: '16px 0' }}>
                   <div
@@ -185,10 +205,10 @@ export function LeadCapturePopup() {
                     </svg>
                   </div>
                   <h3 style={{ color: 'var(--ls-text)', marginBottom: 8, fontSize: '1.2rem' }}>
-                    You&apos;re all set!
+                    Thanks! We&apos;ll be in touch within 24 hours.
                   </h3>
                   <p style={{ color: 'var(--ls-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>
-                    Our team will reach out within 24 hours to schedule your free counselling call.
+                    Our team will reach out to schedule your free counselling call.
                   </p>
                   <button
                     onClick={handleClose}
@@ -234,6 +254,35 @@ export function LeadCapturePopup() {
                       Find the right program for your goals in under 30 minutes — no pressure, no sales pitch.
                     </p>
                   </div>
+
+                  {status === 'error' && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: 10,
+                        background: '#fef2f2',
+                        border: '1px solid #fecaca',
+                        borderRadius: 10,
+                        padding: '12px 14px',
+                        marginBottom: 16,
+                      }}
+                    >
+                      <AlertTriangle size={16} style={{ color: '#dc2626', flexShrink: 0, marginTop: 1 }} />
+                      <p style={{ color: '#dc2626', fontSize: '0.85rem', lineHeight: 1.5 }}>
+                        Something went wrong — please try again or{' '}
+                        <a
+                          href="https://wa.me/919119421237"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ fontWeight: 700, textDecoration: 'underline' }}
+                        >
+                          WhatsApp us directly
+                        </a>
+                        .
+                      </p>
+                    </div>
+                  )}
 
                   <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                     <div>
@@ -338,10 +387,24 @@ export function LeadCapturePopup() {
 
                     <button
                       type="submit"
+                      disabled={status === 'sending'}
                       className="ls-btn-primary"
-                      style={{ marginTop: 6, justifyContent: 'center', width: '100%', padding: '13px 24px' }}
+                      style={{
+                        marginTop: 6,
+                        justifyContent: 'center',
+                        width: '100%',
+                        padding: '13px 24px',
+                        opacity: status === 'sending' ? 0.7 : 1,
+                      }}
                     >
-                      Schedule My Free Call
+                      {status === 'sending' ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Sending…
+                        </>
+                      ) : (
+                        'Schedule My Free Call'
+                      )}
                     </button>
 
                     <p style={{ fontSize: '0.76rem', color: 'var(--ls-muted)', textAlign: 'center', lineHeight: 1.5 }}>

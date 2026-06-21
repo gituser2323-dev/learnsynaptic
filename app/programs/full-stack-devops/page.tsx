@@ -224,9 +224,9 @@ const faqs = [
 ];
 
 const batches = [
-  { date: 'July 14, 2025', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 4 },
-  { date: 'August 25, 2025', type: 'Weekend Batch', time: 'Sat–Sun, 10 AM–6 PM IST', seats: 12 },
-  { date: 'October 6, 2025', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 20 },
+  { date: 'July 14, 2026', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 4 },
+  { date: 'August 25, 2026', type: 'Weekend Batch', time: 'Sat–Sun, 10 AM–6 PM IST', seats: 12 },
+  { date: 'October 6, 2026', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 20 },
 ];
 
 export default function FullStackDevOpsPage() {
@@ -263,7 +263,7 @@ export default function FullStackDevOpsPage() {
             <div className="flex flex-wrap gap-6 mb-8">
               {[
                 { label: 'Duration', value: '6 Months', Icon: Clock },
-                { label: 'Next Batch', value: 'Jul 14, 2025', Icon: Calendar },
+                { label: 'Next Batch', value: 'Jul 14, 2026', Icon: Calendar },
                 { label: 'Price', value: '₹49,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">

@@ -194,9 +194,9 @@ const faqs = [
 ];
 
 const batches = [
-  { date: 'August 5, 2025', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 8 },
-  { date: 'September 15, 2025', type: 'Weekend Batch', time: 'Sat–Sun, 10 AM–4 PM IST', seats: 15 },
-  { date: 'November 10, 2025', type: 'Weekend Batch', time: 'Sat–Sun, 10 AM–4 PM IST', seats: 20 },
+  { date: 'August 5, 2026', type: 'Weekday Batch', time: 'Mon–Fri, 7–11 PM IST', seats: 8 },
+  { date: 'September 15, 2026', type: 'Weekend Batch', time: 'Sat–Sun, 10 AM–4 PM IST', seats: 15 },
+  { date: 'November 10, 2026', type: 'Weekend Batch', time: 'Sat–Sun, 10 AM–4 PM IST', seats: 20 },
 ];
 
 export default function GenAIBuilderPage() {
@@ -220,7 +220,7 @@ export default function GenAIBuilderPage() {
             <div className="flex flex-wrap gap-6 mb-8">
               {[
                 { label: 'Duration', value: '3 Months', Icon: Clock },
-                { label: 'Next Batch', value: 'Aug 5, 2025', Icon: Calendar },
+                { label: 'Next Batch', value: 'Aug 5, 2026', Icon: Calendar },
                 { label: 'Price', value: '₹29,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">

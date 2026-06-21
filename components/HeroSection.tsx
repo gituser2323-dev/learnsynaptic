@@ -74,7 +74,7 @@ export default function HeroSection() {
         <motion.div {...fadeIn(0.1)}>
           <span className="ls-badge mb-4 inline-flex">
             <Calendar size={13} />
-            Next Batch: July 7, 2025
+            Next Batch: July 7, 2026
           </span>
         </motion.div>
 
