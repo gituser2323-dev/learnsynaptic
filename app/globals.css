@@ -1,0 +1,160 @@
+@import "tailwindcss";
+
+/* ─── LearnSynaptic Design Tokens ─────────────────────────────────────────── */
+:root {
+  --ls-blue-primary: #1447E6;
+  --ls-blue-hover:   #0f3ac0;
+  --ls-blue-tint:    #eff6ff;
+  --ls-hero-bg:      #F6FAFE;
+  --ls-background:   #ffffff;
+  --ls-bg-alt:       #f8fafc;
+  --ls-text:         #18181b;
+  --ls-muted:        #71717a;
+  --ls-border:       #e4e4e7;
+  --ls-success:      #16a34a;
+}
+
+/* ─── Tailwind theme extension ─────────────────────────────────────────────── */
+@theme inline {
+  --color-ls-blue:        var(--ls-blue-primary);
+  --color-ls-blue-hover:  var(--ls-blue-hover);
+  --color-ls-blue-tint:   var(--ls-blue-tint);
+  --color-ls-hero-bg:     var(--ls-hero-bg);
+  --color-ls-bg-alt:      var(--ls-bg-alt);
+  --color-ls-text:        var(--ls-text);
+  --color-ls-muted:       var(--ls-muted);
+  --color-ls-border:      var(--ls-border);
+  --color-ls-success:     var(--ls-success);
+
+  --font-sans: var(--font-inter);
+}
+
+/* ─── Base ─────────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--ls-background);
+  color: var(--ls-text);
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Typography scale ─────────────────────────────────────────────────────── */
+h1 {
+  font-size: clamp(2.5rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--ls-text);
+}
+
+h2 {
+  font-size: clamp(1.875rem, 3.5vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--ls-text);
+}
+
+h3 {
+  font-size: clamp(1.25rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ls-text);
+}
+
+p {
+  color: var(--ls-muted);
+  line-height: 1.7;
+}
+
+/* ─── Utilities ────────────────────────────────────────────────────────────── */
+.ls-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--ls-blue-primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms ease;
+  text-decoration: none;
+}
+
+.ls-btn-primary:hover {
+  background: var(--ls-blue-hover);
+  transform: translateY(-1px);
+}
+
+.ls-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  color: var(--ls-text);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.75rem 1.75rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid var(--ls-border);
+  cursor: pointer;
+  transition: border-color 150ms ease, transform 150ms ease;
+  text-decoration: none;
+}
+
+.ls-btn-outline:hover {
+  border-color: var(--ls-blue-primary);
+  color: var(--ls-blue-primary);
+  transform: translateY(-1px);
+}
+
+.ls-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: var(--ls-blue-tint);
+  color: var(--ls-blue-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.3125rem 0.875rem;
+  border-radius: 9999px;
+}
+
+.ls-section {
+  padding: 80px 0;
+}
+
+.ls-section-alt {
+  background: var(--ls-bg-alt);
+  padding: 80px 0;
+}
+
+.ls-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ─── Reduce motion ────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

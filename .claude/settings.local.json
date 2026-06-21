@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(node -e \"const l = require\\('./node_modules/lucide-react/dist/cjs/lucide-react.js'\\); const keys = Object.keys\\(l\\); console.log\\(keys.filter\\(k => /you|tube|twitter|linkedin|instagram|social/i.test\\(k\\)\\).join\\('\\\\n'\\)\\)\")",
+      "Bash(node *)",
+      "Bash(curl -s http://localhost:3000)",
+      "Bash(curl -s http://localhost:3001)",
+      "Bash(kill %1)"
+    ]
+  }
+}
