@@ -122,7 +122,7 @@ export default function ContactPage() {
                         Phone / WhatsApp
                       </p>
                       <a
-                        href="tel:+919119421237"
+                        href="tel:+919763969449"
                         className="text-sm"
                         style={{ color: 'var(--ls-blue-primary)', fontWeight: 500 }}
                       >
