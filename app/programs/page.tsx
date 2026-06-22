@@ -19,8 +19,6 @@ const programs = [
     slug: 'full-stack-devops',
     level: 'Intermediate',
     duration: '6 Months',
-    price: '₹49,999',
-    emi: '₹5,555/mo',
     nextBatch: 'Jul 14, 2026',
     seats: 4,
     rating: 4.9,
@@ -47,8 +45,6 @@ const programs = [
     slug: 'genai-builder',
     level: 'Beginner–Intermediate',
     duration: '3 Months',
-    price: '₹29,999',
-    emi: '₹3,333/mo',
     nextBatch: 'Aug 5, 2026',
     seats: 8,
     rating: 4.8,
@@ -75,8 +71,6 @@ const programs = [
     slug: 'data-science',
     level: 'Intermediate',
     duration: '5 Months',
-    price: '₹39,999',
-    emi: '₹4,444/mo',
     nextBatch: 'Jul 21, 2026',
     seats: 6,
     rating: 4.8,
@@ -103,8 +97,6 @@ const programs = [
     slug: 'bootcamp',
     level: 'Complete Beginner',
     duration: '8 Weeks',
-    price: '₹12,999',
-    emi: '₹1,444/mo',
     nextBatch: 'Jul 7, 2026',
     seats: 12,
     rating: 4.7,
@@ -128,7 +120,6 @@ const programs = [
 
 const comparisonRows = [
   { label: 'Duration', values: ['6 months', '3 months', '5 months', '8 weeks'] },
-  { label: 'Price', values: ['₹49,999', '₹29,999', '₹39,999', '₹12,999'] },
   { label: 'Level', values: ['Intermediate', 'Beg–Inter', 'Intermediate', 'Beginner'] },
   { label: 'Placement support', values: ['✓', '✓', '✓', '✓'] },
   { label: 'Weekend batch', values: ['✓', '✓', '✓', '✓'] },
@@ -224,7 +215,6 @@ export default function ProgramsPage() {
                         {[
                           { label: 'Duration', value: p.duration },
                           { label: 'Level', value: p.level },
-                          { label: 'From', value: p.price },
                         ].map(({ label, value }) => (
                           <div
                             key={label}
@@ -442,7 +432,7 @@ export default function ProgramsPage() {
                 className="inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-xl border-2 hover:-translate-y-0.5 transition-transform"
                 style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.4)', fontSize: '0.9375rem' }}
               >
-                View Pricing & EMI
+                Talk to Us About Fees
               </Link>
             </div>
           </AnimateOnScroll>

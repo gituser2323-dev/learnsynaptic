@@ -39,11 +39,11 @@ const faqGroups = [
     items: [
       {
         q: 'What do the programs cost? Are there hidden fees after enrolment?',
-        a: 'Current fees for all programs are listed on the Pricing page. There are no hidden charges — what you see covers all live sessions, session recordings, project reviews, and 6 months of placement support. You will not be upsold premium mentorship tiers or certificate upgrades after joining.',
+        a: 'Pricing varies by program — book a free consultation for exact details. There are no hidden charges: the fee covers all live sessions, session recordings, project reviews, and 6 months of placement support. You will not be upsold premium mentorship tiers or certificate upgrades after joining.',
       },
       {
         q: 'Do you offer EMI or instalment payment options?',
-        a: 'Yes. All programs offer 0% interest EMI via Razorpay — 9 equal monthly instalments with no processing fee. Per-program breakdown: AI Full Stack Dev + DevOps: ₹5,555/month × 9. GenAI Builder: ₹3,333/month × 9. Data Science AI/ML: ₹4,444/month × 9. AI Beginner Bootcamp: ₹1,444/month × 9. A ₹5,000 (or ₹2,000 for the Bootcamp) registration fee is required upfront to reserve your seat and is adjusted against the total. If you need a custom arrangement, reach out directly — cost should not be the only thing stopping a serious candidate from starting.',
+        a: 'Yes. All programs offer 0% interest EMI via Razorpay — 9 equal monthly instalments with no processing fee. A registration fee is required upfront to reserve your seat and is adjusted against the total. If you need a custom arrangement, reach out directly — cost should not be the only thing stopping a serious candidate from starting.',
       },
       {
         q: 'What is the refund policy if I need to leave the program?',

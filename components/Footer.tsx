@@ -13,7 +13,7 @@ const resources = [
   { name: 'All Programs', href: '/programs' },
   { name: 'Placements', href: '/placements' },
   { name: 'Internship Track', href: '/internship' },
-  { name: 'Pricing & EMI', href: '/pricing' },
+  { name: 'Fees & EMI', href: '/pricing' },
   { name: 'Blog', href: '/blog' },
   { name: 'FAQ', href: '/faq' },
 ];

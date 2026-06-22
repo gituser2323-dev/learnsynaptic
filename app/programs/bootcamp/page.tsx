@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight, Clock, Calendar, Users, CheckCircle2, Star, Layers, Quote,
+  ArrowRight, Clock, Calendar, Users, CheckCircle2, Layers, Quote,
 } from 'lucide-react';
 import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/AnimateOnScroll';
 import { CurriculumAccordion } from '@/components/CurriculumAccordion';
@@ -162,7 +162,7 @@ const faqs = [
   },
   {
     question: 'Is this a stepping stone to the longer programs?',
-    answer: 'Yes — many Bootcamp graduates go on to join the AI Full Stack or GenAI Builder programs. Your Bootcamp fee is credited as ₹3,000 off the next program fee if you enroll within 3 months of completing the Bootcamp.',
+    answer: 'Yes — many Bootcamp graduates go on to join the AI Full Stack or GenAI Builder programs. Completing the Bootcamp unlocks a discount on any longer program when you enroll within 3 months. Reach out after graduation for details.',
   },
   {
     question: 'Is the ChatGPT API free to use?',
@@ -206,7 +206,6 @@ export default function BootcampPage() {
               {[
                 { label: 'Duration', value: '8 Weeks', Icon: Clock },
                 { label: 'Next Batch', value: 'Jul 7, 2026', Icon: Calendar },
-                { label: 'Price', value: '₹12,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">
                   <Icon size={15} style={{ color: 'var(--ls-blue-primary)' }} />
@@ -284,14 +283,12 @@ export default function BootcampPage() {
                   ))}
                 </div>
                 <div className="mt-6 pt-5" style={{ borderTop: '1px solid var(--ls-border)' }}>
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-2xl font-bold" style={{ color: 'var(--ls-text)' }}>₹12,999</span>
-                    <span className="text-sm" style={{ color: 'var(--ls-muted)' }}>total</span>
-                  </div>
-                  <p className="text-xs mb-4" style={{ color: 'var(--ls-muted)' }}>or ₹1,444/month × 9 (0% EMI)</p>
                   <Link href="/contact" className="ls-btn-primary w-full justify-center text-sm">
-                    Join July 7 Batch
+                    Book a Demo
                   </Link>
+                  <p className="text-xs mt-3 text-center" style={{ color: 'var(--ls-muted)' }}>
+                    Free 30-min call — pricing discussed on call.
+                  </p>
                 </div>
               </div>
             </AnimateOnScroll>
@@ -374,20 +371,14 @@ export default function BootcampPage() {
         </div>
       </section>
 
-      {/* ── Pricing ──────────────────────────────────────────────────────── */}
+      {/* ── What's Included ──────────────────────────────────────────────── */}
       <section className="ls-section-alt">
         <div className="ls-container">
-          <AnimateOnScroll className="mb-8"><h2 className="mb-3">Pricing & Payment</h2></AnimateOnScroll>
+          <AnimateOnScroll className="mb-8"><h2 className="mb-3">What&apos;s Included</h2></AnimateOnScroll>
           <AnimateOnScroll>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="rounded-2xl border p-8 bg-white" style={{ borderColor: 'var(--ls-border)' }}>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-4xl font-black" style={{ color: 'var(--ls-text)' }}>₹12,999</span>
-                  <span style={{ color: 'var(--ls-muted)' }}>total bootcamp fee</span>
-                </div>
-                <p className="text-sm mb-6" style={{ color: 'var(--ls-muted)' }}>
-                  Or 9 monthly installments of <strong style={{ color: 'var(--ls-text)' }}>₹1,444/month</strong> at 0% interest.
-                </p>
+                <h3 className="mb-5" style={{ fontSize: '1rem', fontWeight: 700 }}>Everything in this bootcamp</h3>
                 <ul className="space-y-3 mb-6">
                   {[
                     '80+ hours of live instruction over 8 weeks',
@@ -395,7 +386,7 @@ export default function BootcampPage() {
                     'Access to cohort Slack for peer support',
                     '6 months access to recorded sessions',
                     'LearnSynaptic completion certificate',
-                    '₹3,000 credit towards next LearnSynaptic program',
+                    'Discount credit towards any longer LearnSynaptic program',
                   ].map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm">
                       <CheckCircle2 size={15} className="mt-0.5 shrink-0" style={{ color: 'var(--ls-success)' }} />
@@ -403,7 +394,7 @@ export default function BootcampPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/contact" className="ls-btn-primary w-full justify-center">Join the July 7 Batch <ArrowRight size={15} /></Link>
+                <Link href="/contact" className="ls-btn-primary w-full justify-center">Get Program Details <ArrowRight size={15} /></Link>
               </div>
               <div
                 className="rounded-2xl p-6 flex flex-col justify-center"
@@ -412,8 +403,7 @@ export default function BootcampPage() {
                 <Layers size={28} className="mb-4" style={{ color: 'var(--ls-blue-primary)' }} />
                 <h3 className="mb-2" style={{ fontSize: '1.1rem', fontWeight: 700 }}>The upgrade path</h3>
                 <p className="text-sm mb-4" style={{ color: 'var(--ls-muted)', lineHeight: 1.7 }}>
-                  The Bootcamp is designed as a gateway. After completing it, you get <strong style={{ color: 'var(--ls-text)' }}>₹3,000 off</strong> any
-                  longer program — the AI Full Stack Dev + DevOps, GenAI Builder, or Data Science tracks.
+                  The Bootcamp is designed as a gateway. Completing it unlocks a discount on any longer program — the AI Full Stack Dev + DevOps, GenAI Builder, or Data Science tracks.
                   Many of our best Full Stack students started here.
                 </p>
                 <Link href="/programs" className="text-sm font-semibold inline-flex items-center gap-1" style={{ color: 'var(--ls-blue-primary)' }}>
@@ -474,7 +464,7 @@ export default function BootcampPage() {
               July 7 batch. 8 weeks. Your first AI app goes live.
             </h2>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto 2rem' }}>
-              At ₹12,999 this is the most accessible way to start building in tech — 8 weeks to your first deployed AI app.
+              The most accessible way to start building in tech — 8 weeks to your first deployed AI app.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/contact" className="inline-flex items-center gap-2 bg-white font-semibold px-6 py-3 rounded-xl hover:-translate-y-0.5 transition-transform" style={{ color: 'var(--ls-blue-primary)', fontSize: '0.9375rem' }}>

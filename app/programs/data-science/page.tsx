@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight, Clock, Calendar, Users, CheckCircle2, Star, TrendingUp, Quote,
+  ArrowRight, Clock, Calendar, Users, CheckCircle2, TrendingUp, Quote,
 } from 'lucide-react';
 import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/AnimateOnScroll';
 import { CurriculumAccordion } from '@/components/CurriculumAccordion';
@@ -230,7 +230,6 @@ export default function DataSciencePage() {
               {[
                 { label: 'Duration', value: '5 Months', Icon: Clock },
                 { label: 'Next Batch', value: 'Jul 21, 2026', Icon: Calendar },
-                { label: 'Price', value: '₹39,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">
                   <Icon size={15} style={{ color: 'var(--ls-blue-primary)' }} />
@@ -288,14 +287,12 @@ export default function DataSciencePage() {
                   ))}
                 </div>
                 <div className="mt-6 pt-5" style={{ borderTop: '1px solid var(--ls-border)' }}>
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-2xl font-bold" style={{ color: 'var(--ls-text)' }}>₹39,999</span>
-                    <span className="text-sm" style={{ color: 'var(--ls-muted)' }}>total</span>
-                  </div>
-                  <p className="text-xs mb-4" style={{ color: 'var(--ls-muted)' }}>or ₹4,444/month × 9 (0% EMI)</p>
                   <Link href="/contact" className="ls-btn-primary w-full justify-center text-sm">
-                    Apply for This Program
+                    Book a Demo
                   </Link>
+                  <p className="text-xs mt-3 text-center" style={{ color: 'var(--ls-muted)' }}>
+                    Free 30-min call — pricing discussed on call.
+                  </p>
                 </div>
               </div>
             </AnimateOnScroll>
@@ -377,20 +374,14 @@ export default function DataSciencePage() {
         </div>
       </section>
 
-      {/* ── Pricing ──────────────────────────────────────────────────────── */}
+      {/* ── What's Included ──────────────────────────────────────────────── */}
       <section className="ls-section-alt">
         <div className="ls-container">
-          <AnimateOnScroll className="mb-8"><h2 className="mb-3">Pricing & Payment Options</h2></AnimateOnScroll>
+          <AnimateOnScroll className="mb-8"><h2 className="mb-3">What&apos;s Included</h2></AnimateOnScroll>
           <AnimateOnScroll>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="rounded-2xl border p-8 bg-white" style={{ borderColor: 'var(--ls-border)' }}>
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-4xl font-black" style={{ color: 'var(--ls-text)' }}>₹39,999</span>
-                  <span style={{ color: 'var(--ls-muted)' }}>total programme fee</span>
-                </div>
-                <p className="text-sm mb-6" style={{ color: 'var(--ls-muted)' }}>
-                  Or pay in 9 equal installments of <strong style={{ color: 'var(--ls-text)' }}>₹4,444/month</strong> at 0% interest.
-                </p>
+                <h3 className="mb-5" style={{ fontSize: '1rem', fontWeight: 700 }}>Everything in this program</h3>
                 <ul className="space-y-3 mb-6">
                   {[
                     '280+ hours of live instruction',
@@ -407,23 +398,38 @@ export default function DataSciencePage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/contact" className="ls-btn-primary w-full justify-center">Apply Now & Reserve Your Seat <ArrowRight size={15} /></Link>
+                <Link href="/contact" className="ls-btn-primary w-full justify-center">Get Program Details <ArrowRight size={15} /></Link>
               </div>
-              <div className="rounded-2xl border p-6 bg-white space-y-4" style={{ borderColor: 'var(--ls-border)' }}>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>EMI Breakdown</h3>
-                {[
-                  { label: 'Registration fee (upfront)', value: '₹4,000', note: 'Adjusted against total' },
-                  { label: 'Monthly EMI × 9', value: '₹3,999/mo', note: '0% interest via Razorpay' },
-                  { label: 'Processing fee', value: '₹0', note: 'No hidden charges' },
-                ].map(({ label, value, note }) => (
-                  <div key={label} className="flex items-start justify-between text-sm">
-                    <div>
-                      <p style={{ color: 'var(--ls-text)', fontWeight: 500 }}>{label}</p>
-                      <p className="text-xs" style={{ color: 'var(--ls-muted)' }}>{note}</p>
-                    </div>
-                    <span className="font-bold" style={{ color: 'var(--ls-text)' }}>{value}</span>
+              <div className="space-y-4">
+                <div className="rounded-2xl border p-6 bg-white" style={{ borderColor: 'var(--ls-border)' }}>
+                  <h3 className="mb-4" style={{ fontSize: '1rem', fontWeight: 700 }}>Payment options</h3>
+                  <div className="space-y-4">
+                    {[
+                      { label: '0% interest EMI', note: 'Equal monthly installments via Razorpay — no processing fee' },
+                      { label: 'No hidden charges', note: 'Fee covers all sessions, recordings, project reviews, and placement support' },
+                      { label: 'Refund policy', note: 'Full refund within 7 days of batch start, pro-rated after that' },
+                    ].map(({ label, note }) => (
+                      <div key={label} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 size={15} className="mt-0.5 shrink-0" style={{ color: 'var(--ls-success)' }} />
+                        <div>
+                          <p style={{ color: 'var(--ls-text)', fontWeight: 500 }}>{label}</p>
+                          <p className="text-xs mt-0.5" style={{ color: 'var(--ls-muted)' }}>{note}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+                <div className="rounded-2xl p-5" style={{ background: 'var(--ls-blue-tint)', border: '1px solid var(--ls-blue-primary)' }}>
+                  <p className="font-semibold text-sm mb-2" style={{ color: 'var(--ls-text)' }}>
+                    Talk to us about pricing
+                  </p>
+                  <p className="text-sm mb-4" style={{ color: 'var(--ls-muted)' }}>
+                    Fees and EMI options are discussed on a free 30-minute call. Cost should not be the only thing stopping a serious candidate from starting.
+                  </p>
+                  <Link href="/contact" className="text-sm font-semibold" style={{ color: 'var(--ls-blue-primary)' }}>
+                    Book a free call →
+                  </Link>
+                </div>
               </div>
             </div>
           </AnimateOnScroll>

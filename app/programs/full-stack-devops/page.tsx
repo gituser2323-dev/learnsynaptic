@@ -211,7 +211,7 @@ const faqs = [
   },
   {
     question: 'Are EMI options available?',
-    answer: 'Yes. We offer 0% interest EMI in partnership with Razorpay — 9 installments of ₹5,555/month with no processing fee. A ₹5,000 registration fee is required upfront to reserve your seat, which is adjusted against the total fee.',
+    answer: 'Yes. We offer 0% interest EMI in partnership with Razorpay — 9 equal monthly installments with no processing fee and no interest. A registration fee is required upfront to reserve your seat, which is adjusted against the total. Book a free call to get the exact breakdown.',
   },
   {
     question: 'What if I miss a live class?',
@@ -264,7 +264,6 @@ export default function FullStackDevOpsPage() {
               {[
                 { label: 'Duration', value: '6 Months', Icon: Clock },
                 { label: 'Next Batch', value: 'Jul 14, 2026', Icon: Calendar },
-                { label: 'Price', value: '₹49,999', Icon: Star },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">
                   <Icon size={15} style={{ color: 'var(--ls-blue-primary)' }} />
@@ -361,14 +360,12 @@ export default function FullStackDevOpsPage() {
                   ))}
                 </div>
                 <div className="mt-6 pt-5" style={{ borderTop: '1px solid var(--ls-border)' }}>
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="text-2xl font-bold" style={{ color: 'var(--ls-text)' }}>₹49,999</span>
-                    <span className="text-sm" style={{ color: 'var(--ls-muted)' }}>total</span>
-                  </div>
-                  <p className="text-xs mb-4" style={{ color: 'var(--ls-muted)' }}>or ₹5,555/month × 9 (0% EMI)</p>
                   <Link href="/contact" className="ls-btn-primary w-full justify-center text-sm">
-                    Apply for This Program
+                    Book a Demo
                   </Link>
+                  <p className="text-xs mt-3 text-center" style={{ color: 'var(--ls-muted)' }}>
+                    Free 30-min call — pricing discussed on call.
+                  </p>
                 </div>
               </div>
             </AnimateOnScroll>
@@ -497,26 +494,20 @@ export default function FullStackDevOpsPage() {
         </div>
       </section>
 
-      {/* ── Pricing ──────────────────────────────────────────────────────── */}
+      {/* ── What's Included ──────────────────────────────────────────────── */}
       <section className="ls-section-alt">
         <div className="ls-container">
           <AnimateOnScroll className="mb-8">
-            <h2 className="mb-3">Pricing & Payment Options</h2>
+            <h2 className="mb-3">What&apos;s Included</h2>
           </AnimateOnScroll>
           <AnimateOnScroll>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Price card */}
+              {/* Features card */}
               <div
                 className="rounded-2xl border p-8 bg-white"
                 style={{ borderColor: 'var(--ls-border)' }}
               >
-                <div className="flex items-baseline gap-3 mb-2">
-                  <span className="text-4xl font-black" style={{ color: 'var(--ls-text)' }}>₹49,999</span>
-                  <span style={{ color: 'var(--ls-muted)' }}>total programme fee</span>
-                </div>
-                <p className="text-sm mb-6" style={{ color: 'var(--ls-muted)' }}>
-                  Or pay in 9 equal installments of <strong style={{ color: 'var(--ls-text)' }}>₹5,555/month</strong> at 0% interest.
-                </p>
+                <h3 className="mb-5" style={{ fontSize: '1rem', fontWeight: 700 }}>Everything in this program</h3>
                 <ul className="space-y-3 mb-6">
                   {[
                     '360+ hours of live instruction',
@@ -535,31 +526,30 @@ export default function FullStackDevOpsPage() {
                   ))}
                 </ul>
                 <Link href="/contact" className="ls-btn-primary w-full justify-center">
-                  Apply Now & Reserve Your Seat
+                  Get Program Details
                   <ArrowRight size={15} />
                 </Link>
               </div>
 
-              {/* EMI breakdown */}
+              {/* Payment options */}
               <div className="space-y-4">
                 <div
                   className="rounded-2xl border p-6 bg-white"
                   style={{ borderColor: 'var(--ls-border)' }}
                 >
-                  <h3 className="mb-4" style={{ fontSize: '1rem', fontWeight: 700 }}>EMI Breakdown</h3>
-                  <div className="space-y-3">
+                  <h3 className="mb-4" style={{ fontSize: '1rem', fontWeight: 700 }}>Payment options</h3>
+                  <div className="space-y-4">
                     {[
-                      { label: 'Registration fee (upfront)', value: '₹5,000', note: 'Adjusted against total' },
-                      { label: 'Monthly EMI × 9', value: '₹5,000/mo', note: '0% interest via Razorpay' },
-                      { label: 'Interest charge', value: '₹0', note: 'Completely interest-free' },
-                      { label: 'Processing fee', value: '₹0', note: 'No hidden charges' },
-                    ].map(({ label, value, note }) => (
-                      <div key={label} className="flex items-start justify-between text-sm">
+                      { label: '0% interest EMI', note: 'Equal monthly installments via Razorpay — no processing fee' },
+                      { label: 'No hidden charges', note: 'Fee covers all sessions, recordings, project reviews, and placement support' },
+                      { label: 'Refund policy', note: 'Full refund within 7 days of batch start, pro-rated after that' },
+                    ].map(({ label, note }) => (
+                      <div key={label} className="flex items-start gap-2 text-sm">
+                        <CheckCircle2 size={15} className="mt-0.5 shrink-0" style={{ color: 'var(--ls-success)' }} />
                         <div>
                           <p style={{ color: 'var(--ls-text)', fontWeight: 500 }}>{label}</p>
-                          <p className="text-xs" style={{ color: 'var(--ls-muted)' }}>{note}</p>
+                          <p className="text-xs mt-0.5" style={{ color: 'var(--ls-muted)' }}>{note}</p>
                         </div>
-                        <span className="font-bold" style={{ color: 'var(--ls-text)' }}>{value}</span>
                       </div>
                     ))}
                   </div>
@@ -568,12 +558,15 @@ export default function FullStackDevOpsPage() {
                   className="rounded-2xl p-5"
                   style={{ background: 'var(--ls-blue-tint)', border: '1px solid var(--ls-blue-primary)' }}
                 >
-                  <p className="font-semibold text-sm mb-1" style={{ color: 'var(--ls-text)' }}>
-                    Referral discount available
+                  <p className="font-semibold text-sm mb-2" style={{ color: 'var(--ls-text)' }}>
+                    Talk to us about pricing
                   </p>
-                  <p className="text-sm" style={{ color: 'var(--ls-muted)' }}>
-                    Refer a friend who enrolls and get ₹3,000 off your fee. No cap on referrals.
+                  <p className="text-sm mb-4" style={{ color: 'var(--ls-muted)' }}>
+                    Fees and EMI options are discussed on a free 30-minute counselling call. Cost should not be the only thing stopping a serious candidate from starting.
                   </p>
+                  <Link href="/contact" className="text-sm font-semibold" style={{ color: 'var(--ls-blue-primary)' }}>
+                    Book a free call →
+                  </Link>
                 </div>
               </div>
             </div>
@@ -658,7 +651,7 @@ export default function FullStackDevOpsPage() {
               className="text-lg mb-8"
               style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto 2rem' }}
             >
-              Reserve your spot with a ₹5,000 registration fee. Fully adjustable against the total.
+              Talk to our team to get exact program details, confirm batch availability, and reserve your spot.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
