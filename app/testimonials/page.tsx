@@ -164,9 +164,9 @@ export default function TestimonialsPage() {
         <div className="ls-container">
           <div className="grid grid-cols-3 gap-6 text-center">
             {[
-              { value: '200+', label: 'Students trained' },
-              { value: '90%', label: 'Placement rate', green: true },
-              { value: '5+', label: 'Batches completed' },
+              { value: '1200+', label: 'Students trained' },
+              { value: '70%', label: 'Placement rate', green: true },
+              { value: '45+', label: 'Batches completed' },
             ].map(({ value, label, green }) => (
               <div key={label}>
                 <p

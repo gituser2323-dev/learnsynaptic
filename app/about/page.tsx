@@ -122,9 +122,9 @@ export default function AboutPage() {
 
               <div className="flex flex-wrap gap-5 mt-8">
                 {[
-                  { value: '3–4 yrs', label: 'Industry experience', Icon: Code2 },
-                  { value: '5+', label: 'Batches completed', Icon: BookOpen },
-                  { value: '200+', label: 'Students trained', Icon: Users },
+                  { value: '5-6 yrs', label: 'Industry experience', Icon: Code2 },
+                  { value: '45+', label: 'Batches completed', Icon: BookOpen },
+                  { value: '1200+', label: 'Students trained', Icon: Users },
                 ].map(({ value, label, Icon }) => (
                   <div key={label} className="flex items-center gap-3">
                     <div

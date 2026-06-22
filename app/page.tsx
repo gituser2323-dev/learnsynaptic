@@ -38,10 +38,10 @@ export const metadata: Metadata = {
 /* ── Data ─────────────────────────────────────────────────────────────────── */
 
 const stats = [
-  { value: '200+', label: 'Students Trained', Icon: Users },
-  { value: '85%', label: 'Placement Rate', Icon: TrendingUp, green: true },
+  { value: '1200+', label: 'Students Trained', Icon: Users },
+  { value: '75%', label: 'Placement Rate', Icon: TrendingUp, green: true },
   { value: '60+', label: 'Hiring Partners', Icon: Building2 },
-  { value: '5+', label: 'Batches Completed', Icon: BookOpen },
+  { value: '50+', label: 'Batches Completed', Icon: BookOpen },
 ];
 
 const programs = [
@@ -431,9 +431,9 @@ export default function HomePage() {
               </div>
               <div className="flex flex-wrap gap-6 mt-6">
                 {[
-                  { value: '5+', label: 'Years Industry Exp.' },
-                  { value: '5+', label: 'Batches Delivered' },
-                  { value: '200+', label: 'Students Mentored' },
+                  { value: '6+', label: 'Years Industry Exp.' },
+                  { value: '45+', label: 'Batches Delivered' },
+                  { value: '1200+', label: 'Students Mentored' },
                 ].map(({ value, label }) => (
                   <div key={label}>
                     <p
