@@ -1,7 +1,7 @@
 'use client'
 
 export function WhatsAppButton() {
-  const phone = '919119421237'
+  const phone = '919763969449'
   const message = encodeURIComponent("Hi! I'm interested in LearnSynaptic programs.")
   const href = `https://wa.me/${phone}?text=${message}`
 

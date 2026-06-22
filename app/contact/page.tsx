@@ -126,7 +126,7 @@ export default function ContactPage() {
                         className="text-sm"
                         style={{ color: 'var(--ls-blue-primary)', fontWeight: 500 }}
                       >
-                        +91 91194 21237
+                        +91 9763969449
                       </a>
                     </div>
                   </li>

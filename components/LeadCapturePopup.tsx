@@ -272,7 +272,7 @@ export function LeadCapturePopup() {
                       <p style={{ color: '#dc2626', fontSize: '0.85rem', lineHeight: 1.5 }}>
                         Something went wrong — please try again or{' '}
                         <a
-                          href="https://wa.me/919119421237"
+                          href="https://wa.me/919763969449"
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{ fontWeight: 700, textDecoration: 'underline' }}
