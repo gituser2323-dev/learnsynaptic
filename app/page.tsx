@@ -15,6 +15,7 @@ import {
   Quote,
 } from 'lucide-react';
 import HeroSection from '@/components/HeroSection';
+import { LogoMarquee } from '@/components/LogoMarquee';
 import {
   AnimateOnScroll,
   StaggerContainer,
@@ -169,6 +170,9 @@ export default function HomePage() {
     <>
       {/* ── 1. Hero ──────────────────────────────────────────────────────── */}
       <HeroSection />
+
+      {/* ── 1b. Logo Marquee ──────────────────────────────────────────────── */}
+      <LogoMarquee />
 
       {/* ── 2. Stat Band ─────────────────────────────────────────────────── */}
       <section style={{ background: 'var(--ls-blue-primary)', padding: '56px 0' }}>

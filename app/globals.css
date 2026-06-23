@@ -233,6 +233,23 @@ html.custom-cursor-active * {
   cursor: none !important;
 }
 
+/* ─── Logo marquee ───────────────────────────────────────────────────────── */
+@keyframes ls-marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ls-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ls-marquee 32s linear infinite;
+}
+.ls-marquee-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-right: 20px;
+}
+
 /* ─── Reduce motion ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -243,4 +260,5 @@ html.custom-cursor-active * {
     transition-duration: 0.01ms !important;
   }
   .wa-float::after { animation: none; }
+  .ls-marquee-track { animation: none; }
 }
