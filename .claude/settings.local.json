@@ -59,7 +59,13 @@
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless=new --screenshot=/tmp/nav-screenshot.png --window-size=1440,900 --hide-scrollbars http://localhost:3001)",
       "Bash(echo \"exit: $?\")",
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless=new --screenshot=/tmp/footer-screenshot.png --window-size=1440,900 --hide-scrollbars http://localhost:3001/about)",
-      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless=new --run-to-element-string=/footer --screenshot=/tmp/footer-screenshot.png --window-size=1440,2400 --hide-scrollbars --virtual-time-budget=3000 http://localhost:3001/about)"
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless=new --run-to-element-string=/footer --screenshot=/tmp/footer-screenshot.png --window-size=1440,2400 --hide-scrollbars --virtual-time-budget=3000 http://localhost:3001/about)",
+      "Bash(npx next *)",
+      "Bash(git *)",
+      "Bash(npm list *)",
+      "Bash(kill 19895)",
+      "Bash(kill 41815)",
+      "Bash(echo \"New PID: $!\")"
     ]
   }
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence, type Transition } from 'framer-motion'
 import { X, Loader2, AlertTriangle } from 'lucide-react'
 import emailjs from '@emailjs/browser'
@@ -22,6 +23,7 @@ const programs = [
 const ease = [0.0, 0.0, 0.2, 1.0] as const
 
 export function LeadCapturePopup() {
+  const pathname = usePathname()
   const [visible, setVisible] = useState(false)
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
   const [form, setForm] = useState({ name: '', phone: '', program: '' })
@@ -29,6 +31,7 @@ export function LeadCapturePopup() {
 
   // Trigger: 15 s timer OR 50% scroll depth, whichever first; once per session
   useEffect(() => {
+    if (pathname === '/register') return
     if (sessionStorage.getItem(STORAGE_KEY)) return
 
     function show() {
