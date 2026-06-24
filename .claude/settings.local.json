@@ -70,7 +70,12 @@
       "Bash(mv \"03-corporate-expo-2023-poster.jpeg.jpeg\" \"03-corporate-expo-2023-poster.jpeg\")",
       "Bash(mv \"04-felicitation-award.jpeg.jpeg\" \"04-felicitation-award.jpeg\")",
       "Bash(mv \"05-office-team-coding-1.jpeg.jpeg\" \"05-office-team-coding-1.jpeg\")",
-      "Bash(mv \"06-office-desk-row.jpeg.jpeg\" \"06-office-desk-row.jpeg\")"
+      "Bash(mv \"06-office-desk-row.jpeg.jpeg\" \"06-office-desk-row.jpeg\")",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(lsof -ti:3000)",
+      "Bash(kill 74885)",
+      "Bash(timeout 40 bash -c 'until curl -sf http://localhost:3000 >/dev/null; do sleep 1; done')",
+      "Bash(/Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/node_modules/.bin/playwright install *)"
     ]
   }
 }

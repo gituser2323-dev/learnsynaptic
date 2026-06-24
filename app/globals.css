@@ -250,6 +250,58 @@ html.custom-cursor-active * {
   padding-right: 20px;
 }
 
+/* ─── Masonry gallery — About page ──────────────────────────────────────── */
+.ls-gallery-masonry {
+  columns: 1;
+  column-gap: 12px;
+}
+@media (min-width: 640px) {
+  .ls-gallery-masonry { columns: 2; }
+}
+@media (min-width: 1024px) {
+  .ls-gallery-masonry { columns: 3; column-gap: 16px; }
+}
+
+.ls-gallery-brick {
+  break-inside: avoid;
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  cursor: default;
+}
+@media (min-width: 1024px) {
+  .ls-gallery-brick { margin-bottom: 16px; }
+}
+
+/* ─── Caption overlay — fades in on hover (shared by both galleries) ──── */
+.ls-caption-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.68) 0%, rgba(0,0,0,0.06) 55%, transparent 75%);
+  opacity: 0;
+  transition: opacity 0.32s ease;
+  pointer-events: none;
+}
+.ls-caption-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1rem 1.125rem;
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.005em;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 0.32s ease, transform 0.32s ease;
+  pointer-events: none;
+}
+.group:hover .ls-caption-overlay { opacity: 1; }
+.group:hover .ls-caption-text    { opacity: 1; transform: translateY(0); }
+
 /* ─── Reduce motion ────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   *,
