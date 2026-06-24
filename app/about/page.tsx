@@ -4,6 +4,7 @@ import {
   ArrowRight, MapPin, Code2, Users, BookOpen, Zap, CheckCircle2,
 } from 'lucide-react';
 import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/AnimateOnScroll';
+import { AboutGallery } from '@/components/AboutGallery';
 
 export const metadata: Metadata = {
   title: 'About Pratik Sabale — Founder, LearnSynaptic',
@@ -349,6 +350,9 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* ── Gallery ─────────────────────────────────────────────────────── */}
+      <AboutGallery />
 
       {/* ── CTA ─────────────────────────────────────────────────────────── */}
       <section style={{ background: 'var(--ls-blue-primary)', padding: '88px 0' }}>

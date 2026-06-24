@@ -24,6 +24,7 @@ import {
 import { TiltCard } from '@/components/ui/TiltCard';
 import { TestimonialCard } from '@/components/TestimonialCard';
 import { StatCard } from '@/components/StatCard';
+import { HomepageGalleryStrip } from '@/components/HomepageGalleryStrip';
 
 export const metadata: Metadata = {
   title: 'LearnSynaptic — AI, Full Stack & Data Science Training in India',
@@ -329,6 +330,9 @@ export default function HomePage() {
           </AnimateOnScroll>
         </div>
       </section>
+
+      {/* ── 3b. Life at LearnSynaptic Gallery Strip ──────────────────────── */}
+      <HomepageGalleryStrip />
 
       {/* ── 4. Why LearnSynaptic (asymmetric — deliberate layout break) ──── */}
       <section className="ls-section-alt">
