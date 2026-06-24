@@ -290,7 +290,7 @@ export default function PlacementsPage() {
           <StaggerContainer className="grid grid-cols-1 sm:grid-cols-3 gap-8 lg:gap-16 text-center">
             {[
               { value: '45+', label: 'Batches Completed', Icon: BookOpen },
-              { value: '1200+', label: 'Students Trained', Icon: Users },
+              { value: '3200+', label: 'Students Trained', Icon: Users },
               { value: '70%', label: 'Placement Rate', Icon: TrendingUp, green: true },
             ].map(({ value, label, Icon, green }) => (
               <StaggerItem key={label}>

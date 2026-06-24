@@ -24,8 +24,8 @@ Applies everywhere: headlines, testimonials, stats, founder bio.
 ## 2. Social Proof Hierarchy (use in this order of strength)
 1. **Named, specific outcomes** (strongest): "Priya, BCS graduate →
    Backend Developer at a Pune startup, 3 months after the program"
-2. **Aggregate numbers with context**: "1200+ students trained" is
-   weaker alone than "1200+ students trained across 45 batches since
+2. **Aggregate numbers with context**: "3200+ students trained" is
+   weaker alone than "3200+ students trained across 45 batches since
    [year]" — context makes numbers feel earned, not inflated
 3. **Process transparency**: showing the actual curriculum, actual
    session count, actual project list — proof of substance, not just

@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 /* ── Data ─────────────────────────────────────────────────────────────────── */
 
 const stats = [
-  { value: '1200+', label: 'Students Trained', Icon: Users },
+  { value: '3200+', label: 'Students Trained', Icon: Users },
   { value: '75%', label: 'Placement Rate', Icon: TrendingUp, green: true },
   { value: '60+', label: 'Hiring Partners', Icon: Building2 },
   { value: '50+', label: 'Batches Completed', Icon: BookOpen },
@@ -441,7 +441,7 @@ export default function HomePage() {
                 {[
                   { value: '6+', label: 'Years Industry Exp.' },
                   { value: '45+', label: 'Batches Delivered' },
-                  { value: '1200+', label: 'Students Mentored' },
+                  { value: '3200+', label: 'Students Mentored' },
                 ].map(({ value, label }) => (
                   <div key={label}>
                     <p

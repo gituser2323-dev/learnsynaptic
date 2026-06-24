@@ -8,7 +8,7 @@ import { ArrowRight, CheckCircle2, Calendar } from 'lucide-react';
 import { SplineScene } from '@/components/ui/spline-scene';
 
 const trustStats = [
-  '1200+ Students Trained',
+  '3200+ Students Trained',
   '75% Placement Rate',
   'Pune-based, Pan-India Reach',
 ];

@@ -30,7 +30,7 @@ const timeline = [
   {
     // [EDIT] Replace with exact month + year milestone was reached
     date: '[EDIT: e.g. Mid 2024]',
-    label: 'Crossed 5+ batches, 200+ students trained',
+    label: 'Crossed 25+ batches, 3200+ students trained',
     detail: "The number that mattered wasn't the total — it was seeing former students get hired and come back to say it changed their trajectory. That's what made this feel like something worth scaling.",
   },
   {
@@ -125,7 +125,7 @@ export default function AboutPage() {
                 {[
                   { value: '5-6 yrs', label: 'Industry experience', Icon: Code2 },
                   { value: '45+', label: 'Batches completed', Icon: BookOpen },
-                  { value: '1200+', label: 'Students trained', Icon: Users },
+                  { value: '3200+', label: 'Students trained', Icon: Users },
                 ].map(({ value, label, Icon }) => (
                   <div key={label} className="flex items-center gap-3">
                     <div
