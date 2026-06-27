@@ -227,15 +227,13 @@ const placementCards = [
 },
 ];
 
-/*
- * PLACEHOLDER — Hiring partner logos
- * Replace company names with actual logo <Image> components before launch.
- * Logos should be ~120×40px SVG or PNG on white/transparent background.
- */
+// PLACEHOLDER LOGOS — replace with real hiring partner names/logos once partnerships
+// are confirmed. Do not use real company names/logos without an actual partnership.
 const hiringPartners = [
-  'TCS', 'Wipro', 'Infosys', 'Cognizant', 'Persistent Systems',
-  'Tech Mahindra', 'HCL Technologies', 'Accenture', 'Capgemini',
-  'Hexaware', 'KPMG India', 'Deloitte', 'Mphasis', 'Cyient', 'Birlasoft',
+  'Nexora Tech', 'Bluepeak Systems', 'Vertex Solutions', 'Orbital Labs',
+  'Northwind Digital', 'Quanta Soft', 'Crestline Tech', 'Hivewave',
+  'Synapse Digital', 'Meridian Systems', 'Cascade Labs', 'Irongate Code',
+  'Luminary Tech', 'Apex Dynamics', 'Nimbus IO',
 ];
 
 const processSteps = [
@@ -318,6 +316,83 @@ export default function PlacementsPage() {
         </div>
       </section>
 
+      {/* ── Hiring Partners Carousel ─────────────────────────────────────── */}
+      {/*
+       * PLACEHOLDER LOGOS — replace with real hiring partner names/logos once
+       * partnerships are confirmed. Do not use real company names/logos without
+       * an actual partnership.
+       */}
+      <div
+        style={{
+          background: '#fff',
+          borderTop: '1px solid var(--ls-border)',
+          borderBottom: '1px solid var(--ls-border)',
+          padding: '24px 0',
+        }}
+      >
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: '0.6875rem',
+            fontWeight: 600,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: 'var(--ls-muted)',
+            marginBottom: 14,
+            opacity: 0.7,
+          }}
+        >
+          Companies hiring our graduates
+        </p>
+        <div style={{ overflow: 'hidden', position: 'relative' }}>
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute', left: 0, top: 0, bottom: 0, width: 80,
+              background: 'linear-gradient(to right, #fff, transparent)',
+              zIndex: 1, pointerEvents: 'none',
+            }}
+          />
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute', right: 0, top: 0, bottom: 0, width: 80,
+              background: 'linear-gradient(to left, #fff, transparent)',
+              zIndex: 1, pointerEvents: 'none',
+            }}
+          />
+          <div className="ls-marquee-track">
+            {[0, 1].map((copy) => (
+              <div
+                key={copy}
+                className="ls-marquee-inner"
+                aria-hidden={copy === 1 ? true : undefined}
+              >
+                {hiringPartners.map((name) => (
+                  <div
+                    key={name}
+                    style={{
+                      padding: '7px 22px',
+                      border: '1.5px solid var(--ls-border)',
+                      borderRadius: 10,
+                      fontSize: '0.8125rem',
+                      fontWeight: 700,
+                      color: 'var(--ls-text)',
+                      opacity: 0.38,
+                      filter: 'grayscale(1)',
+                      whiteSpace: 'nowrap',
+                      letterSpacing: '0.01em',
+                    }}
+                  >
+                    {name}
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ── Video Testimonials ───────────────────────────────────────────── */}
       <VideoTestimonialsSection />
 
@@ -394,40 +469,6 @@ export default function PlacementsPage() {
                   <p className="text-xs mt-2" style={{ color: 'var(--ls-muted)' }}>
                     via {card.program}
                   </p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
-        </div>
-      </section>
-
-      {/* ── Hiring Partners ──────────────────────────────────────────────── */}
-      {/*
-       * PLACEHOLDER — hiring partner logos
-       * Replace company name text with actual <Image> logo components before launch.
-       * Recommended logo size: 120×36px, SVG or PNG on transparent background.
-       */}
-      <section className="ls-section-alt">
-        <div className="ls-container">
-          <AnimateOnScroll className="mb-8">
-            <h2 className="mb-3">Our graduates work at</h2>
-            <p style={{ color: 'var(--ls-muted)', maxWidth: 480 }}>
-              60+ companies across India have hired LearnSynaptic graduates.
-              Below is a selection — logo placeholders to be updated before launch.
-            </p>
-          </AnimateOnScroll>
-
-          <StaggerContainer className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-4">
-            {hiringPartners.map((company) => (
-              <StaggerItem key={company}>
-                {/* TODO: replace this div with <Image> company logo */}
-                <div
-                  className="bg-white rounded-xl border flex items-center justify-center py-4 px-3 text-center"
-                  style={{ borderColor: 'var(--ls-border)', minHeight: 60 }}
-                >
-                  <span className="text-xs font-semibold" style={{ color: 'var(--ls-text)' }}>
-                    {company}
-                  </span>
                 </div>
               </StaggerItem>
             ))}

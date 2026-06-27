@@ -25,6 +25,10 @@ import { TiltCard } from '@/components/ui/TiltCard';
 import { TestimonialCard } from '@/components/TestimonialCard';
 import { StatCard } from '@/components/StatCard';
 import { HomepageGalleryStrip } from '@/components/HomepageGalleryStrip';
+import { MeetTheTeam } from '@/components/MeetTheTeam';
+import { TechStackSection } from '@/components/TechStackSection';
+import { HomepageVideoTeaser } from '@/components/HomepageVideoTeaser';
+import { ProgramComparisonTable } from '@/components/ProgramComparisonTable';
 
 export const metadata: Metadata = {
   title: 'LearnSynaptic — AI, Full Stack & Data Science Training in India',
@@ -188,6 +192,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── 2b. Video Testimonial Teaser ─────────────────────────────────── */}
+      <HomepageVideoTeaser />
+
       {/* ── 3. Programs Grid ─────────────────────────────────────────────── */}
       <section className="ls-section">
         <div className="ls-container">
@@ -331,7 +338,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── 3b. Life at LearnSynaptic Gallery Strip ──────────────────────── */}
+      {/* ── 3b. Program Comparison Table ─────────────────────────────────── */}
+      <ProgramComparisonTable />
+
+      {/* ── 3c. Tech Stack ───────────────────────────────────────────────── */}
+      <TechStackSection />
+
+      {/* ── 3c. Life at LearnSynaptic Gallery Strip ──────────────────────── */}
       <HomepageGalleryStrip />
 
       {/* ── 4. Why LearnSynaptic (asymmetric — deliberate layout break) ──── */}
@@ -496,6 +509,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── 5b. Meet the Team ────────────────────────────────────────────── */}
+      <MeetTheTeam />
 
       {/* ── 6. Testimonials Preview ──────────────────────────────────────── */}
       <section className="ls-section-alt">
