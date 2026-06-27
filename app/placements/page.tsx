@@ -5,6 +5,7 @@ import {
   FileText, MessageSquare, Send, Star,
 } from 'lucide-react';
 import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/AnimateOnScroll';
+import VideoTestimonialsSection from '@/components/VideoTestimonialsSection';
 
 export const metadata: Metadata = {
   title: 'Placements & Hiring Outcomes — LearnSynaptic',
@@ -316,6 +317,9 @@ export default function PlacementsPage() {
           </StaggerContainer>
         </div>
       </section>
+
+      {/* ── Video Testimonials ───────────────────────────────────────────── */}
+      <VideoTestimonialsSection />
 
       {/* ── Placement Cards Grid ─────────────────────────────────────────── */}
       {/*

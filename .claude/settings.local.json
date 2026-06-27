@@ -75,7 +75,16 @@
       "Bash(lsof -ti:3000)",
       "Bash(kill 74885)",
       "Bash(timeout 40 bash -c 'until curl -sf http://localhost:3000 >/dev/null; do sleep 1; done')",
-      "Bash(/Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/node_modules/.bin/playwright install *)"
+      "Bash(/Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/node_modules/.bin/playwright install *)",
+      "Bash(npx playwright@latest screenshot http://localhost:3000/placements /tmp/placements-full.png --full-page)",
+      "Bash(npx playwright@latest screenshot http://localhost:3000/placements /tmp/placements-viewport.png --wait-for-timeout=3000)",
+      "Bash(kill 16578)",
+      "Bash(ffprobe -v error -show_streams -select_streams a -of default=noprint_wrappers=1 /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t1.mp4)",
+      "Bash(ffprobe -v error -show_streams -select_streams a -of default=noprint_wrappers=1 /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t2.mp4)",
+      "Bash(ffmpeg -version)",
+      "Bash(ffmpeg -i /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t1.mp4 -ss 00:00:01 -update 1 -frames:v 1 /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t1-poster.jpg -y)",
+      "Bash(ffmpeg -i /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t2.mp4 -ss 00:00:01 -update 1 -frames:v 1 /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t2-poster.jpg -y)",
+      "Bash(ffprobe *)"
     ]
   }
 }
