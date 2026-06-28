@@ -1,96 +1,53 @@
 const partners = [
-  'Wipro', 'TCS', 'Infosys', 'Deloitte', 'Accenture',
-  'Cognizant', 'HCL', 'Tech Mahindra', 'Persistent Systems', 'KPMG',
-  'IBM', 'Oracle', 'Capgemini', 'Mphasis', 'Hexaware',
+  "Wipro",
+  "TCS",
+  "Infosys",
+  "Deloitte",
+  "Accenture",
+  "Cognizant",
+  "HCL",
+  "Tech Mahindra",
+  "Persistent",
+  "KPMG",
+  "IBM",
+  "Oracle",
+  "Capgemini",
+  "Mphasis",
+  "Hexaware",
 ];
 
 export function LogoMarquee() {
+  const items = [...partners, ...partners];
+
   return (
-    <div
-      style={{
-        background: '#fff',
-        borderTop: '1px solid var(--ls-border)',
-        borderBottom: '1px solid var(--ls-border)',
-        padding: '22px 0',
-      }}
-    >
-      {/* Label */}
-      <p
-        style={{
-          textAlign: 'center',
-          fontSize: '0.6875rem',
-          fontWeight: 600,
-          letterSpacing: '0.1em',
-          textTransform: 'uppercase',
-          color: 'var(--ls-muted)',
-          marginBottom: 14,
-          opacity: 0.7,
-        }}
-      >
-        Our graduates are now at
+    <section className="border-y border-slate-200 bg-white py-10 overflow-hidden">
+
+      <p className="mb-8 text-center text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+        Our Graduates Are Working At
       </p>
 
-      {/* Scroll strip */}
-      <div style={{ overflow: 'hidden', position: 'relative' }}>
-        {/* Fade edges */}
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            left: 0,
-            top: 0,
-            bottom: 0,
-            width: 80,
-            background: 'linear-gradient(to right, #fff, transparent)',
-            zIndex: 1,
-            pointerEvents: 'none',
-          }}
-        />
-        <div
-          aria-hidden
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: 0,
-            bottom: 0,
-            width: 80,
-            background: 'linear-gradient(to left, #fff, transparent)',
-            zIndex: 1,
-            pointerEvents: 'none',
-          }}
-        />
+      <div className="relative overflow-hidden">
 
-        <div className="ls-marquee-track">
-          {/* Two identical copies for seamless loop */}
-          {[0, 1].map((copy) => (
-            <div
-              key={copy}
-              className="ls-marquee-inner"
-              aria-hidden={copy === 1 ? true : undefined}
-            >
-              {partners.map((name) => (
-                <div
-                  key={name}
-                  style={{
-                    padding: '7px 22px',
-                    border: '1.5px solid var(--ls-border)',
-                    borderRadius: 10,
-                    fontSize: '0.8125rem',
-                    fontWeight: 700,
-                    color: 'var(--ls-text)',
-                    opacity: 0.38,
-                    filter: 'grayscale(1)',
-                    whiteSpace: 'nowrap',
-                    letterSpacing: '0.01em',
-                  }}
-                >
-                  {name}
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-      </div>
+        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-white to-transparent z-10" />
+        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-white to-transparent z-10" />
+
+      <div className="flex animate-marquee gap-8 whitespace-nowrap">
+  {items.map((company, index) => (
+    <div
+      key={`${company}-${index}`}
+      className="flex items-center gap-8 shrink-0"
+    >
+      <span className="text-base font-medium text-slate-400 hover:text-slate-800 transition">
+        {company}
+      </span>
+
+      <span className="text-slate-200 text-xl">•</span>
     </div>
+  ))}
+</div>
+
+      </div>
+
+    </section>
   );
 }

@@ -26,9 +26,8 @@ import { TestimonialCard } from '@/components/TestimonialCard';
 import { StatCard } from '@/components/StatCard';
 import { HomepageGalleryStrip } from '@/components/HomepageGalleryStrip';
 import { MeetTheTeam } from '@/components/MeetTheTeam';
-import { TechStackSection } from '@/components/TechStackSection';
 import { HomepageVideoTeaser } from '@/components/HomepageVideoTeaser';
-import { ProgramComparisonTable } from '@/components/ProgramComparisonTable';
+import { CompetitiveComparisonTable } from '@/components/ProgramComparisonTable';
 
 export const metadata: Metadata = {
   title: 'LearnSynaptic — AI, Full Stack & Data Science Training in India',
@@ -180,8 +179,47 @@ export default function HomePage() {
       <LogoMarquee />
 
       {/* ── 2. Stat Band ─────────────────────────────────────────────────── */}
-      <section style={{ background: 'var(--ls-blue-primary)', padding: '56px 0' }}>
-        <div className="ls-container">
+     <section
+  className="
+  relative
+  overflow-hidden
+  bg-gradient-to-br
+  from-[#165DFC]
+  via-[#1456F2]
+  to-[#0E46D5]
+  py-28
+"
+>
+  {/* Background Glow */}
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="absolute -left-32 top-10 h-80 w-80 rounded-full bg-blue-300/20 blur-[140px]" />
+    <div className="absolute right-0 bottom-0 h-[28rem] w-[28rem] rounded-full
+bg-gradient-to-br
+from-[#165DFC]
+via-[#1457F0]
+to-[#0D47D9]
+" />
+  </div>
+
+  <div className="relative mx-auto max-w-7xl px-6">
+
+    {/* Section Heading */}
+    <div className="mb-16 text-center">
+      <p className="text-xs font-semibold uppercase tracking-[0.3em]" style={{color:"white"}}>
+        WHY LEARN SYNAPTIC
+      </p>
+
+      <h2 className="mt-4 text-5xl text-white" style={{color:"white"}}>
+        Results That Speak For Themselves
+      </h2>
+
+      <p className="mx-auto mt-5 max-w-2xl text-lg text-white" style={{color:"white"}}>
+        Thousands of learners have launched successful careers through
+        industry-led training, real-world projects, internships, and
+        dedicated placement support.
+      </p>
+    </div>
+  
           <StaggerContainer className="grid grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
             {stats.map(({ value, label, Icon, green }) => (
               <StaggerItem key={label}>
@@ -339,10 +377,8 @@ export default function HomePage() {
       </section>
 
       {/* ── 3b. Program Comparison Table ─────────────────────────────────── */}
-      <ProgramComparisonTable />
+      <CompetitiveComparisonTable />
 
-      {/* ── 3c. Tech Stack ───────────────────────────────────────────────── */}
-      <TechStackSection />
 
       {/* ── 3c. Life at LearnSynaptic Gallery Strip ──────────────────────── */}
       <HomepageGalleryStrip />

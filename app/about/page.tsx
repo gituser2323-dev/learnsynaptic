@@ -77,8 +77,8 @@ export default function AboutPage() {
               className="text-xl"
               style={{ color: 'var(--ls-muted)', maxWidth: 580, lineHeight: 1.7 }}
             >
-              I&apos;m a MERN Stack Developer and EdTech founder. LearnSynaptic isn&apos;t a planned launch —
-              it&apos;s already running. 5+ batches, 200+ students, and I still take every class myself.
+              I&apos;m a SDE and EdTech founder. LearnSynaptic isn&apos;t a planned launch —
+              it&apos;s already running., 1200+ students, and I still take every class myself.
             </p>
           </AnimateOnScroll>
         </div>
@@ -93,7 +93,7 @@ export default function AboutPage() {
               <div className="flex items-center gap-2 mb-6">
                 <Code2 size={16} style={{ color: 'var(--ls-blue-primary)' }} />
                 <span className="text-sm font-semibold" style={{ color: 'var(--ls-muted)' }}>
-                  MERN Developer → EdTech Founder
+                  SDE → EdTech Founder
                 </span>
               </div>
 

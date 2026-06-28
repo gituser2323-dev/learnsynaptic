@@ -124,9 +124,8 @@ export function MeetTheTeam() {
         </AnimateOnScroll>
 
         <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {team.map((member) => (
-            <StaggerItem key={member.name + member.initials}>
-              <MemberCard member={member} />
+          {team.map((member,index) => (
+            <StaggerItem key={`${member.name}-${index}`}>              <MemberCard member={member} />
             </StaggerItem>
           ))}
         </StaggerContainer>

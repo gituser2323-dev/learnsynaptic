@@ -1,6 +1,9 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { usePathname } from "next/navigation";
+
+
 
 export function CustomCursor() {
   const [active, setActive] = useState(false)
@@ -10,6 +13,12 @@ export function CustomCursor() {
   // Inner elements — CSS transitions handle scale/opacity
   const dotRef = useRef<HTMLDivElement>(null)
   const ringRef = useRef<HTMLDivElement>(null)
+
+  const pathname = usePathname();
+
+  
+  
+
 
   useEffect(() => {
     const hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches
@@ -41,20 +50,21 @@ export function CustomCursor() {
 
     function tick() {
       // Lerp: 0.12 gives a ~120ms settling feel — premium, not laggy
-      curX += (targetX - curX) * 0.12
-      curY += (targetY - curY) * 0.12
+     const speed = 0.30
 
-      const t = `translate(${curX}px, ${curY}px)`
-      if (dotWrapRef.current) dotWrapRef.current.style.transform = t
+curX += (targetX - curX) * speed;
+curY += (targetY - curY) * speed;
+
+const t = `translate3d(${curX}px, ${curY}px,0)`;    
+  if (dotWrapRef.current) dotWrapRef.current.style.transform = t
       if (ringWrapRef.current) ringWrapRef.current.style.transform = t
 
       rafId = requestAnimationFrame(tick)
     }
-
-    function onMouseMove(e: MouseEvent) {
-      targetX = e.clientX
-      targetY = e.clientY
-    }
+function onMouseMove(e: PointerEvent) {
+  targetX = e.clientX;
+  targetY = e.clientY;
+}
 
     function onPointerOver(e: PointerEvent) {
       const el = e.target as Element | null
@@ -64,18 +74,66 @@ export function CustomCursor() {
       setHovered(interactive)
     }
 
-    window.addEventListener('mousemove', onMouseMove, { passive: true })
-    document.addEventListener('pointerover', onPointerOver)
-    rafId = requestAnimationFrame(tick)
+window.addEventListener("pointermove", onMouseMove, {
+  passive: true,
+});  
 
+window.addEventListener("mousedown", () => {
+  dotRef.current!.style.transform = "scale(.7)";
+});
+
+window.addEventListener("mouseup", () => {
+  dotRef.current!.style.transform = currentlyHovered
+    ? "scale(0)"
+    : "scale(1)";
+});
+document.addEventListener("pointermove", handleHover);    rafId = requestAnimationFrame(tick)
+
+function handleHover(e: PointerEvent) {
+  const el = document.elementFromPoint(
+    e.clientX,
+    e.clientY
+  );
+
+  const interactive = !!el?.closest(
+    `
+      a,
+      button,
+      input,
+      textarea,
+      select,
+      label,
+      summary,
+      [role="button"],
+      .cursor-pointer,
+      [data-cursor]
+    `
+  );
+
+  setHovered(interactive);
+}
     return () => {
       document.documentElement.classList.remove('custom-cursor-active')
-      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mousemove', onmousemove)
       document.removeEventListener('pointerover', onPointerOver)
       cancelAnimationFrame(rafId)
     }
   }, [])
 
+
+  useEffect(() => {
+  if (!active) return;
+
+  if (dotRef.current) {
+    dotRef.current.style.transform = "scale(1)";
+    dotRef.current.style.opacity = "0.65";
+  }
+
+  if (ringRef.current) {
+    ringRef.current.style.transform = "scale(0)";
+    ringRef.current.style.opacity = "0";
+  }
+}, [pathname, active]);
   if (!active) return null
 
   return (

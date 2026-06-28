@@ -7,12 +7,15 @@ import { WhatsAppButton } from '@/components/ui/WhatsAppButton';
 import { CustomCursor } from '@/components/ui/CustomCursor'
 import { SpotlightGlow } from '@/components/ui/SpotlightGlow'
 import { LeadCapturePopup } from '@/components/LeadCapturePopup';
+import { LeadModalProvider } from "@/components/lead-modal";
+
 
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter',
   display: 'swap',
 });
+
 
 export const metadata: Metadata = {
   title: {
@@ -42,6 +45,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col" style={{ color: 'var(--ls-text)' }}>
+                  <LeadModalProvider>
+
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
@@ -49,6 +54,9 @@ export default function RootLayout({
         <SpotlightGlow />
         <CustomCursor />
         <LeadCapturePopup />
+
+
+        </LeadModalProvider>
       </body>
     </html>
   );

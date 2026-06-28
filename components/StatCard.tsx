@@ -1,6 +1,4 @@
-// Server component — hover effects handled entirely by CSS (.stat-cell, .stat-number, .stat-accent)
-// This avoids the Next.js RSC boundary issue (LucideIcon functions can't be serialised to client)
-import type { LucideIcon } from 'lucide-react';
+import type { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
   value: string;
@@ -9,38 +7,121 @@ interface StatCardProps {
   green?: boolean;
 }
 
-export function StatCard({ value, label, Icon, green }: StatCardProps) {
-  const numColor = green ? '#86efac' : '#fff';
-  const accentColor = green ? '#86efac' : 'rgba(255,255,255,0.75)';
+export function StatCard({
+  value,
+  label,
+  Icon,
+  green,
+}: StatCardProps) {
+  const color = green ? "#22c55e" : "#2563eb";
 
   return (
-    <div className="stat-cell flex flex-col items-center text-center">
+
+    
+    <div
+      className="
+      group
+      relative
+      overflow-hidden
+      rounded-3xl
+      border
+      border-white/10
+      backdrop-blur-xl
+      p-8
+      transition-all
+      duration-500
+      hover:-translate-y-2
+      hover:border-blue-400/30
+      hover:bg-white/10
+      hover:shadow-[0_25px_60px_rgba(37,99,235,0.18)]
+    "
+    style={{backgroundColor:"white"}}
+    >
+      {/* Glow */}
+
       <div
-        className="w-10 h-10 rounded-lg flex items-center justify-center mb-3"
-        style={{ background: 'rgba(255,255,255,0.15)' }}
+        className="
+        absolute
+        -right-8
+        -top-8
+        h-24
+        w-24
+        rounded-full
+        blur-3xl
+        opacity-0
+        transition
+        duration-500
+        group-hover:opacity-100
+      "
+        style={{
+          background: "rgba(37,99,235,.18)",
+        }}
+      />
+
+      {/* Icon */}
+
+      <div
+        className="
+        mb-6
+        flex
+        h-14
+        w-14
+        items-center
+        justify-center
+        rounded-2xl
+        bg-gradient-to-br
+        from-blue-500
+        to-blue-600
+        shadow-lg
+        shadow-blue-500/30
+        transition
+        duration-300
+        group-hover:scale-110
+      "
       >
-        <Icon size={20} color={numColor} />
+        <Icon size={24} color="white" />
       </div>
 
-      {/* Number + accent line are siblings inside an inline-block wrapper
-          so the accent line width:100% is relative to the number span width */}
-      <div style={{ display: 'inline-block', marginBottom: '4px' }}>
-        <span
-          className="stat-number block text-4xl lg:text-5xl font-bold"
-          style={{ color: numColor, letterSpacing: '-0.02em' }}
-        >
-          {value}
-        </span>
-        <div
-          className="stat-accent"
-          style={{ background: accentColor }}
-          aria-hidden
-        />
-      </div>
+      {/* Number */}
 
-      <span className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>
+      <h3
+        className="
+        text-5xl
+        font-black
+        tracking-tight
+        transition-all
+        duration-300
+        group-hover:scale-105
+      "
+        style={{
+          color,
+        }}
+      >
+        {value}
+      </h3>
+
+      {/* Accent */}
+
+      <div
+        className="
+        mt-3
+        h-1
+        w-16
+        rounded-full
+        transition-all
+        duration-300
+        group-hover:w-24
+      "
+        style={{
+          background: color,
+        }}
+      />
+
+      {/* Label */}
+
+      <p className="mt-5 text-base font-medium text-slate-300">
         {label}
-      </span>
+      </p>
     </div>
   );
 }

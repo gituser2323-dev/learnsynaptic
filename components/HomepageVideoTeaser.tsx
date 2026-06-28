@@ -175,35 +175,201 @@ export function HomepageVideoTeaser() {
   return (
     <section className="ls-section-alt">
       <div className="ls-container">
-        <AnimateOnScroll className="text-center mb-10">
-          <span className="ls-badge mb-4 inline-flex">Real outcomes</span>
-          <h2 className="mb-3">Hear it from our graduates</h2>
-          <p style={{ maxWidth: 480, margin: '0 auto', color: 'var(--ls-muted)' }}>
-            Not testimonials written for a brochure — actual videos from students who went
-            through the program and landed their next role.
-          </p>
-        </AnimateOnScroll>
+       <AnimateOnScroll className="relative mb-20 overflow-hidden">
+
+  {/* Background Glow */}
+
+  <div className="absolute left-1/2 top-10 -z-10 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-blue-500/10 blur-[140px]" />
+
+  <div className="absolute right-0 top-0 -z-10 h-60 w-60 rounded-full bg-cyan-400/10 blur-[120px]" />
+
+  <div className="absolute left-0 bottom-0 -z-10 h-60 w-60 rounded-full bg-indigo-500/10 blur-[120px]" />
+
+  <div className="mx-auto max-w-5xl text-center">
+
+    {/* Badge */}
+
+    <div
+      className="
+      inline-flex
+      items-center
+      gap-2
+      rounded-full
+      border
+      border-blue-100
+      bg-blue-50
+      px-5
+      py-2
+      shadow-sm
+    "
+    >
+      <span className="h-2 w-2 animate-pulse rounded-full bg-[#165DFC]" />
+
+      <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#165DFC]">
+
+        VERIFIED SUCCESS STORIES
+
+      </span>
+    </div>
+
+    {/* Heading */}
+
+    <h2
+      className="
+      mx-auto
+      mt-8
+      max-w-5xl
+      text-4xl
+      font-black
+      leading-[1.05]
+      tracking-[-0.04em]
+      text-slate-900
+      sm:text-5xl
+      lg:text-6xl
+    "
+    >
+      Students Who
+      <span className="block bg-gradient-to-r from-[#165DFC] via-blue-500 to-cyan-500 bg-clip-text text-transparent">
+
+        Turned Learning
+
+      </span>
+
+      Into Careers.
+    </h2>
+
+    {/* Subtitle */}
+
+    <p
+      className="
+      mx-auto
+      mt-8
+      max-w-2xl
+      text-lg
+      leading-8
+      text-slate-600
+    "
+    >
+      Every placement has a story.
+      Watch how our students transformed their careers through
+      live training, real-world projects, internships and dedicated
+      placement support.
+    </p>
+
+  </div>
+
+</AnimateOnScroll>
+
+
+      <div className="mx-auto mt-16 max-w-7xl">
+
+        <div className="pointer-events-none absolute inset-0 -z-10">
+
+  <div className="absolute left-10 top-20 h-60 w-60 rounded-full bg-blue-500/5 blur-[120px]" />
+
+  <div className="absolute right-10 bottom-10 h-60 w-60 rounded-full bg-cyan-500/5 blur-[120px]" />
+
+</div>
+
+  <div className="grid gap-6 lg:grid-cols-[1.7fr_.9fr]">
+
+    
+
+    {/* Featured Video */}
+
+    <div
+      className="
+      group
+      relative
+      overflow-hidden
+      rounded-[32px]
+      border
+      border-slate-200
+      bg-white
+      p-3
+      shadow-[0_30px_80px_rgba(15,23,42,.08)]
+      transition-all
+      duration-500
+      hover:-translate-y-2
+      hover:shadow-[0_40px_100px_rgba(22,93,252,.15)]
+    "
+    >
+
+
+      <VideoCard
+        t={testimonials[0]}
+        isActive={activeId === testimonials[0].id}
+        onActivate={handleActivate}
+      />
+
+    </div>
+
+    {/* Side Videos */}
+
+    <div className="flex flex-col gap-6">
+
+      {testimonials.slice(1).map((t) => (
 
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 gap-6 mx-auto"
-          style={{ maxWidth: 680 }}
+          key={t.id}
+          className="
+          group
+          relative
+          overflow-hidden
+          rounded-[28px]
+          border
+          border-slate-200
+          bg-white
+          p-3
+          shadow-lg
+          transition-all
+          duration-500
+          hover:-translate-y-2
+          hover:shadow-[0_25px_70px_rgba(22,93,252,.15)]
+        "
         >
-          {testimonials.map((t) => (
-            <VideoCard
-              key={t.id}
-              t={t}
-              isActive={activeId === t.id}
-              onActivate={handleActivate}
-            />
-          ))}
+
+          <VideoCard
+            t={t}
+            isActive={activeId === t.id}
+            onActivate={handleActivate}
+          />
+
         </div>
 
-        <AnimateOnScroll className="text-center mt-8">
-          <Link href="/placements" className="ls-btn-outline">
-            See All Outcomes
-            <ArrowRight size={15} />
-          </Link>
-        </AnimateOnScroll>
+      ))}
+
+    </div>
+
+  </div>
+
+</div><Link
+  href="/placements"
+  className="
+  inline-flex
+  items-center
+  gap-2
+  rounded-2xl
+  bg-[#165DFC]
+  px-8
+  py-4
+  font-semibold
+  text-white
+  shadow-lg
+  shadow-blue-600/20
+  transition-all
+  duration-300
+  hover:-translate-y-1
+  hover:bg-blue-700
+"
+>
+  Explore Success Stories
+
+  <ArrowRight
+    size={18}
+    className="transition group-hover:translate-x-1"
+  />
+</Link>
       </div>
     </section>
   )

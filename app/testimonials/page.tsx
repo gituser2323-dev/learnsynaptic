@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 const testimonials = [
   {
     initials: 'AD',
-    name: 'Arjun Deshmukh',
+    name: 'Arjun',
     before: 'Final-year BE Computer Engineering student',
     after: 'Backend Developer at a Pune startup',
     program: 'GenAI Builder → Freelancer',
@@ -33,7 +33,7 @@ const testimonials = [
   },
   {
     initials: 'KI',
-    name: 'Kavya Iyer',
+    name: 'Kavya',
     before: 'BPO data entry executive, 2 years',
     after: 'Data Analyst at Cognizant',
     program: 'Data Science AI/ML',
@@ -44,7 +44,7 @@ const testimonials = [
   },
   {
     initials: 'RV',
-    name: 'Rahul Verma',
+    name: 'Rahul',
     before: 'Unemployed BCS graduate, 8 months post-college',
     after: 'Python Developer at a Hyderabad SaaS company',
     program: 'AI Beginner Bootcamp → Full Stack Dev',
@@ -55,7 +55,7 @@ const testimonials = [
   },
   {
     initials: 'SP',
-    name: 'Siddhi Patil',
+    name: 'Siddhi ',
     before: 'HR executive at a mid-size IT company',
     after: 'Junior Full Stack Developer at LeapFrog Technology',
     program: 'AI Full Stack Dev + DevOps',
@@ -66,7 +66,7 @@ const testimonials = [
   },
   {
     initials: 'AS',
-    name: 'Aakash Sharma',
+    name: 'Aakash',
     before: 'Mechanical engineering graduate, no coding background',
     after: 'MERN Stack Developer at a Delhi startup',
     program: 'AI Full Stack Dev + DevOps',
@@ -77,7 +77,7 @@ const testimonials = [
   },
   {
     initials: 'PN',
-    name: 'Pooja Nair',
+    name: 'Snehal',
     before: 'Content writer, no coding experience',
     after: 'Freelance AI Developer — ₹45K/month',
     program: 'GenAI Builder → Freelancer',
@@ -88,7 +88,7 @@ const testimonials = [
   },
   {
     initials: 'NG',
-    name: 'Nikhil Gaikwad',
+    name: 'Nikhil',
     before: 'Second-year BCS student, zero practical skills',
     after: 'Junior Developer intern at Webwise Solutions, Pune',
     program: 'AI Beginner Bootcamp',
@@ -99,7 +99,7 @@ const testimonials = [
   },
   {
     initials: 'SK',
-    name: 'Sneha Kulkarni',
+    name: 'Sneha',
     before: 'Customer support executive, 3 years experience',
     after: 'Frontend Developer at an EdTech company',
     program: 'AI Full Stack Dev + DevOps',
@@ -110,7 +110,7 @@ const testimonials = [
   },
   {
     initials: 'RJ',
-    name: 'Rishi Joshi',
+    name: 'Rishi',
     before: 'IT fresher, 1 year into a support role at a service firm',
     after: 'AI Integration Developer at a product company',
     program: 'GenAI Builder → Freelancer',
@@ -121,7 +121,7 @@ const testimonials = [
   },
   {
     initials: 'TB',
-    name: 'Tanvi Bhat',
+    name: 'Tanvi',
     before: 'MBA graduate with no tech skills, job-hunting for 5 months',
     after: 'Data Analyst at a management consultancy in Bangalore',
     program: 'Data Science AI/ML',
