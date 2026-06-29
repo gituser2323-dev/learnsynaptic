@@ -233,9 +233,8 @@ export function HomepageVideoTeaser() {
 
         Turned Learning
 
-      </span>
-
       Into Careers.
+      </span>
     </h2>
 
     {/* Subtitle */}
