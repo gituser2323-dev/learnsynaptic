@@ -114,7 +114,7 @@ function handleHover(e: PointerEvent) {
 }
     return () => {
       document.documentElement.classList.remove('custom-cursor-active')
-      window.removeEventListener('mousemove', onmousemove)
+let onMouseMove: ((e: MouseEvent) => void) | null = null;
       document.removeEventListener('pointerover', onPointerOver)
       cancelAnimationFrame(rafId)
     }
