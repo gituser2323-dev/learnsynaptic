@@ -83,7 +83,7 @@ of 3 trust-stat checkmarks below CTAs, small icon + short stat text.
 
 **Program cards**: badge/tag, title, rating stars + review count
 (optional), duration chip, numbered "what you'll build" list (max 3
-points), CTA pair ("Explore Program" + "Download Brochure"). White bg,
+points), CTA pair ("Explore Programs" + "Download Brochure"). White bg,
 `--ls-border` border, subtle shadow ONLY on hover (box-shadow with low
 opacity, transition 200ms) — never a permanent shadow, that's dated.
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Quote } from 'lucide-react';
+import { Quote, Star, ThumbsUp } from 'lucide-react';
 import { useReducedMotion } from 'framer-motion';
 
 interface TestimonialCardProps {
@@ -21,68 +21,60 @@ export function TestimonialCard({ name, role, quote, badge, initials }: Testimon
   const reducedActive = hovered && shouldReduce;
 
   return (
-    <div
-      className="bg-white rounded-2xl border p-6 h-full flex flex-col"
-      style={{
-        // Warm glow instead of sharp shadow — the "human" treatment
-        boxShadow: active
-          ? '0 8px 24px rgba(20,71,230,0.12)'
-          : '0 0 0 transparent',
-        borderColor: active || reducedActive
-          ? 'rgba(20,71,230,0.18)'
-          : 'var(--ls-border)',
-        transform: active ? 'translateY(-3px)' : 'translateY(0)',
-        transition: shouldReduce
-          ? 'border-color 150ms ease'
-          : 'transform 250ms ease-out, box-shadow 250ms ease-out, border-color 200ms ease',
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <Quote
-        size={20}
-        className="mb-4"
-        style={{ color: 'var(--ls-blue-tint)' }}
-      />
-      <p
-        className="text-sm leading-relaxed flex-1 mb-5"
-        style={{ color: 'var(--ls-text)' }}
-      >
-        &ldquo;{quote}&rdquo;
-      </p>
+<div
+  className="group h-full rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl"
+>
+  {/* Header */}
+  <div className="flex items-start justify-between">
+    <div className="flex items-center gap-3">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#165DFC] font-bold text-white">
+        {initials}
+      </div>
 
-      <div
-        className="flex items-center gap-3 mt-auto pt-4"
-        style={{ borderTop: '1px solid var(--ls-border)' }}
-      >
-        {/* Avatar — scales slightly on hover, the human-focused detail */}
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-          style={{
-            background: 'var(--ls-blue-primary)',
-            transform: active ? 'scale(1.05)' : 'scale(1)',
-            transition: shouldReduce ? 'none' : 'transform 250ms ease-out',
-          }}
-        >
-          {initials}
-        </div>
+      <div>
+        <h4 className="font-semibold text-slate-900">{name}</h4>
 
-        <div className="min-w-0 flex-1">
-          <p className="font-semibold text-sm" style={{ color: 'var(--ls-text)' }}>
-            {name}
-          </p>
-          <p className="text-xs" style={{ color: 'var(--ls-muted)' }}>
-            {role}
-          </p>
-        </div>
-
-        <span
-          className="shrink-0 text-xs font-semibold px-2 py-1 rounded-full whitespace-nowrap"
-          style={{ background: '#dcfce7', color: 'var(--ls-success)' }}
-        >
-          {badge}
-        </span>
+        <p className="text-xs text-slate-500">{role}</p>
       </div>
     </div>
+
+    <span className="text-slate-400 text-xl">⋮</span>
+  </div>
+
+  {/* Stars
+  <div className="mt-5 flex items-center gap-1">
+    {Array.from({ length: 5 }).map((_, i) => (
+      <Star
+        key={i}
+        size={15}
+        className="fill-[#FBBC04] text-[#FBBC04]"
+      />
+    ))}
+
+
+  </div> */}
+
+  {/* Review */}
+  <p className="mt-4 text-[15px] leading-7 text-slate-700">
+    {quote}
+  </p>
+
+  {/* Footer */}
+  <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
+
+    <div className="flex items-center gap-2 text-sm text-slate-500">
+
+      <ThumbsUp size={15} />
+
+      <span>Helpful</span>
+
+    </div>
+
+    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-[#165DFC]">
+      {badge}
+    </span>
+
+  </div>
+</div>
   );
 }

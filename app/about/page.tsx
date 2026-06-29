@@ -17,19 +17,19 @@ export const metadata: Metadata = {
 const timeline = [
   {
     // [EDIT] Replace with exact month + year when MERN training started
-    date: '[EDIT: e.g. Jan 2022]',
+    date: 'Jan 2021',
     label: 'Started training MERN batches in Pune',
     detail: 'First cohort was small — 8 students, a shared screen, and a lot of debugging sessions. The curriculum was rough but the feedback was clear: hands-on beats theory every time.',
   },
   {
     // [EDIT] Replace with exact month + year GenAI Builder launched
-    date: '[EDIT: e.g. Late 2023]',
+    date: 'Aug 2024',
     label: 'Launched the GenAI Builder Program',
     detail: 'When LLMs went mainstream, the demand for "how do I actually build with this?" spiked overnight. Built the GenAI Builder curriculum from scratch to answer exactly that.',
   },
   {
     // [EDIT] Replace with exact month + year milestone was reached
-    date: '[EDIT: e.g. Mid 2024]',
+    date: 'Mid 2022',
     label: 'Crossed 25+ batches, 3200+ students trained',
     detail: "The number that mattered wasn't the total — it was seeing former students get hired and come back to say it changed their trajectory. That's what made this feel like something worth scaling.",
   },
@@ -78,7 +78,7 @@ export default function AboutPage() {
               style={{ color: 'var(--ls-muted)', maxWidth: 580, lineHeight: 1.7 }}
             >
               I&apos;m a SDE and EdTech founder. LearnSynaptic isn&apos;t a planned launch —
-              it&apos;s already running., 1200+ students, and I still take every class myself.
+              it&apos;s already running., 3200+ students, and I still take every class myself with growing team.
             </p>
           </AnimateOnScroll>
         </div>

@@ -28,6 +28,13 @@ import { HomepageGalleryStrip } from '@/components/HomepageGalleryStrip';
 import { MeetTheTeam } from '@/components/MeetTheTeam';
 import { HomepageVideoTeaser } from '@/components/HomepageVideoTeaser';
 import { CompetitiveComparisonTable } from '@/components/ProgramComparisonTable';
+import Image from 'next/image';
+
+const currentMonth = new Date().toLocaleString("en-US", {
+  month: "long",
+});
+
+const heading = `${currentMonth} Admissions Are Now Open`;
 
 export const metadata: Metadata = {
   title: 'LearnSynaptic — AI, Full Stack & Data Science Training in India',
@@ -135,37 +142,156 @@ const whyPoints = [
   },
 ];
 
-const testimonials = [
+const testimonials =[
   {
-    name: 'Ravi Kumar',
-    role: 'B.E. Graduate → Full Stack Developer at Wipro',
-    quote:
-      'The AI Full Stack program changed my trajectory completely. I went from struggling with interviews to getting placed in 4 months. The portfolio projects are what got me noticed — every interviewer asked about them.',
-    badge: '₹6.2 LPA Package',
-    initials: 'RK',
+    "name": "Sumit Matale",
+    "role": "GenAI Builder Program",
+    "quote": "Honestly one of the best learning experiences I've had. Pratik sir explains even difficult topics in a very simple way and always encourages us to build instead of just watching.",
+    "badge": "★★★★",
+    "initials": "SM"
+  },
+   {
+    "type": "whatsapp",
+    "name": "Aditi CI",
+    "role": "Data Science • CI Batch 22",
+    "quote": "I thought Python would be difficult 😅\nNow I'm actually looking forward to every class and really happy I joined this batch bcoz every class gives something new to build and practice.",
+    "badge": "Thu • 6:31 PM",
+    "initials": "AP"
   },
   {
-    name: 'Priya Sharma',
-    role: 'BPO Executive → Data Analyst at Deloitte',
-    quote:
-      'I was stuck in a dead-end job for 3 years. The Data Science program gave me both the skills and the confidence to make the switch. The placement team was incredible — 8 companies reached out to me.',
-    badge: '2.5× Salary Hike',
-    initials: 'PS',
+    "name": "Chetana Alekar",
+    "role": "AI Full Stack Program",
+    "quote": "Very supportive mentors and a friendly environment. I never felt hesitant to ask questions, even basic ones. Every doubt was cleared patiently.",
+    "badge": "★★★★★",
+    "initials": "CA"
   },
   {
-    name: 'Aditya Patil',
-    role: 'Final Year Student → Freelance GenAI Developer',
-    quote:
-      "I started getting freelance clients before even finishing the program. The GenAI Builder course gave me real projects to show clients, and now I earn more than my friends in full-time jobs.",
-    badge: '₹55K/month Freelance',
-    initials: 'AP',
+    "name": "Akash Karle",
+    "role": "GenAI Program",
+    "quote": "The best thing about LearnSynaptic is that everything is practical. We actually built projects instead of just reading notes.",
+    "badge": "★★★★",
+    "initials": "AK"
   },
-];
+
+  {
+    "type": "whatsapp",
+    "name": "Swaraj Suryawanshi",
+    "role": "AI Full Stack Program",
+    "quote": "Pratik sir,\nMock interview helped a lot 😅\nThe interviewer literally asked React questions we practiced.",
+    "badge": "Yesterday • 8:56 PM",
+    "initials": "SW"
+  },
+
+  
+  {
+      "type": "whatsapp",
+    "name": "Swapnali CI Batch",
+    "role": "CI Batch 22",
+    "quote": "Sir,\nCompleted today's AI chatbot.\nIt's actually responding correctly now 😂",
+    "badge": "Tue • 9:03 PM",
+    "initials": "SA"
+  },
+  
+  {
+    "name": "Rutik",
+    "role": "Data Analytics",
+    "quote": "Pratik sir's teaching style is completely different. He explains why we write code, not just what to type. Highly recommended.",
+    "badge": "★★★★",
+    "initials": "R"
+  },
+  {
+    "name": "Sanket Rajput",
+    "role": "AI Full Stack Program",
+    "quote": "I joined with almost zero confidence. After a few weeks I was building projects on my own. The improvement surprised even me.",
+    "badge": "★★★★",
+    "initials": "SR"
+  },
+
+   {
+    "type": "whatsapp",
+    "name": "Kavya",
+    "role": "CI Batch 22",
+    "quote": "Never thought coding would become this interesting 😄\nLooking forward to tomorrow's session.",
+    "badge": "Mon • 04:07 PM",
+    "initials": "C"
+  },
+     {
+    "type": "whatsapp",
+    "name": "Kalpesh",
+    "role": "Full Stack AI Program",
+    "quote": "Sir got selected ❤️\nJoining next Monday.\nThank you for all the guidance 🙏",
+    "badge": "Jan 25 • 6:08 PM",
+    "initials": "KC"
+  },
+  {
+    "name": "Neelam",
+    "role": "Data Analytics",
+    "quote": "The classes are interactive and practical. Every session adds something useful instead of repeating theory.",
+    "badge": "★★★★",
+    "initials": "N"
+  },
+  {
+    "type": "whatsapp",
+    "name": "Shree AI Batch",
+    "role": "AI Batch 26",
+    "quote": "Honestly sir,\nThis doesn't feel like a normal institute.\nFeels more like working with a development team.",
+    "badge": "Tue • 8:46 PM",
+    "initials": "SP"
+  },
+  {
+    "name": "Snehal Modhale",
+    "role": "Full Stack Development",
+    "quote": "Really liked the project reviews. We got proper feedback on what to improve instead of just hearing 'good job'.",
+    "badge": "★★★★★",
+    "initials": "SM"
+  },
+  {
+    "name": "Sneha",
+    "role": "Data Analytics",
+    "quote": "Everything is explained step by step with real examples. It made learning much less stressful than I expected.",
+    "badge": "★★★★★",
+    "initials": "S"
+  },
+  {
+    "name": "Akash Patil",
+    "role": "GenAI Program",
+    "quote": "The AI tools and projects are very up to date. I was able to build things that I had only seen on YouTube before.",
+    "badge": "★★★★",
+    "initials": "AP"
+  },
+  {
+    "name": "Apurva",
+    "role": "Data Science Program",
+    "quote": "Every class feels engaging. The mentors keep everyone involved and the assignments actually help you learn.",
+    "badge": "★★★★",
+    "initials": "A"
+  },
+   {
+    "type": "whatsapp",
+    "name": "Sneha Full Stack CI",
+    "role": "AI Full Stack Program",
+    "quote": "Good night sir 😄\nJust wanted to say thanks.\nNever thought coding would become this interesting.",
+    "badge": "03:04 PM",
+    "initials": "CA"
+  },
+  {
+    "name": "Pratik Parde",
+    "role": "AI Full Stack Program",
+    "quote": "Joining LearnSynaptic was one of my best decisions. The roadmap is clear and the mentors genuinely care about your progress.",
+    "badge": "★★★★★",
+    "initials": "PP"
+  },
+
+ 
+  
+
+]
 
 const hiringPartners = [
   'Wipro', 'TCS', 'Infosys', 'Deloitte', 'Accenture',
   'Cognizant', 'HCL', 'Tech Mahindra', 'Persistent Systems', 'KPMG',
 ];
+
 
 /* ── Page ─────────────────────────────────────────────────────────────────── */
 
@@ -227,6 +353,8 @@ to-[#0D47D9]
               </StaggerItem>
             ))}
           </StaggerContainer>
+
+          
         </div>
       </section>
 
@@ -350,9 +478,9 @@ to-[#0D47D9]
                     <div className="flex items-center gap-2">
                       <Link
                         href={program.href}
-                        className="ls-btn-primary flex-1 justify-center text-sm py-2.5"
+                        className="ls-btn-primary flex-1 justify-center  text-sm py-2"
                       >
-                        Explore Program
+                        Explore 
                       </Link>
                       <Link
                         href={`${program.href}#brochure`}
@@ -454,7 +582,7 @@ to-[#0D47D9]
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
             {/* Text — wider */}
             <AnimateOnScroll className="lg:col-span-3">
-              <span className="ls-badge mb-5 inline-flex">From the founder</span>
+              <span className="ls-badge mb-5 inline-flex">From the co-founder</span>
               <div className="mb-5">
                 <Quote size={32} style={{ color: 'var(--ls-blue-tint)' }} />
               </div>
@@ -482,72 +610,111 @@ to-[#0D47D9]
                     Pratik Sabale
                   </p>
                   <p className="text-sm" style={{ color: 'var(--ls-muted)' }}>
-                    Founder &amp; Lead Trainer, LearnSynaptic · Pune, Maharashtra
+                   Co-Founder &amp; Lead Trainer, LearnSynaptic · Pune, Maharashtra
                   </p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-6 mt-6">
-                {[
-                  { value: '6+', label: 'Years Industry Exp.' },
-                  { value: '45+', label: 'Batches Delivered' },
-                  { value: '3200+', label: 'Students Mentored' },
-                ].map(({ value, label }) => (
-                  <div key={label}>
-                    <p
-                      className="text-2xl font-bold"
-                      style={{ color: 'var(--ls-blue-primary)' }}
-                    >
-                      {value}
-                    </p>
-                    <p className="text-xs" style={{ color: 'var(--ls-muted)' }}>
-                      {label}
-                    </p>
-                  </div>
-                ))}
-              </div>
+            
             </AnimateOnScroll>
 
             {/* Photo placeholder — right column */}
-            <AnimateOnScroll
-              className="lg:col-span-2 flex justify-center lg:justify-end"
-              delay={0.15}
-            >
-              <div
-                className="w-64 h-72 rounded-3xl flex items-center justify-center"
-                style={{
-                  background: 'var(--ls-blue-tint)',
-                  border: '1px solid var(--ls-border)',
-                }}
-              >
-                <div className="flex flex-col items-center text-center px-6">
-                  <div
-                    className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold text-white mb-3"
-                    style={{ background: 'var(--ls-blue-primary)' }}
-                  >
-                    PS
-                  </div>
-                  <p className="font-semibold text-sm" style={{ color: 'var(--ls-text)' }}>
-                    Pratik Sabale
-                  </p>
-                  <p className="text-xs mt-1" style={{ color: 'var(--ls-muted)' }}>
-                    Founder, LearnSynaptic
-                  </p>
-                  {/* TODO: replace with real photo */}
-                  <span
-                    className="mt-3 text-xs px-2.5 py-1 rounded-full font-medium"
-                    style={{ background: 'white', color: 'var(--ls-muted)' }}
-                  >
-                    Photo placeholder
-                  </span>
-                </div>
-              </div>
-            </AnimateOnScroll>
+         <AnimateOnScroll
+  className="lg:col-span-2 flex justify-center lg:justify-end"
+  delay={0.15}
+>
+  <div className="relative group">
+
+    {/* Glow */}
+    <div className="absolute -inset-6 rounded-[40px] bg-blue-500/10 blur-3xl transition duration-500 group-hover:bg-blue-500/20" />
+
+    {/* Card */}
+    <div
+      className="
+      relative
+      overflow-hidden
+      rounded-[32px]
+      border
+      border-slate-200
+      bg-white
+      shadow-[0_30px_80px_rgba(15,23,42,.10)]
+      transition-all
+      duration-500
+      group-hover:-translate-y-2
+      group-hover:shadow-[0_40px_100px_rgba(22,93,252,.18)]
+    "
+    >
+      {/* Image */}
+      <div className="relative h-[420px] w-[320px]">
+
+        <Image
+          src="/learn.jpeg" // <-- replace with your image
+          alt="Pratik Sabale"
+          fill
+          priority
+          className="
+          object-cover
+          transition-transform
+          duration-700
+          group-hover:scale-105
+        "
+        />
+
+        {/* Gradient Overlay */}
+
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black via-black/40 to-transparent" />
+
+        {/* Name */}
+
+        <div className="absolute bottom-8 left-8">
+
+          <p className="text-3xl font-white" style={{color:"white"}}>
+            Pratik Sabale
+          </p>
+
+          <p className="mt-1 text-sm text-white/80"  style={{color:"white"}}>
+            Co-Founder & SDE
+          </p>
+
+        </div>
+
+      </div>
+
+      {/* Floating Badge */}
+
+      <div
+        className="
+        absolute
+        top-5
+        right-5
+        rounded-2xl
+        bg-white/90
+        backdrop-blur-xl
+        px-4
+        py-3
+        shadow-xl
+      "
+      >
+
+        <p className="text-2xl font-black text-[#165DFC]">
+          6+
+        </p>
+
+        <p className="text-xs text-slate-500">
+          Years Experience
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+</AnimateOnScroll>
           </div>
         </div>
       </section>
 
       {/* ── 5b. Meet the Team ────────────────────────────────────────────── */}
-      <MeetTheTeam />
+      {/* <MeetTheTeam /> */}
 
       {/* ── 6. Testimonials Preview ──────────────────────────────────────── */}
       <section className="ls-section-alt">
@@ -573,6 +740,8 @@ to-[#0D47D9]
               </StaggerItem>
             ))}
           </StaggerContainer>
+
+      
 
           <AnimateOnScroll className="text-center mt-8">
             <Link href="/testimonials" className="ls-btn-outline">
@@ -623,7 +792,7 @@ to-[#0D47D9]
                     className="text-4xl font-bold"
                     style={{ color: 'var(--ls-success)', letterSpacing: '-0.02em' }}
                   >
-                    85%
+                    75%
                   </span>
                   <span
                     className="text-lg font-semibold"
@@ -646,51 +815,239 @@ to-[#0D47D9]
       </section>
 
       {/* ── 8. Final CTA ─────────────────────────────────────────────────── */}
-      <section style={{ background: 'var(--ls-blue-primary)', padding: '96px 0' }}>
-        <div className="ls-container">
-          <AnimateOnScroll className="text-center">
-            <h2
-              className="mb-4"
-              style={{ color: '#fff', maxWidth: 700, margin: '0 auto 1rem' }}
+
+
+<section className="relative overflow-hidden bg-white py-24 lg:py-36">
+
+  {/* Background Glow */}
+
+  <div className="absolute inset-0 -z-10">
+
+    <div className="absolute left-1/2 top-36 h-[650px] w-[650px] -translate-x-1/2 rounded-full bg-blue-500/5 blur-[120px]" />
+
+    <div className="absolute left-1/2 top-52 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-cyan-400/10 blur-[90px]" />
+
+  </div>
+
+  <div className="ls-container">
+
+    <AnimateOnScroll>
+
+      <div className="mx-auto max-w-6xl text-center">
+
+        {/* Badge */}
+
+        <span
+          className="
+          inline-flex
+          items-center
+          gap-2
+          rounded-full
+          border
+          border-blue-100
+          bg-blue-50
+          px-5
+          py-2.5
+          text-sm
+          font-semibold
+          text-[#165DFC]
+        "
+        >
+          🚀 {currentMonth} Admissions Open • Limited Seats
+        </span>
+
+        {/* Heading */}
+
+        <h1
+          className="
+          mx-auto
+          mt-8
+          max-w-6xl
+
+          text-[42px]
+          font-black
+          leading-[0.95]
+          tracking-[-0.05em]
+
+          sm:text-[56px]
+
+          md:text-[72px]
+
+          lg:text-[96px]
+
+          xl:text-[110px]
+        "
+        >
+          Six Months
+          <br />
+
+          <span className="text-slate-900">
+            From Today,
+          </span>
+
+          <span className="mt-2 bg-gradient-to-r from-[#165DFC] via-blue-500 to-cyan-500 bg-clip-text text-transparent">
+
+            You'll Thank Yourself.
+
+          </span>
+
+        </h1>
+
+        {/* Subtitle */}
+
+        <p
+          className="
+          mx-auto
+          mt-8
+          max-w-3xl
+
+          text-base
+          leading-8
+          text-slate-600
+
+          sm:text-lg
+
+          lg:text-xl
+        "
+        >
+          Every successful tech career begins with one decision.
+          Learn from experienced mentors, build production-ready projects,
+          prepare for real interviews and become the developer companies
+          want to hire.
+        </p>
+
+        {/* Features */}
+
+        <div
+          className="
+          mt-12
+
+          flex
+
+          flex-wrap
+
+          justify-center
+
+          gap-3
+        "
+        >
+
+          {[
+            "🚀 Live Classes",
+            "💼 Industry Projects",
+            "🎯 Mock Interviews",
+            "🤝 Real Mentorship",
+            "💬 Internship"
+          ].map((item) => (
+
+            <div
+              key={item}
+              className="
+              rounded-full
+              border
+              border-slate-200
+              bg-white
+              px-5
+              py-3
+              text-sm
+              font-medium
+              shadow-sm
+            "
             >
-              The July cohort is open. Your next career step starts here.
-            </h2>
-            <p
-              className="text-lg mb-8"
-              style={{
-                color: 'rgba(255,255,255,0.8)',
-                maxWidth: 520,
-                margin: '0 auto 2rem',
-                lineHeight: 1.7,
-              }}
-            >
-              Enroll in any program and get a free 30-minute career counselling session
-              with our team — no commitment needed.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/programs"
-                className="inline-flex items-center gap-2 bg-white font-semibold px-6 py-3 rounded-xl transition-all hover:-translate-y-0.5"
-                style={{ color: 'var(--ls-blue-primary)', fontSize: '0.9375rem' }}
-              >
-                Explore Programs
-                <ArrowRight size={16} />
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-xl border-2 transition-all hover:-translate-y-0.5"
-                style={{
-                  color: '#fff',
-                  borderColor: 'rgba(255,255,255,0.4)',
-                  fontSize: '0.9375rem',
-                }}
-              >
-                Talk to a Counsellor
-              </Link>
+              {item}
             </div>
-          </AnimateOnScroll>
+
+          ))}
+
         </div>
-      </section>
+
+        {/* Buttons */}
+
+        <div
+          className="
+          mt-14
+
+          flex
+
+          flex-col
+
+          items-center
+
+          justify-center
+
+          gap-4
+
+          sm:flex-row
+        "
+        >
+
+          <Link
+            href="/programs"
+            className="
+            inline-flex
+            h-14
+            items-center
+            justify-center
+            gap-2
+            rounded-2xl
+            bg-[#165DFC]
+            px-8
+            text-base
+            font-semibold
+            text-white
+            shadow-lg
+            shadow-blue-500/20
+            transition-all
+            duration-300
+            hover:-translate-y-1
+            hover:shadow-blue-500/40
+          "
+          >
+            Explore Learning Paths
+
+            <ArrowRight size={18} />
+
+          </Link>
+
+          <Link
+            href="/contact"
+            className="
+            inline-flex
+            h-14
+            items-center
+            justify-center
+            rounded-2xl
+            border
+            border-slate-200
+            bg-white
+            px-8
+            text-base
+            font-semibold
+            text-slate-900
+            transition-all
+            duration-300
+            hover:border-[#165DFC]
+            hover:text-[#165DFC]
+          "
+          >
+            Book Free Career Strategy Call
+          </Link>
+
+        </div>
+
+        {/* Bottom Line */}
+
+        <p className="mt-8 text-sm text-slate-500">
+          The best investment you can make is in yourself.
+        </p>
+
+      </div>
+
+    </AnimateOnScroll>
+
+  </div>
+
+</section>
     </>
   );
 }

@@ -276,7 +276,7 @@ export default function ProgramsPage() {
                           href={`/programs/${p.slug}`}
                           className="ls-btn-primary flex-1 justify-center text-sm py-2.5"
                         >
-                          Explore Program
+                          Explore Programs
                           <ArrowRight size={14} />
                         </Link>
                         <Link
