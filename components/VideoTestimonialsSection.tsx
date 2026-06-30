@@ -14,7 +14,7 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   { id: 't1', studentName: 'Sumit Matale',     program: 'AI Full Stack Dev — now SDE', videoSrc: '/gallery/t1.mp4', posterSrc: '/gallery/t1-poster.jpg' },
   { id: 't2', studentName: 'Akash Patil',     program: 'AI Full Stack Dev', videoSrc: '/gallery/t2.mp4', posterSrc: '/gallery/t2-poster.jpg' },
-  { id: 't3', studentName: 'Sanket K', program: 'GenAI Builder',    videoSrc: '/gallery/t3.mp4' },
+  { id: 't3', studentName: 'Sanket K', program: 'GenAI Builder',    videoSrc: '/gallery/t3.mp4',posterSrc: '/gallery/t3-poster.jpg' },
   { id: 't4', studentName: 'Student Name', program: 'Data Science',     videoSrc: '' },
     { id: 't4', studentName: 'Student Name', program: 'Data Science',     videoSrc: '' },
   { id: 't4', studentName: 'Student Name', program: 'Data Science',     videoSrc: '' },

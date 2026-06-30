@@ -8,17 +8,24 @@ import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll'
 const testimonials = [
   {
     id: 't1',
-    studentName: 'Sumit M',
+    studentName: 'Sumit Matale',
     program: 'AI Full Stack Dev — now SDE',
     videoSrc: '/gallery/t1.mp4',
     posterSrc: '/gallery/t1-poster.jpg',
   },
   {
     id: 't2',
-    studentName: 'Akash P',
+    studentName: 'Akash Patil',
     program: 'AI Full Stack Dev',
     videoSrc: '/gallery/t2.mp4',
     posterSrc: '/gallery/t2-poster.jpg',
+  },
+   {
+    id: 't3',
+    studentName: 'Sanket K',
+    program: 'AI Full Stack Dev',
+    videoSrc: '/gallery/t3.mp4',
+    posterSrc: '/gallery/t3-poster.jpg',
   },
 ]
 
