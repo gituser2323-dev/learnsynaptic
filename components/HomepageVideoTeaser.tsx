@@ -25,7 +25,7 @@ const testimonials = [
     studentName: 'Sanket K',
     program: 'AI Full Stack Dev',
     videoSrc: '/gallery/t3.mp4',
-    posterSrc: '/gallery/t3-poster.jpg',
+    posterSrc: '/gallery/t3-poster.png',
   },
 ]
 
