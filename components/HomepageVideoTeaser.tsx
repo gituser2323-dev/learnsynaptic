@@ -27,13 +27,7 @@ const testimonials = [
     videoSrc: '/gallery/t2.mp4',
     posterSrc: '/gallery/t2-poster.jpg',
   },
-   {
-    id: 't3',
-    studentName: 'Sanket K',
-    program: 'AI Full Stack Dev',
-    videoSrc: '/gallery/t3.mp4',
-    posterSrc: '/gallery/t3-poster.png',
-  },
+  
 ]
 
 function VideoCard({
