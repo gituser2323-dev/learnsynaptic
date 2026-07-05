@@ -7,6 +7,13 @@ import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll'
 
 const testimonials = [
   {
+    id: 't4',
+    studentName: 'Priya Gaikwad',
+    program: 'AI Full Stack Dev',
+    videoSrc: '/gallery/t4.mp4',
+    posterSrc: '/gallery/t4-poster.png',
+  },
+  {
     id: 't1',
     studentName: 'Sumit Matale',
     program: 'AI Full Stack Dev — now SDE',
