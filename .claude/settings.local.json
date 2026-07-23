@@ -84,7 +84,17 @@
       "Bash(ffmpeg -version)",
       "Bash(ffmpeg -i /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t1.mp4 -ss 00:00:01 -update 1 -frames:v 1 /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t1-poster.jpg -y)",
       "Bash(ffmpeg -i /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t2.mp4 -ss 00:00:01 -update 1 -frames:v 1 /Users/pratikparshuramsabale/Desktop/learnsynaptic-v2/public/gallery/t2-poster.jpg -y)",
-      "Bash(ffprobe *)"
+      "Bash(ffprobe *)",
+      "Bash(disown)",
+      "Bash(echo \"check exit: $?\")",
+      "Bash(rm -f /tmp/nextdev.log)",
+      "Bash(npx eslint *)",
+      "Bash(lsof -i :3000 -sTCP:LISTEN -t)",
+      "Bash(xargs -r kill)",
+      "Bash(lsof -i :3000 -sTCP:LISTEN)",
+      "Bash(echo \"TSC_EXIT:$?\")",
+      "Bash(xargs -I{} echo {})",
+      "Bash(pkill -f \"next start\")"
     ]
   }
 }

@@ -7,12 +7,12 @@ import { whatsappBenefitsList } from "./data";
 import { AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL } from "@/config/aiBootcamp";
 
 export function SuccessModal() {
-  const { isSuccessOpen, closeSuccess } = useRegisterModal();
+  const { isSuccessOpen, closeSuccess, registeredName } = useRegisterModal();
+  const firstName = registeredName.trim().split(/\s+/)[0];
 
   return (
     <ModalShell open={isSuccessOpen} onClose={closeSuccess} maxWidth={480}>
       <div style={{ textAlign: "center" }}>
-        <div style={{ fontSize: 52 }}>🎉</div>
         <h2
           style={{
             fontFamily: "var(--font-display-promo)",
@@ -21,7 +21,7 @@ export function SuccessModal() {
             margin: "16px 0 8px",
           }}
         >
-          Registration Successful!
+          {firstName ? `You're In, ${firstName}!` : "Registration Successful!"}
         </h2>
         <p style={{ color: "var(--ink-200)", fontSize: 15.5, lineHeight: 1.6, margin: 0 }}>
           Welcome to the 7-Day AI Engineering Bootcamp.

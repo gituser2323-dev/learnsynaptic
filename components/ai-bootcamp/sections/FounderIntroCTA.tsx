@@ -40,6 +40,7 @@ export function FounderIntroCTA() {
           >
             <video
               className="absolute inset-0 h-full w-full object-cover"
+              poster="/bootcamplogos/me.png"
               autoPlay
               muted
               loop
@@ -94,7 +95,7 @@ export function FounderIntroCTA() {
             <button
               onClick={openRegister}
               className="aib-btn"
-              style={{ background: "var(--ls-primary)", color: "#fff", padding: "16px 32px", fontSize: 15.5 }}
+              style={{ background: "var(--ls-primary)", color: "#fff", padding: "16px 32px", fontSize: 13.5 }}
             >
               Explore the AI Bootcamp →
             </button>

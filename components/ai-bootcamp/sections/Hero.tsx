@@ -75,7 +75,7 @@ export function Hero() {
             }}
           >
             <span className="aib-live-dot" style={{ backgroundColor: "rgb(0, 213, 27)" }} />
-            FREE · 7-DAY AI LIVE BOOTCAMP ·&nbsp; STARTS JULY 27
+            FREE · AI BOOTCAMP ·&nbsp; STARTS JULY 27
           </span>
           <div
             style={{

@@ -27,7 +27,7 @@ export function FaqClosing() {
           {faqList.map((f, i) => {
             const open = !!openIndex[i];
             return (
-              <div key={f.q} style={{ borderBottom: "1px solid var(--border-editorial)", padding: "18px 0" }}>
+              <div key={f.q} style={{ borderBottom: "1px solid var(--border-editorial)", padding: "10px 0" }}>
                 <button
                   onClick={() => setOpenIndex((s) => ({ ...s, [i]: !s[i] }))}
                   aria-expanded={open}
@@ -66,9 +66,9 @@ export function FaqClosing() {
 
       <section style={{ background: "var(--ls-dark)", color: "#fff", padding: "100px 6%", textAlign: "center" }}>
         <h2 style={{ fontFamily: "var(--font-display-promo)", fontWeight: 800, fontSize: "clamp(30px, 6vw, 46px)", margin: "0 0 16px" }}>
-          Stop Watching.
+         The Best Time To Start Was Yesterday. 
           <br />
-          <span style={{ color: "var(--ls-primary-light)" }}>Start Shipping.</span>
+          <span style={{ color: "var(--ls-primary-light)" }}>The Next Best Time Is Today.</span>
         </h2>
         <p style={{ color: "var(--ink-200)", fontSize: 17, margin: "0 0 32px" }}>
           Cohort starts July 27. Seats close when it&apos;s full.

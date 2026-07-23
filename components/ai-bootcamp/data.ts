@@ -17,7 +17,33 @@ import {
   Wrench,
   BookOpen,
   Users,
+  Laptop,
+  Code2,
 } from "lucide-react";
+
+export interface AwarenessItem {
+  icon: LucideIcon;
+  headline: string;
+  description: string;
+}
+
+export const awarenessList: AwarenessItem[] = [
+  {
+    icon: Laptop,
+    headline: "You only know ChatGPT?",
+    description: "You use AI tools, but don’t understand how modern AI applications are actually built.",
+  },
+  {
+    icon: Code2,
+    headline: "Confused About Which AI Tool to Use?",
+    description: "You want AI skills that help you grow your career or business.",
+  },
+  {
+    icon: TrendingUp,
+    headline: "Not Sure Where to Start?",
+    description: "Companies are hiring developers who can build with AI—not just write code.",
+  },
+];
 
 export interface AudienceItem {
   label: string;
@@ -109,110 +135,72 @@ export const daysData: DayItem[] = [
   {
     day: 1,
     label: "Day 01",
-    title: "Welcome to the AI Era",
-    hook: "Understand how AI works and build your first AI app.",
-    topics: [
-      "Future of Software Engineering",
-      "AI vs Traditional Development",
-      "AI Engineer vs Full Stack Developer",
-      "AI Full Stack Roadmap",
-      "What is AI & Generative AI?",
-      "How ChatGPT Works",
-      "LLMs, Tokens & Context Window",
-      "Cursor, ChatGPT, Claude & Gemini",
-    ],
-    project: "🤖 Build Your First AI Chat App",
+    problem:
+      "Everyone can open ChatGPT. That's not a skill companies pay for anymore — the way you build with AI is. Today you'll see exactly why 'Traditional Developer' is becoming 'AI Engineer', and why the companies hiring in 2026 aren't looking for AI users.",
+    solution:
+      "Get the wake-up call first: why AI is rewriting every industry, the shift from AI User to AI Builder, and the AI Engineering mindset. Then go hands-on — AI vs ML vs Generative AI, how LLMs actually think, tokens, context windows, and real prompt engineering across ChatGPT, Claude, Gemini and Cursor.",
+    tech: "AI vs ML vs Generative AI, How LLMs Work, Tokens & Context Window, Prompt Engineering, ChatGPT, Claude, Gemini, Cursor, AI Development Workflow",
+    project: "our First AI App",
   },
   {
     day: 2,
     label: "Day 02",
-    title: "Work Like an AI Engineer",
-    hook: "Learn how developers use AI to build faster.",
-    topics: [
-      "Prompt Engineering",
-      "System vs User Prompts",
-      "Prompt Patterns",
-      "Cursor IDE",
-      "AI Pair Programming",
-      "Debugging with AI",
-      "Reading AI Generated Code",
-      "Best Practices",
-    ],
-    project: "🎨 AI Landing Page Builder",
+    problem:
+      "Writing every line by hand is how you fall behind. AI engineers aren't typing faster — they're building differently, with AI as a teammate instead of a search bar.",
+    solution:
+      "Learn the real AI-assisted development workflow: Cursor mastery, AI pair programming, generating and refactoring code with AI, debugging with AI, and prompting for production-quality code instead of toy snippets.",
+    tech: "Cursor Mastery, AI Pair Programming, Code Generation, AI Refactoring, AI Debugging, GitHub Copilot vs Cursor, Prompting for Code",
+    project: "AI-Generated Landing Page",
   },
   {
     day: 3,
     label: "Day 03",
-    title: "Build AI-Powered Applications",
-    hook: "Connect your app with powerful AI models.",
-    topics: [
-      "What is an API?",
-      "OpenAI API",
-      "Gemini API",
-      "API Keys",
-      "Chat Completion",
-      "Structured Outputs",
-      "JSON Responses",
-    ],
+    problem:
+      "Anyone can chat with AI in a browser tab. Companies pay engineers who can wire AI directly into a real product, not people who copy-paste answers.",
+    solution:
+      "Move from consuming AI to shipping it — call the OpenAI and Gemini APIs directly, stream responses in real time, and return structured, production-ready JSON your app can actually use.",
+    tech: "OpenAI API, Gemini API, Chat Completions, Streaming Responses, JSON Mode, Structured Outputs, Error Handling",
     project: "📄 AI Resume Analyzer",
   },
   {
     day: 4,
     label: "Day 04",
-    title: "Teach AI Your Own Knowledge",
-    hook: "Build AI that can answer questions from PDFs.",
-    topics: [
-      "Why AI Forgets",
-      "Context Window",
-      "Embeddings",
-      "Vector Database",
-      "Retrieval Augmented Generation (RAG)",
-    ],
-    project: "📚 Chat with PDF",
+    problem:
+      "Generic AI doesn't know your business, your docs, or your data — which is exactly why most AI demos fall apart the moment they meet the real world.",
+    solution:
+      "Build AI that actually knows your data. Understand why LLMs hallucinate, then fix it with embeddings, vector databases, and a real RAG pipeline that answers questions from your own documents.",
+    tech: "Why LLMs Hallucinate, Embeddings, Vector Databases, Chunking, Similarity Search, RAG Pipeline, PDF Processing",
+    project: "📚 Chat With Your Own PDFs",
   },
   {
     day: 5,
     label: "Day 05",
-    hook: "Create AI that can think, plan and take actions.",
-    topics: [
-      "What is an AI Agent?",
-      "Tools",
-      "Memory",
-      "Workflows",
-      "Multi-Agent Systems",
-      "MCP Introduction",
-    ],
-    project: "⚡ AI Research Assistant",
+    problem:
+      "A chatbot answers questions. An agent gets things done on its own. That one difference is driving most of the AI engineering job market right now.",
+    solution:
+      "Build AI that thinks, plans and acts — tool calling, function calling, memory and multi-step reasoning, using the same MCP fundamentals powering today's agent frameworks.",
+    tech: "What Are AI Agents?, Tool Calling, Function Calling, Memory, Planning, MCP Basics, Multi-Step Workflows",
+    project: "Your Own AI Research Agent",
   },
   {
     day: 6,
     label: "Day 06",
-    title: "Launch a Complete AI SaaS",
-    hook: "Combine everything into a real-world AI product.",
-    topics: [
-      "Authentication",
-      "AI Chat",
-      "PDF Upload",
-      "RAG Integration",
-      "Deployment",
-      "Production Architecture",
-    ],
-    project: "🚀 AI Study Assistant SaaS",
+    problem:
+      "A demo running on your laptop means nothing to an employer. A live product with real users is the portfolio piece that actually gets you hired.",
+    solution:
+      "Combine everything you've built — auth, an AI chat interface, RAG, file uploads — into one production AI SaaS, deployed live with real environment configs and production best practices.",
+    tech: "Authentication, AI Chat Interface, RAG Integration, File Upload, Deployment, Environment Variables, Production Best Practices",
+    project: "A Live AI SaaS Product",
   },
   {
     day: 7,
     label: "Day 07",
-    title: "Become an AI Engineer",
-    hook: "Learn the roadmap to build your AI career.",
-    topics: [
-      "AI Engineering Roadmap",
-      "Portfolio Strategy",
-      "Resume Tips",
-      "Salary Trends",
-      "Interview Preparation",
-      "Live Q&A",
-    ],
-    project: "🎯 Career Roadmap & Next Steps",
+    problem:
+      "Skills without a strategy still leave you invisible to recruiters. The engineers who get hired are the ones who know how to prove what they built.",
+    solution:
+      "Walk away with a career roadmap, not just a certificate — how to package your AI portfolio, position your GitHub, optimize LinkedIn, and go into interviews ready for real AI engineering questions.",
+    tech: "AI Engineer Roadmap, AI Portfolio, GitHub Projects, Resume Strategy, LinkedIn Optimization, Interview Preparation, Freelancing vs Jobs",
+    project: "Career Roadmap + Final Showcase",
   },
 ];
 
@@ -226,7 +214,7 @@ export const bonusesList: BonusItem[] = [
   { text: "7 Days of Live Sessions", icon: Video, value: "₹3,000" },
   { text: "1:1 Mentorship", icon: UserCheck, value: "₹2,000" },
   { text: "AI Toolkit", icon: Wrench, value: "₹2,000" },
-  { text: "Prompt Library", icon: BookOpen, value: "₹1,500" },
+  { text: "Prompt Library", icon: BookOpen, value: "₹1,000" },
   { text: "Community Access", icon: Users, value: "₹2,000" },
 ];
 
@@ -258,6 +246,24 @@ export const whatsappBenefitsList = [
   { text: "Daily Updates" },
   { text: "Resources" },
   { text: "Announcements" },
+];
+
+/** The multi-tool grid for the "AI Engineers" side of the beginner/engineer
+ *  comparison — deliberately spans code, chat, design, video and research
+ *  tools to sell "chooses the best AI for every task" at a glance. */
+export const compareLogos: { toolId: string; name: string }[] = [
+  { toolId: "chatgpt", name: "ChatGPT" },
+  { toolId: "claude", name: "Claude" },
+  { toolId: "gemini", name: "Gemini" },
+  { toolId: "cursor", name: "Cursor" },
+  { toolId: "github", name: "GitHub Copilot" },
+  { toolId: "perplexity", name: "Perplexity" },
+  { toolId: "n8n", name: "n8n" },
+  { toolId: "vercel", name: "Vercel" },
+  { toolId: "v0", name: "v0" },
+  { toolId: "midjourney", name: "Midjourney" },
+  { toolId: "runway", name: "Runway" },
+  { toolId: "openai", name: "OpenAI" },
 ];
 
 export interface WorkflowStep {
@@ -354,6 +360,8 @@ export const toolLogoOverrides: Record<string, string> = {
   vercel: "/bootcamplogos/vercel.png",
   figma: "/bootcamplogos/figma-color.png",
   v0: "/bootcamplogos/v0.png",
+  gemini: "/bootcamplogos/gemini-color.png",
+  github: "/bootcamplogos/github-copilot.png",
   // dalle: intentionally left on the monogram fallback — the only supplied
   // asset (dalle-color.png) is plain color bars, not DALL·E's actual mark.
   // firecrawl, higgsfield, kimi, galileo: no usable asset was supplied for

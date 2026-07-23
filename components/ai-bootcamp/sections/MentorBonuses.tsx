@@ -86,7 +86,7 @@ export function MentorBonuses() {
             <div style={{ display: "flex", alignItems: "center", padding: "20px 0 4px" }}>
               <span style={{ flex: 1, fontWeight: 800, fontSize: 16, color: "var(--ink-black)" }}>Estimated Learning Value</span>
               <span style={{ fontFamily: "var(--font-heading-editorial)", fontWeight: 800, fontSize: 20, color: "var(--ink-black)" }}>
-                ₹17,500
+                ₹10,000
               </span>
             </div>
             <div style={{ fontSize: 12, color: "var(--ink-400)", padding: "0 0 20px" }}>

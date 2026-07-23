@@ -1,16 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-<<<<<<< HEAD
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import { WhatsAppButton } from '@/components/ui/WhatsAppButton';
-import { CustomCursor } from '@/components/ui/CustomCursor'
-import { SpotlightGlow } from '@/components/ui/SpotlightGlow'
-import { LeadCapturePopup } from '@/components/LeadCapturePopup';
-=======
 import { SiteChrome } from '@/components/SiteChrome';
->>>>>>> c81ba5c (final)
 import { LeadModalProvider } from "@/components/lead-modal";
 
 
@@ -49,22 +40,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col" style={{ color: 'var(--ls-text)' }}>
-<<<<<<< HEAD
-                  <LeadModalProvider>
-
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <WhatsAppButton />
-        <SpotlightGlow />
-        <CustomCursor />
-        <LeadCapturePopup />
-
-
-=======
         <LeadModalProvider>
           <SiteChrome>{children}</SiteChrome>
->>>>>>> c81ba5c (final)
         </LeadModalProvider>
       </body>
     </html>

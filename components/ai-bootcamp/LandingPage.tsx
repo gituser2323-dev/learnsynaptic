@@ -4,6 +4,7 @@ import { RegistrationModal } from "./RegistrationModal";
 import { SuccessModal } from "./SuccessModal";
 import { FloatingCTA } from "./FloatingCTA";
 import { Hero } from "./sections/Hero";
+import { AwarenessCards } from "./sections/AwarenessCards";
 import { ProblemAwareness } from "./sections/ProblemAwareness";
 import { FounderIntroCTA } from "./sections/FounderIntroCTA";
 import { AudienceComparison } from "./sections/AudienceComparison";
@@ -17,6 +18,7 @@ export function AiBootcampLandingPage() {
       <div className="aib-root">
         <div style={{ paddingBottom: 76 }}>
           <Hero />
+          <AwarenessCards />
           <ProblemAwareness />
           <FounderIntroCTA />
           <AudienceComparison />

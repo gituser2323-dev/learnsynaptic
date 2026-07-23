@@ -315,8 +315,6 @@ html.custom-cursor-active * {
   .ls-marquee-track { animation: none; }
 }
 
-<<<<<<< HEAD
-=======
 /* ═══════════════════════════════════════════════════════════════════════════
    BUILDERS EXPERIENCE — /bootcamp cinematic page only.
    Scoped entirely under .builders so the rest of the site (locked light-only
@@ -464,7 +462,6 @@ html.custom-cursor-active * {
   .builders .b-grid-animate { animation: none; }
 }
 
->>>>>>> c81ba5c (final)
 @keyframes marquee {
   from {
     transform: translateX(0);
