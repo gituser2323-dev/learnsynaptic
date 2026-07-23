@@ -3,7 +3,9 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRegisterModal } from "./RegisterModalContext";
+import { useLanguage } from "./LanguageContext";
 import { getNextCohortSaturday, getIstDateParts } from "@/lib/cohortDate";
+import type { Translation } from "./translations";
 
 interface FloatingCTAProps {
   seatsReserved?: number;
@@ -12,14 +14,9 @@ interface FloatingCTAProps {
 
 const MINUTE_MS = 60 * 1000;
 
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
-function formatCohortDate(d: Date): string {
+function formatCohortDate(d: Date, t: Translation): string {
   const { day, month } = getIstDateParts(d);
-  return `Saturday, ${day} ${MONTHS[month]} • 8:30 PM Onwards`;
+  return `${t.dates.saturday}, ${day} ${t.dates.months[month]} • ${t.floatingCta.timeLabel}`;
 }
 
 interface Remaining {
@@ -38,10 +35,6 @@ function getRemaining(target: number, now: number): Remaining {
   return { days, hours, minutes, totalMinutes };
 }
 
-/** Tracks the next upcoming cohort and the live countdown to it, rolling
- *  forward automatically once the current cohort's start time passes.
- *  Re-renders are gated on the minute actually changing, keeping this
- *  premium and quiet rather than ticking every second. */
 function useNextCohort() {
   const [state, setState] = useState(() => {
     const now = Date.now();
@@ -55,10 +48,7 @@ function useNextCohort() {
         const now = Date.now();
         const target = getNextCohortSaturday(now);
         const remaining = getRemaining(target.getTime(), now);
-        if (
-          target.getTime() === prev.target.getTime() &&
-          remaining.totalMinutes === prev.totalMinutes
-        ) {
+        if (target.getTime() === prev.target.getTime() && remaining.totalMinutes === prev.totalMinutes) {
           return prev;
         }
         return { target, ...remaining };
@@ -75,8 +65,8 @@ function useNextCohort() {
 function CountdownUnit({ value, label, animate }: { value: number; label: string; animate?: boolean }) {
   const padded = String(value).padStart(2, "0");
   return (
-    <span className="aib-countdown-unit">
-      <span className="aib-countdown-value">
+    <span className="aig-countdown-unit">
+      <span className="aig-countdown-value">
         {animate ? (
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.span
@@ -85,7 +75,7 @@ function CountdownUnit({ value, label, animate }: { value: number; label: string
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 6 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="aib-countdown-value-frame"
+              className="aig-countdown-value-frame"
             >
               {padded}
             </motion.span>
@@ -94,16 +84,17 @@ function CountdownUnit({ value, label, animate }: { value: number; label: string
           padded
         )}
       </span>
-      <span className="aib-countdown-label">{label}</span>
+      <span className="aig-countdown-label">{label}</span>
     </span>
   );
 }
 
-/** Floating bottom CTA bar — appears once the visitor has scrolled ~20% into
- *  the page, hidden again at the very top and while a modal is open so it
- *  never sits on top of the registration flow. */
-export function FloatingCTA({ seatsReserved = 27, seatsTotal =40 }: FloatingCTAProps) {
+/** Floating bottom CTA bar — appears once the visitor has scrolled past the
+ *  top, hidden while a modal is open so it never sits on top of the
+ *  registration flow. */
+export function FloatingCTA({ seatsReserved = 27, seatsTotal = 40 }: FloatingCTAProps) {
   const { openRegister, isRegisterOpen, isSuccessOpen } = useRegisterModal();
+  const { t } = useLanguage();
   const [scrolledPast, setScrolledPast] = useState(false);
   const { target, days, hours, minutes } = useNextCohort();
 
@@ -140,42 +131,44 @@ export function FloatingCTA({ seatsReserved = 27, seatsTotal =40 }: FloatingCTAP
     <AnimatePresence>
       {visible && (
         <motion.div
-          className="aib-floating-cta-wrap"
+          className="aig-floating-cta-wrap"
           initial={{ opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 28 }}
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="aib-floating-cta">
-            <div className="aib-floating-cta-info">
-              <span className="aib-floating-cta-title">7-Day AI Engineering Bootcamp</span>
-              <div className="aib-floating-cta-meta">
-                <span className="aib-floating-cta-cohort">
-                  <span className="aib-floating-cta-cohort-label">Upcoming Live Cohort</span>
-                  <span className="aib-floating-cta-cohort-date">{formatCohortDate(target)}</span>
+          <div className="aig-floating-cta">
+            <div className="aig-floating-cta-info">
+              <span className="aig-floating-cta-title">{t.floatingCta.title}</span>
+              <div className="aig-floating-cta-meta">
+                <span className="aig-floating-cta-cohort">
+                  <span className="aig-floating-cta-cohort-label">{t.floatingCta.cohortLabel}</span>
+                  <span className="aig-floating-cta-cohort-date">
+                    {formatCohortDate(target, t)}
+                  </span>
                 </span>
-                <span className="aib-floating-cta-meta-divider" aria-hidden="true" />
+                <span className="aig-floating-cta-meta-divider" aria-hidden="true" />
                 <div
-                  className="aib-floating-cta-countdown"
+                  className="aig-floating-cta-countdown"
                   role="timer"
-                  aria-label={`Starts in ${days} days, ${hours} hours, ${minutes} minutes`}
+                  aria-label={`${days} ${t.floatingCta.daysLabel}, ${hours} ${t.floatingCta.hrsLabel}, ${minutes} ${t.floatingCta.minLabel}`}
                 >
-                  <CountdownUnit value={days} label="Days" />
-                  <span className="aib-countdown-divider" aria-hidden="true" />
-                  <CountdownUnit value={hours} label="Hrs" />
-                  <span className="aib-countdown-divider" aria-hidden="true" />
-                  <CountdownUnit value={minutes} label="Min" animate />
+                  <CountdownUnit value={days} label={t.floatingCta.daysLabel} />
+                  <span className="aig-countdown-divider" aria-hidden="true" />
+                  <CountdownUnit value={hours} label={t.floatingCta.hrsLabel} />
+                  <span className="aig-countdown-divider" aria-hidden="true" />
+                  <CountdownUnit value={minutes} label={t.floatingCta.minLabel} animate />
                 </div>
               </div>
             </div>
 
-            <div className="aib-floating-cta-action">
-              <span className="aib-floating-cta-seats">
-                <span className="aib-live-dot" style={{ backgroundColor: "rgb(0, 213, 27)" }} />
-                {seatsReserved} / {seatsTotal} Seats Reserved
+            <div className="aig-floating-cta-action">
+              <span className="aig-floating-cta-seats">
+                <span className="aig-live-dot" style={{ backgroundColor: "rgb(0, 213, 27)" }} />
+                {seatsReserved} / {seatsTotal} {t.floatingCta.seatsSuffix}
               </span>
-              <button onClick={openRegister} className="aib-btn aib-floating-cta-btn">
-                Reserve My Free Seat →
+              <button onClick={openRegister} className="aig-btn aig-floating-cta-btn">
+                {t.floatingCta.cta}
               </button>
             </div>
           </div>

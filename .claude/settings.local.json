@@ -94,7 +94,8 @@
       "Bash(lsof -i :3000 -sTCP:LISTEN)",
       "Bash(echo \"TSC_EXIT:$?\")",
       "Bash(xargs -I{} echo {})",
-      "Bash(pkill -f \"next start\")"
+      "Bash(pkill -f \"next start\")",
+      "Bash(ps -p 87914 -o pid,command)"
     ]
   }
 }

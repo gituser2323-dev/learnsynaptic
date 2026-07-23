@@ -2,12 +2,13 @@
 
 import { ModalShell } from "./ModalShell";
 import { useRegisterModal } from "./RegisterModalContext";
+import { useLanguage } from "./LanguageContext";
 import { WhatsAppIcon } from "./WhatsAppIcon";
-import { whatsappBenefitsList } from "./data";
 import { AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL } from "@/config/aiBootcamp";
 
 export function SuccessModal() {
   const { isSuccessOpen, closeSuccess, registeredName } = useRegisterModal();
+  const { t } = useLanguage();
   const firstName = registeredName.trim().split(/\s+/)[0];
 
   return (
@@ -21,11 +22,9 @@ export function SuccessModal() {
             margin: "16px 0 8px",
           }}
         >
-          {firstName ? `✅ You're In, ${firstName}!` : "✅ Registration Successful"}
+          {firstName ? `✅ ${t.success.greetingPrefix} ${firstName}!` : `✅ ${t.success.greetingFallback}`}
         </h2>
-        <p style={{ color: "var(--ink-200)", fontSize: 15.5, lineHeight: 1.6, margin: 0 }}>
-          You&apos;re all set!
-        </p>
+        <p style={{ color: "var(--ink-200)", fontSize: 15.5, lineHeight: 1.6, margin: 0 }}>{t.success.welcome}</p>
       </div>
 
       <div
@@ -38,25 +37,33 @@ export function SuccessModal() {
           textAlign: "left",
         }}
       >
-        <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>Next Step</div>
+        <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4 }}>{t.success.lastStepTitle}</div>
         <p style={{ color: "var(--ink-200)", fontSize: 13.5, lineHeight: 1.6, margin: "0 0 16px" }}>
-          Join our WhatsApp Community to receive:
+          {t.success.lastStepBody}
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {whatsappBenefitsList.map((w) => (
-            <div key={w.text} style={{ fontSize: 14, color: "var(--ink-200)" }}>
-              ✓ {w.text}
+          {t.success.benefits.map((benefit) => (
+            <div key={benefit} style={{ fontSize: 14, color: "var(--ink-200)" }}>
+              ✓ {benefit}
             </div>
           ))}
         </div>
       </div>
 
       <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 12 }}>
-      
+        <a
+          href={AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="aig-btn aig-btn-whatsapp"
+          style={{ height: 56, fontSize: 16 }}
+        >
+          {t.success.joinCta}
+        </a>
 
         <button
           onClick={closeSuccess}
-          className="aib-btn"
+          className="aig-btn"
           style={{
             height: 48,
             background: "transparent",
@@ -65,7 +72,7 @@ export function SuccessModal() {
             fontSize: 14.5,
           }}
         >
-          Maybe Later
+          {t.success.laterCta}
         </button>
       </div>
     </ModalShell>

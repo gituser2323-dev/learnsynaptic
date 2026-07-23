@@ -1,0 +1,110 @@
+"use client";
+
+import { useRegisterModal } from "../RegisterModalContext";
+import { useLanguage } from "../LanguageContext";
+
+export function FounderIntroCTA() {
+  const { openRegister } = useRegisterModal();
+  const { t } = useLanguage();
+
+  return (
+    <>
+      <section style={{ background: "var(--white)", padding: "0 6%" }}>
+        <div style={{ maxWidth: 820, margin: "0 auto", textAlign: "center" }}>
+          <div style={{ color: "var(--blue-600)", fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 16 }}>
+            {t.founder.kicker}
+          </div>
+          <h2
+            style={{
+              fontFamily: "var(--font-heading-editorial)",
+              fontWeight: 800,
+              fontSize: "clamp(24px, 4.5vw, 34px)",
+              color: "var(--ink-black)",
+              margin: "0 0 16px",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {t.founder.heading}
+          </h2>
+          <p style={{ color: "var(--ink-600)", fontSize: 16, lineHeight: 1.7, maxWidth: 560, margin: "0 auto 40px" }}>
+            {t.founder.subcopy}
+          </p>
+          <div
+            style={{
+              position: "relative",
+              borderRadius: "var(--radius-panel)",
+              overflow: "hidden",
+              boxShadow: "0 1px 2px rgba(10,10,14,0.04),0 16px 48px rgba(10,10,14,0.12)",
+              border: "1px solid var(--border-editorial)",
+              aspectRatio: "16/9",
+            }}
+          >
+            <video
+              className="absolute inset-0 h-full w-full object-cover"
+              poster="/bootcamplogos/me.png"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            >
+              <source src="/videos/founder-intro.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+            <div style={{ position: "absolute", bottom: 16, right: 16, pointerEvents: "none" }}>
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.95)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 8px 24px rgba(10,10,14,0.25)",
+                }}
+              >
+                <div
+                  style={{
+                    width: 0,
+                    height: 0,
+                    borderTop: "9px solid transparent",
+                    borderBottom: "9px solid transparent",
+                    borderLeft: "15px solid var(--blue-600)",
+                    marginLeft: 4,
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+          <div style={{ fontWeight: 700, fontSize: 14.5, color: "var(--ink-black)", marginTop: 20 }}>
+            {t.founder.founderName}
+          </div>
+        </div>
+      </section>
+
+      <section style={{ background: "#fff", padding: "96px 6%" }}>
+        <div style={{ background: "var(--paper)", borderRadius: "var(--radius-panel)", padding: "56px 48px", textAlign: "center" }}>
+          <h3 style={{ fontFamily: "var(--font-heading-editorial)", fontWeight: 800, fontSize: "clamp(22px, 4vw, 30px)", color: "var(--ink-black)", margin: 0 }}>
+            {t.founder.ctaHeadline}
+          </h3>
+          <p style={{ color: "var(--ink-600)", fontSize: 16, maxWidth: 560, margin: "16px auto 0", lineHeight: 1.6 }}>
+            {t.founder.ctaSubcopy}
+          </p>
+          <div style={{ display: "flex", gap: 20, justifyContent: "center", alignItems: "center", marginTop: 28, flexWrap: "wrap" }}>
+            <button
+              onClick={openRegister}
+              className="aig-btn"
+              style={{ background: "var(--ls-primary)", color: "#fff", padding: "16px 32px", fontSize: 13.5 }}
+            >
+              {t.founder.ctaPrimary}
+            </button>
+            <a href="#curriculum" style={{ color: "var(--ink-black)", fontSize: 14.5, fontWeight: 700, textDecoration: "underline" }}>
+              {t.founder.ctaSecondary}
+            </a>
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}

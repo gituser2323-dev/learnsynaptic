@@ -156,7 +156,7 @@ export default function SuccessScreen({ onClose }: Props) {
         >
           <MessageCircle size={18} />
 
-          Join WhatsApp Community
+          Join Community
 
         </button>
 

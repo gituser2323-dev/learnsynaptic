@@ -1,25 +1,21 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { faqList } from "../data";
 import { useRegisterModal } from "../RegisterModalContext";
+import { useLanguage } from "../LanguageContext";
 import { WhatsAppIcon } from "../WhatsAppIcon";
 import { getNextCohortSaturday, getIstDateParts } from "@/lib/cohortDate";
 import { AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL } from "@/config/aiBootcamp";
 
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
 export function FaqClosing() {
   const [openIndex, setOpenIndex] = useState<Record<number, boolean>>({});
   const { openRegister } = useRegisterModal();
+  const { t } = useLanguage();
 
   const nextCohortLabel = useMemo(() => {
     const { day, month } = getIstDateParts(getNextCohortSaturday());
-    return `Saturday, ${day} ${MONTHS[month]}`;
-  }, []);
+    return `${t.dates.saturday}, ${day} ${t.dates.months[month]}`;
+  }, [t]);
 
   return (
     <>
@@ -35,16 +31,16 @@ export function FaqClosing() {
               margin: "0 0 40px",
             }}
           >
-            Frequently Asked Questions
+            {t.faq.headline}
           </h2>
-          {faqList.map((f, i) => {
+          {t.faq.items.map((f, i) => {
             const open = !!openIndex[i];
             return (
               <div key={f.q} style={{ borderBottom: "1px solid var(--border-editorial)", padding: "10px 0" }}>
                 <button
                   onClick={() => setOpenIndex((s) => ({ ...s, [i]: !s[i] }))}
                   aria-expanded={open}
-                  className="aib-faq-q"
+                  className="aig-faq-q"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -67,29 +63,25 @@ export function FaqClosing() {
       <section style={{ background: "var(--white)", padding: "80px 6%", textAlign: "center" }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
           <h2 style={{ fontFamily: "var(--font-heading-editorial)", fontWeight: 800, fontSize: 30, color: "var(--ink-black)", margin: "0 0 16px" }}>
-            Why We Cap Every Cohort
+            {t.faq.capHeadline}
           </h2>
-          <p style={{ color: "var(--ink-600)", fontSize: 16, lineHeight: 1.6, margin: 0 }}>
-            Every project gets reviewed live. Every question gets answered on the spot. That only works in a small
-            room — so registration closes once the cohort fills. No countdown gimmicks. Just a simple fact: the
-            sooner you join, the sooner Day 1 starts.
-          </p>
+          <p style={{ color: "var(--ink-600)", fontSize: 16, lineHeight: 1.6, margin: 0 }}>{t.faq.capBody}</p>
         </div>
       </section>
 
       <section style={{ background: "var(--ls-dark)", color: "#fff", padding: "100px 6%", textAlign: "center" }}>
         <h2 style={{ fontFamily: "var(--font-display-promo)", fontWeight: 800, fontSize: "clamp(30px, 6vw, 46px)", margin: "0 0 16px" }}>
-         The Best Time To Start Was Yesterday. 
+          {t.faq.finalHeadline1}
           <br />
-          <span style={{ color: "var(--ls-primary-light)" }}>The Next Best Time Is Today.</span>
+          <span style={{ color: "var(--ls-primary-light)" }}>{t.faq.finalHeadline2}</span>
         </h2>
         <p style={{ color: "var(--ink-200)", fontSize: 17, margin: "0 0 32px" }}>
-          Cohort starts {nextCohortLabel}. Seats close when it&apos;s full.
+          {t.faq.finalSubcopy.replace("{date}", nextCohortLabel)}
         </p>
-        <div className="aib-cta-row" style={{ justifyContent: "center" }}>
+        <div className="aig-cta-row" style={{ justifyContent: "center" }}>
           <button
             onClick={openRegister}
-            className="aib-btn"
+            className="aig-btn"
             style={{
               background: "linear-gradient(180deg,var(--ls-primary),var(--ls-primary-hover))",
               color: "#fff",
@@ -98,22 +90,20 @@ export function FaqClosing() {
               boxShadow: "var(--shadow-glow)",
             }}
           >
-            Start Building Free
+            {t.faq.finalCta}
           </button>
           <a
             href={AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="aib-btn aib-btn-whatsapp"
+            className="aig-btn aig-btn-whatsapp"
             style={{ padding: "20px 40px", fontSize: 19 }}
           >
-            <WhatsAppIcon size={18} />
-            Join Community
+            <WhatsAppIcon size={20} />
+            {t.faq.finalCtaWhatsapp}
           </a>
         </div>
-        <div style={{ marginTop: 44, color: "var(--ink-400)", fontSize: 14 }}>
-          learnsynaptic.com · #AISoftwareEngineeringCohort
-        </div>
+        <div style={{ marginTop: 44, color: "var(--ink-400)", fontSize: 14 }}>{t.faq.finalFooter}</div>
       </section>
     </>
   );

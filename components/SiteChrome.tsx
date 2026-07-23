@@ -9,17 +9,17 @@ import { SpotlightGlow } from '@/components/ui/SpotlightGlow';
 import { LeadCapturePopup } from '@/components/LeadCapturePopup';
 
 /**
- * /bootcamp and /ai-bootcamp are standalone campaign microsites, not pages
- * inside the main site — they must not inherit the global Navbar/Footer/
- * WhatsApp bubble/lead popup. /ai-bootcamp additionally ships its own,
- * completely separate design system (an imported Claude Design) so it also
- * skips the ambient cursor glow / custom cursor micro-interactions that
- * belong to the existing site's visual identity, keeping the two designs
- * from ever blending.
+ * /bootcamp, /ai-bootcamp and /ai-generalist are standalone campaign
+ * microsites, not pages inside the main site — they must not inherit the
+ * global Navbar/Footer/WhatsApp bubble/lead popup. /ai-bootcamp and
+ * /ai-generalist additionally ship their own, completely separate design
+ * systems (an imported Claude Design) so they also skip the ambient cursor
+ * glow / custom cursor micro-interactions that belong to the existing
+ * site's visual identity, keeping the designs from ever blending.
  */
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAiBootcamp = pathname?.startsWith('/ai-bootcamp');
+  const isAiBootcamp = pathname?.startsWith('/ai-bootcamp') || pathname?.startsWith('/ai-generalist');
   const isIsolatedMicrosite = pathname?.startsWith('/bootcamp') || isAiBootcamp;
 
   if (isAiBootcamp) {

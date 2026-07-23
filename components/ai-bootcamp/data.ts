@@ -242,9 +242,10 @@ export const faqList = [
 ];
 
 export const whatsappBenefitsList = [
-  { text: "Live Session Links" },
-  { text: "Daily Updates" },
-  { text: "Resources" },
+  { text: "Zoom Links" },
+  { text: "Daily Resources" },
+  { text: "Session Reminders" },
+  { text: "Assignments" },
   { text: "Announcements" },
 ];
 

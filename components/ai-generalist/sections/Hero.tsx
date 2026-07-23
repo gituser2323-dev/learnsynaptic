@@ -3,19 +3,15 @@
 import { useMemo } from "react";
 import Image from "next/image";
 import { useRegisterModal } from "../RegisterModalContext";
+import { useLanguage } from "../LanguageContext";
 import { WhatsAppIcon } from "../WhatsAppIcon";
 import { getNextCohortSaturday, getIstDateParts } from "@/lib/cohortDate";
 import { AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL } from "@/config/aiBootcamp";
 
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
 function GlassBadge({ text, style }: { text: string; style: React.CSSProperties }) {
   return (
     <div
-      className="aib-glass aib-hero-badge"
+      className="aig-glass aig-hero-badge"
       style={{
         position: "absolute",
         borderRadius: 14,
@@ -43,11 +39,12 @@ function GlassBadge({ text, style }: { text: string; style: React.CSSProperties 
 
 export function Hero() {
   const { openRegister } = useRegisterModal();
+  const { t } = useLanguage();
 
   const nextCohortLabel = useMemo(() => {
     const { day, month } = getIstDateParts(getNextCohortSaturday());
-    return `Saturday • ${day} ${MONTHS[month]}`;
-  }, []);
+    return `${t.dates.saturday} • ${day} ${t.dates.months[month]}`;
+  }, [t]);
 
   return (
     <section style={{ background: "var(--ls-dark)", color: "#fff", padding: "72px 6% 96px", position: "relative", overflow: "hidden" }}>
@@ -63,7 +60,7 @@ export function Hero() {
         }}
       />
       <div
-        className="aib-hero-grid"
+        className="aig-hero-grid"
         style={{
           position: "relative",
           display: "grid",
@@ -91,11 +88,11 @@ export function Hero() {
             justifySelf: "start",
           }}
         >
-          <span className="aib-live-dot" style={{ backgroundColor: "rgb(0, 213, 27)" }} />
-          FREE · AI BOOTCAMP ·&nbsp; {nextCohortLabel.toUpperCase()}
+          <span className="aig-live-dot" style={{ backgroundColor: "rgb(0, 213, 27)" }} />
+          {t.hero.badgePrefix} ·&nbsp; {nextCohortLabel.toUpperCase()}
         </span>
         <div
-          className="aib-hero-item"
+          className="aig-hero-item"
           style={{
             gridArea: "eyebrow",
             color: "var(--ls-primary-light)",
@@ -106,10 +103,10 @@ export function Hero() {
             marginTop: 28,
           }}
         >
-          &nbsp;AI FIRST ACADEMY
+          &nbsp;{t.hero.eyebrow}
         </div>
         <h1
-          className="aib-hero-item"
+          className="aig-hero-item"
           style={{
             gridArea: "headline",
             fontWeight: 800,
@@ -119,20 +116,15 @@ export function Hero() {
             letterSpacing: "-0.02em",
           }}
         >
-          The Next Big Opportunity.
+          {t.hero.h1Line1}
           <br />
-          <span style={{ color: "var(--ls-primary-light)" }}>Starts With AI.</span>
+          <span style={{ color: "var(--ls-primary-light)" }}>{t.hero.h1Line2}</span>
         </h1>
-        <p className="aib-hero-item" style={{ gridArea: "subhead", fontSize: 17, color: "var(--ink-200)", maxWidth: 520, margin: "22px 0 0", lineHeight: 1.6 }}>
-          Most people consume AI content. Very few build AI products. This free 7-day live bootcamp helps you become
-          one of them.
+        <p className="aig-hero-item" style={{ gridArea: "subhead", fontSize: 17, color: "var(--ink-200)", maxWidth: 520, margin: "22px 0 0", lineHeight: 1.6 }}>
+          {t.hero.subhead}
         </p>
-        <div className="aib-hero-item" style={{ gridArea: "checklist", display: "flex", flexDirection: "column", gap: 12, marginTop: 28 }}>
-          {[
-            "Worth ₹10,000+ • Free This Cohort",
-            "AI Skills Are Becoming the New Standard",
-            "5 Hands-On AI Projects | Applications",
-          ].map((text) => (
+        <div className="aig-hero-item" style={{ gridArea: "checklist", display: "flex", flexDirection: "column", gap: 12, marginTop: 28 }}>
+          {t.hero.checklist.map((text) => (
             <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <span
                 style={{
@@ -158,10 +150,10 @@ export function Hero() {
             </div>
           ))}
         </div>
-        <div className="aib-cta-row aib-hero-item" style={{ gridArea: "buttons", marginTop: 34 }}>
+        <div className="aig-cta-row aig-hero-item" style={{ gridArea: "buttons", marginTop: 34 }}>
           <button
             onClick={openRegister}
-            className="aib-btn"
+            className="aig-btn"
             style={{
               background: "linear-gradient(180deg,var(--ls-primary),var(--ls-primary-hover))",
               color: "#fff",
@@ -170,20 +162,20 @@ export function Hero() {
               boxShadow: "var(--shadow-glow)",
             }}
           >
-            Reserve My Seat
+            {t.hero.ctaPrimary}
           </button>
           <a
             href={AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="aib-btn aib-btn-whatsapp"
-            style={{ padding: "18px 30px", fontSize: 17,background:"#1FA855" }}
+            className="aig-btn aig-btn-whatsapp"
+            style={{ padding: "18px 30px", fontSize: 17 }}
           >
-            Join AI Community
+            {t.hero.ctaWhatsapp}
           </a>
         </div>
-        <p className="aib-hero-item" style={{ gridArea: "note", fontSize: 13, color: "var(--ink-400)", margin: "14px 0 0", lineHeight: 1.5 }}>
-          No spam. Only AI resources, event reminders and bootcamp updates.
+        <p className="aig-hero-item" style={{ gridArea: "note", fontSize: 13, color: "var(--ink-400)", margin: "14px 0 0", lineHeight: 1.5 }}>
+          {t.hero.note}
         </p>
 
         <div
@@ -232,16 +224,16 @@ export function Hero() {
             />
           </div>
 
-          <GlassBadge text="AI Engineering" style={{ top: "8%", left: "-2%" }} />
-          <GlassBadge text="Built 20+ AI Workflows" style={{ top: 81, right: -51 }} />
-          <GlassBadge text="GPT • Claude • Gemini" style={{ bottom: "26%", left: "-6%" }} />
+          <GlassBadge text={t.hero.badges[0]} style={{ top: "8%", left: "-2%" }} />
+          <GlassBadge text={t.hero.badges[1]} style={{ top: 81, right: -51 }} />
+          <GlassBadge text={t.hero.badges[2]} style={{ bottom: "26%", left: "-6%" }} />
 
           <div style={{ position: "relative", textAlign: "center", marginTop: 28 }}>
             <div style={{ fontFamily: "var(--font-display-promo)", fontWeight: 800, fontSize: 22, color: "#fff" }}>
-              - with Pratik S
+              {t.hero.founderCaption}
             </div>
             <div style={{ color: "var(--ls-primary-light)", fontSize: 13.5, fontWeight: 700, marginTop: 4 }}>
-              Co Founder at Learn Synaptic | AI Engineer
+              {t.hero.founderTitle}
             </div>
           </div>
         </div>
