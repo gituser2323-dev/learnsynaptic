@@ -21,7 +21,6 @@ const trustedDeviceSchema = new Schema<TrustedDeviceDocument>(
   { timestamps: { createdAt: true, updatedAt: false } },
 );
 
-trustedDeviceSchema.index({ deviceTokenHash: 1 }, { unique: true });
 trustedDeviceSchema.index({ userId: 1 });
 trustedDeviceSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 

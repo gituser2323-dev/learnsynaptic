@@ -1,12 +1,24 @@
 name: CI
 
-# RC-1 stabilization — the automated gate that previously didn't exist
-# between "compiles on my machine" and "it's live." Runs the same three
-# checks this project has manually verified before every change all
-# session: type-check, lint, and (new) an end-to-end smoke suite. No
-# MONGODB_URI is set — the in-memory repository fallback is exactly
-# what a CI run wants (fresh, empty state every time, no external
-# service to provision just to run tests).
+# RC-1 stabilization opened this file with type-check + lint + an E2E
+# smoke suite. RC-4 (Deployment & Production Infrastructure) closes the
+# real gap found during that pass's own CI audit: unit tests and a
+# production build were never actually run in CI at all — a change
+# could break either and still merge clean. Every step below is a real
+# deployment gate (BUILD PASS / TYPECHECK PASS / LINT PASS / TEST PASS,
+# the mission's own named minimum), ordered cheapest-and-most-likely-to-
+# fail first so a broken PR fails in seconds, not after a multi-minute
+# Playwright browser install. `npm audit` is a separate, non-blocking-
+# by-default job (see its own comment below) rather than a fifth step
+# in this same job, so a new transitive-dependency advisory can't block
+# an unrelated PR from merging while still being visible.
+#
+# No MONGODB_URI/secrets are set anywhere in this workflow — the
+# in-memory repository fallback is exactly what a CI run wants (fresh,
+# empty state every run, no external service to provision), and
+# `npm run build` is verified (RC-4) to succeed against a completely
+# empty environment the same way production's own graceful-degradation
+# posture requires (see lib/startupValidation.ts).
 on:
   push:
     branches: [main]
@@ -24,7 +36,7 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install dependencies (deterministic — lockfile-pinned)
         run: npm ci
 
       - name: Type-check
@@ -32,6 +44,12 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Production build
+        run: npm run build
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
@@ -46,3 +64,30 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  # RC-4 — a separate job (parallel with `verify`, not a step inside
+  # it): `npm audit` reports on the ENTIRE dependency tree, including
+  # transitive advisories this app's own code never touches and can't
+  # fix by itself (waiting on an upstream maintainer). Gating merges on
+  # that would eventually block unrelated work on a Friday-afternoon CVE
+  # disclosure in a five-levels-deep transitive dependency. `--audit-
+  # level=high` still fails the job (and is visible in the PR checks
+  # list) for anything genuinely severe; moderate/low advisories are
+  # reported, not blocking — a human decides whether/when to
+  # `npm audit fix`, the same judgment RC-2's own CVE remediation pass
+  # already applied manually.
+  dependency-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies (deterministic — lockfile-pinned)
+        run: npm ci
+
+      - name: npm audit (high/critical severity fails the job)
+        run: npm audit --audit-level=high

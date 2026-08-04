@@ -40,6 +40,14 @@ async function handleCronRunDueJobs(request: Request): Promise<NextResponse> {
   return apiSuccess({ ...result });
 }
 
+// RC-4 — Serverless Limits: an explicit, deployment-plan-independent
+// duration ceiling rather than whatever a given Vercel plan's own
+// default happens to be. Safe: schedulerService.ts's own
+// MAX_BATCH_DURATION_MS (45s) stops the internal loop from claiming a
+// NEW job well before this 60s ceiling, so this function always
+// finishes cleanly rather than being killed by Vercel mid-job.
+export const maxDuration = 60;
+
 // No requiredRole — this route is intentionally outside the admin JWT
 // model; isValidCronRequest() above is the entire auth check. A generous
 // rate limit here is just a sanity backstop against a misconfigured

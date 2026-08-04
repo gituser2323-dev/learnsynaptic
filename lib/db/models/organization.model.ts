@@ -17,8 +17,10 @@ const organizationSchema = new Schema<OrganizationDocument>(
 );
 
 // Duplicate prevention: a second organization with the same slug is
-// rejected by MongoDB itself, same pattern as User.email/Campaign.code.
-organizationSchema.index({ slug: 1 }, { unique: true });
+// rejected by MongoDB itself, same pattern as User.email/Campaign.code
+// — enforced via the field's own `unique: true` above, not a second
+// explicit index here (that was a real duplicate-index declaration,
+// found and fixed during RC-4's own index-sync verification).
 
 export function toOrganization(doc: OrganizationDocument): Organization {
   return {

@@ -44,7 +44,6 @@ const userSchema = new Schema<UserDocument>(
 // Duplicate prevention: a second user with the same email is rejected by
 // MongoDB itself, not just checked in application code (same pattern as
 // Campaign.code).
-userSchema.index({ email: 1 }, { unique: true });
 
 export function toUser(doc: UserDocument): User {
   return {

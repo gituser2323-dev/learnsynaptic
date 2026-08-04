@@ -33,8 +33,35 @@ export async function getConnection(): Promise<typeof mongoose> {
       maxPoolSize: 10,
       minPoolSize: 0,
       serverSelectionTimeoutMS: 5000,
+      // RC-4 — Mongoose's own default (autoIndex: true) runs
+      // createIndex() for every model on EVERY connection, meaning
+      // every cold start in production: real, avoidable latency on the
+      // hot path, and lock contention against a large collection this
+      // mission's own explicit "do NOT automatically create destructive
+      // indexes/migrations during every production boot" instruction
+      // rules out. Index creation/sync is instead a deliberate,
+      // operator-triggered step — see scripts/syncIndexes.ts. Local dev
+      // and CI (in-memory repositories, no MONGODB_URI, so this file
+      // isn't even reached) are unaffected; a real MongoDB pointed at
+      // from a non-production NODE_ENV still gets the convenient
+      // auto-created indexes developers expect.
+      autoIndex: process.env.NODE_ENV !== "production",
     });
   }
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    // RC-4 — found live during this pass's own infrastructure audit: a
+    // rejected connect() promise was being cached forever. Without this
+    // reset, one transient MongoDB outage (a brief network blip, Atlas
+    // failover, cold-start racing DNS) would permanently poison this
+    // module-level cache for the rest of the process/serverless
+    // instance's lifetime — every subsequent call would immediately
+    // re-await the SAME already-rejected promise instead of ever
+    // attempting a new connection, even after MongoDB recovered.
+    // Clearing it here is what makes the NEXT call actually retry.
+    cached.promise = null;
+    throw error;
+  }
   return cached.conn;
 }

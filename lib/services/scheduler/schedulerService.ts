@@ -14,6 +14,36 @@ const logger = createLogger({ service: "scheduler" });
  *  Marketing Dashboard module's MAX_CAMPAIGNS_FOR_OVERALL_METRICS cap. */
 const DEFAULT_BATCH_SIZE = 20;
 
+/**
+ * RC-4 — Deployment & Production Infrastructure: Serverless Limits.
+ * `runDueScheduledJobs()`'s own loop processes jobs SEQUENTIALLY
+ * (`await`ing each in turn, deliberately — see its own doc comment on
+ * why this isn't parallelized), so DEFAULT_BATCH_SIZE alone doesn't
+ * bound a single invocation's WALL-CLOCK duration, only its job COUNT.
+ * A batch of 20 jobs each near their own worst-case provider timeout
+ * (lib/net/timeouts.ts — up to 30s for an AI call) could take up to
+ * ~10 minutes sequentially, far past any real serverless function
+ * duration limit — Vercel would kill the invocation mid-batch, and per
+ * claim()'s own doc comment, the one job that was actually in flight
+ * at that moment is safely recovered by the 10-minute stale-claim
+ * window, but every job the batch never REACHED yet would sit waiting
+ * an extra cron cycle for no reason if this function kept trying to
+ * claim more jobs than it realistically has time left to run.
+ *
+ * This is a real time BUDGET, not just another timeout slapped on top
+ * (the mission's own explicit "do NOT simply increase timeouts and
+ * call the problem solved") — the loop below checks elapsed time
+ * before claiming each NEW job and stops cleanly once the budget is
+ * spent, leaving any remaining due jobs for the NEXT cron tick five
+ * minutes later (see vercel.json) rather than risking Vercel killing
+ * the function mid-job. Comfortably under the 60s `maxDuration` both
+ * app/api/cron/run-due-jobs and app/api/admin/scheduler/run-due-jobs
+ * now declare explicitly (see those routes' own exports) — the
+ * function always finishes whatever job it's currently on, then checks
+ * the budget, so it never overruns that declared ceiling.
+ */
+const MAX_BATCH_DURATION_MS = 45_000;
+
 function addMinutes(base: Date, minutes: number): Date {
   return new Date(base.getTime() + minutes * 60_000);
 }
@@ -178,14 +208,26 @@ export async function runDueScheduledJobs(batchSize = DEFAULT_BATCH_SIZE): Promi
   // were created under).
   return runCrossTenantSweep(async () => {
     const due = await repository.findDue(new Date(), batchSize);
+    const startedAt = Date.now();
+    let processed = 0;
+
     for (const job of due) {
+      if (Date.now() - startedAt > MAX_BATCH_DURATION_MS) {
+        logger.warn("scheduler.batch_time_budget_exceeded", {
+          processed,
+          remaining: due.length - processed,
+          batchSize,
+        });
+        break;
+      }
       if (job.organizationId) {
         await runWithTenantContext({ organizationId: job.organizationId }, () => processJob(job));
       } else {
         await processJob(job);
       }
+      processed++;
     }
-    return { processed: due.length };
+    return { processed };
   });
 }
 

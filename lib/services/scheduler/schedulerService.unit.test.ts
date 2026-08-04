@@ -298,6 +298,36 @@ describe("schedulerService — due-job selection and retry branching", () => {
     expect(healthyJob.status).toBe("completed");
   });
 
+  it("RC-4 — Serverless Limits: a batch that would run too long stops claiming NEW jobs once its time budget is spent, leaving the rest pending for the next cron tick", async () => {
+    const jobType = makeJobType();
+    let runs = 0;
+    // Each job's own handler simulates real wall-clock work by
+    // advancing the fake clock — MAX_BATCH_DURATION_MS (45s) is spent
+    // after the 3rd job (3 x 20s = 60s > 45s checked BEFORE claiming a
+    // 4th), so the 4th enqueued job must never even be attempted.
+    registerJobHandler(jobType, async () => {
+      runs++;
+      await vi.advanceTimersByTimeAsync(20_000);
+      return { result: "completed" };
+    });
+
+    for (let i = 0; i < 4; i++) {
+      await enqueueJob({ jobType, payload: {}, runAt: new Date().toISOString() });
+    }
+
+    const { processed } = await runDueScheduledJobs();
+
+    expect(processed).toBe(3);
+    expect(runs).toBe(3);
+
+    const repository = await getScheduledJobRepository();
+    const jobs = (await repository.list({ jobType }, 1, 10)).items;
+    const completed = jobs.filter((j) => j.status === "completed");
+    const stillPending = jobs.filter((j) => j.status === "pending");
+    expect(completed).toHaveLength(3);
+    expect(stillPending).toHaveLength(1); // left for the next cron tick, not lost or stuck.
+  });
+
   it("an unknown job type is marked failed without ever calling a handler", async () => {
     await enqueueJob({ jobType: "no-such-job-type", payload: {}, runAt: new Date().toISOString() });
     const { processed } = await runDueScheduledJobs();

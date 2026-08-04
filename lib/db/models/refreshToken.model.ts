@@ -40,7 +40,6 @@ const refreshTokenSchema = new Schema<RefreshTokenDocument>(
 );
 
 // The one lookup every refresh/logout call makes.
-refreshTokenSchema.index({ tokenHash: 1 }, { unique: true });
 // Reuse detection revokes every record sharing a family in one call.
 refreshTokenSchema.index({ familyId: 1 });
 // RC-1 — the Active Sessions panel's own lookup: every session for a user, newest first.

@@ -41,6 +41,12 @@ async function handleImportCsv(request: Request, ctx: ApiRouteContext): Promise<
   return apiSuccess({ campaign: result.campaign, importResult: result.result });
 }
 
+// RC-4 — Serverless Limits: same reasoning as the general CRM CSV
+// import route (app/api/admin/crm/import) — an explicit ceiling for a
+// row-by-row-validated bulk operation, capped at 5,000 rows, rather
+// than relying on a given Vercel plan's own default duration.
+export const maxDuration = 60;
+
 export const POST = withApiRoute("whatsapp_campaigns.import_csv", handleImportCsv, {
   requiredRole: "admin",
   rateLimit: { limit: 10, windowMs: 60_000 },

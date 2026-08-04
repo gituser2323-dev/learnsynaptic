@@ -19,7 +19,6 @@ const passwordResetTokenSchema = new Schema<PasswordResetTokenDocument>(
   { timestamps: { createdAt: true, updatedAt: false } },
 );
 
-passwordResetTokenSchema.index({ tokenHash: 1 }, { unique: true });
 passwordResetTokenSchema.index({ userId: 1 });
 // TTL cleanup — same posture as RefreshToken's own expiry index.
 passwordResetTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });

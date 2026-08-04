@@ -27,6 +27,12 @@ async function handleRunDueJobs(): Promise<NextResponse> {
   return apiSuccess({ ...result });
 }
 
+// RC-4 — Serverless Limits: same explicit ceiling as the real cron
+// route (app/api/cron/run-due-jobs) — both call the identical
+// runDueScheduledJobs(), whose own internal time budget already keeps
+// this comfortably under 60s. See that route's own doc comment.
+export const maxDuration = 60;
+
 export const POST = withApiRoute("scheduler.run_due_jobs", handleRunDueJobs, {
   requiredRole: "admin",
   rateLimit: { limit: 60, windowMs: 60_000 },

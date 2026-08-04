@@ -50,6 +50,19 @@ async function handleImport(request: Request, ctx: ApiRouteContext): Promise<Nex
   return apiSuccess({ mode, ...result });
 }
 
+// RC-4 — Serverless Limits: `mode=commit` calls registerLead() once per
+// CSV row, sequentially (validation + dedup + scoring + assignment per
+// row, not a bulk insert — see leadService.importLeadsFromCsv's own doc
+// comment), up to CAMPAIGN_CSV_IMPORT_MAX_ROWS rows. An explicit ceiling
+// here is honest about that real cost rather than relying on whatever a
+// given Vercel plan's own default happens to be. Disclosed, not further
+// hardened this pass: converting this into an async, progress-polling
+// background job (matching RC-3's own job architecture) would be a real
+// UX change to an existing, working feature — a reasonable next step if
+// CAMPAIGN_CSV_IMPORT_MAX_ROWS is ever raised significantly, not
+// required at today's 5,000-row cap.
+export const maxDuration = 60;
+
 export const POST = withApiRoute("admin.crm.import", handleImport, {
   requiredRole: "manager",
   rateLimit: { limit: 10, windowMs: 60_000 },

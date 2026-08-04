@@ -19,7 +19,6 @@ const emailVerificationTokenSchema = new Schema<EmailVerificationTokenDocument>(
   { timestamps: { createdAt: true, updatedAt: false } },
 );
 
-emailVerificationTokenSchema.index({ tokenHash: 1 }, { unique: true });
 emailVerificationTokenSchema.index({ userId: 1 });
 emailVerificationTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 

@@ -33,8 +33,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — RC-4 found this pattern was ALSO silently swallowing
+# .env.example itself (a real, committed-by-design template with no
+# secrets in it — see that file's own header), meaning a fresh clone of
+# this repository had zero documentation of what env vars even exist.
+# The negated pattern below is required immediately after the
+# exclusion (gitignore evaluates rules in order; a later un-ignore only
+# works if it comes after the rule that would otherwise catch it).
 .env*
+!.env.example
 
 # vercel
 .vercel
