@@ -6,9 +6,11 @@ import { ModalShell } from "./ModalShell";
 import { useRegisterModal } from "./RegisterModalContext";
 import { useLanguage } from "./LanguageContext";
 import { WhatsAppIcon } from "./WhatsAppIcon";
-import { isValidIndianMobile } from "@/lib/ai-generalist/validation";
+import { isValidIndianMobile, normalizeIndianMobile } from "@/lib/ai-generalist/validation";
 import { sendAiGeneralistRegistration } from "@/lib/ai-generalist/email";
 import { AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL } from "@/config/aiBootcamp";
+import { useLeadCapture } from "@/components/lead-capture/useLeadCapture";
+import { syntheticEmailFromPhone } from "@/lib/services/leads/phoneOnlyEmail";
 
 export function RegistrationModal() {
   const { isRegisterOpen, closeRegister, openSuccess } = useRegisterModal();
@@ -17,13 +19,15 @@ export function RegistrationModal() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [fullName, setFullName] = useState("");
   const [whatsappError, setWhatsappError] = useState<string | null>(null);
-  const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
+  const { status, submit, reset } = useLeadCapture();
 
   function handleClose() {
     if (status === "sending") return;
     closeRegister();
   }
 
+  /* RC-1: same WhatsApp-number-only funnel as the AI Bootcamp modal —
+   * see that file's own comment and phoneOnlyEmail.ts. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (status === "sending") return;
@@ -37,14 +41,23 @@ export function RegistrationModal() {
       return;
     }
     setWhatsappError(null);
-    setStatus("sending");
 
-    try {
-      await sendAiGeneralistRegistration({ whatsappNumber, fullName });
+    const normalizedPhone = normalizeIndianMobile(whatsappNumber);
+    const result = await submit({
+      lead: {
+        name: fullName || "Not provided",
+        email: syntheticEmailFromPhone(normalizedPhone),
+        phone: normalizedPhone,
+        program: "AI Generalist",
+        source: "ai-generalist-modal",
+      },
+      analyticsEvent: "CompleteRegistration",
+      analyticsParams: { formName: "AiGeneralistRegistration" },
+      notify: () => sendAiGeneralistRegistration({ whatsappNumber, fullName }),
+    });
+
+    if (result.success) {
       openSuccess(fullName);
-    } catch (err) {
-      console.error(err);
-      setStatus("error");
     }
   }
 
@@ -101,11 +114,12 @@ export function RegistrationModal() {
               type="tel"
               inputMode="numeric"
               placeholder={t.registration.phonePlaceholder}
+              aria-label={t.registration.phonePlaceholder}
               value={whatsappNumber}
               onChange={(e) => {
                 setWhatsappNumber(e.target.value);
                 if (whatsappError) setWhatsappError(null);
-                if (status === "error") setStatus("idle");
+                if (status === "error") reset();
               }}
               className={`aig-input${whatsappError ? " aig-input-error" : ""}`}
               style={{ paddingLeft: 46 }}
@@ -135,6 +149,7 @@ export function RegistrationModal() {
           <input
             type="text"
             placeholder={t.registration.namePlaceholder}
+            aria-label={t.registration.namePlaceholder}
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             className="aig-input"

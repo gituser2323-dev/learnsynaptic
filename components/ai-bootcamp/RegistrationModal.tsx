@@ -5,9 +5,11 @@ import { LoaderCircle, Phone, User, ArrowRight } from "lucide-react";
 import { ModalShell } from "./ModalShell";
 import { useRegisterModal } from "./RegisterModalContext";
 import { WhatsAppIcon } from "./WhatsAppIcon";
-import { isValidIndianMobile } from "@/lib/ai-bootcamp/validation";
+import { isValidIndianMobile, normalizeIndianMobile } from "@/lib/ai-bootcamp/validation";
 import { sendAiBootcampRegistration } from "@/lib/ai-bootcamp/email";
 import { AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL } from "@/config/aiBootcamp";
+import { useLeadCapture } from "@/components/lead-capture/useLeadCapture";
+import { syntheticEmailFromPhone } from "@/lib/services/leads/phoneOnlyEmail";
 
 export function RegistrationModal() {
   const { isRegisterOpen, closeRegister, openSuccess } = useRegisterModal();
@@ -15,13 +17,19 @@ export function RegistrationModal() {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [fullName, setFullName] = useState("");
   const [whatsappError, setWhatsappError] = useState<string | null>(null);
-  const [status, setStatus] = useState<"idle" | "sending" | "error">("idle");
+  const { status, submit, reset } = useLeadCapture();
 
   function handleClose() {
     if (status === "sending") return;
     closeRegister();
   }
 
+  /* RC-1: this modal is a deliberately WhatsApp-number-only funnel — no
+   * email field, by product design (see phoneOnlyEmail.ts for why a
+   * synthesized placeholder is used rather than adding one). /api/leads
+   * is now the primary, awaited call; the existing EmailJS-backed
+   * sendAiBootcampRegistration() becomes a best-effort secondary
+   * notification. */
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (status === "sending") return;
@@ -35,14 +43,23 @@ export function RegistrationModal() {
       return;
     }
     setWhatsappError(null);
-    setStatus("sending");
 
-    try {
-      await sendAiBootcampRegistration({ whatsappNumber, fullName });
+    const normalizedPhone = normalizeIndianMobile(whatsappNumber);
+    const result = await submit({
+      lead: {
+        name: fullName || "Not provided",
+        email: syntheticEmailFromPhone(normalizedPhone),
+        phone: normalizedPhone,
+        program: "7-Day AI Engineering Bootcamp",
+        source: "ai-bootcamp-modal",
+      },
+      analyticsEvent: "CompleteRegistration",
+      analyticsParams: { formName: "AiBootcampRegistration" },
+      notify: () => sendAiBootcampRegistration({ whatsappNumber, fullName }),
+    });
+
+    if (result.success) {
       openSuccess(fullName);
-    } catch (err) {
-      console.error(err);
-      setStatus("error");
     }
   }
 
@@ -99,11 +116,12 @@ export function RegistrationModal() {
               type="tel"
               inputMode="numeric"
               placeholder="WhatsApp Number *"
+              aria-label="WhatsApp Number"
               value={whatsappNumber}
               onChange={(e) => {
                 setWhatsappNumber(e.target.value);
                 if (whatsappError) setWhatsappError(null);
-                if (status === "error") setStatus("idle");
+                if (status === "error") reset();
               }}
               className={`aib-input${whatsappError ? " aib-input-error" : ""}`}
               style={{ paddingLeft: 46 }}
@@ -133,6 +151,7 @@ export function RegistrationModal() {
           <input
             type="text"
             placeholder="Full Name (optional)"
+            aria-label="Full Name (optional)"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
             className="aib-input"

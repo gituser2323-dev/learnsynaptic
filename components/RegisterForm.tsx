@@ -7,8 +7,10 @@ import {
   CheckCircle2, ArrowRight, Loader2, AlertTriangle,
   User, Mail, Phone, MapPin, BookOpen, Briefcase, Sparkles, MessageSquare,
 } from 'lucide-react';
+import { useLeadCapture } from '@/components/lead-capture/useLeadCapture';
+import { submitRegistration } from '@/lib/services/registrations/client';
 
-/* ── EmailJS (unchanged) ────────────────────────────────────────────────── */
+/* ── EmailJS (unchanged — now a secondary notification, see handleSubmit) ── */
 const EJS_SERVICE          = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!;
 const EJS_REGISTER_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_REGISTER_TEMPLATE_ID!;
 const EJS_KEY              = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!;
@@ -22,6 +24,20 @@ const PROGRAMS = [
   { value: 'AI Beginner Bootcamp (8 weeks)',                         label: 'AI Beginner Bootcamp (8 weeks)' },
   { value: 'Still deciding — help me choose',                        label: 'Still deciding — help me choose' },
 ];
+
+/**
+ * RC-1: maps this form's descriptive program labels onto the catalog
+ * slugs Registration.programSlug expects (the same slugs ContactForm's
+ * own dropdown already uses) — undefined for "still deciding," since
+ * that visitor hasn't actually chosen a program to register for yet
+ * (they still become a Lead, just not a Registration; see handleSubmit).
+ */
+const PROGRAM_SLUGS: Record<string, string> = {
+  'AI Powered Full Stack Dev + DevOps (6 months)': 'full-stack-devops',
+  'GenAI Builder → Freelancer Program (3 months)': 'genai-builder',
+  'Data Science — AI/ML Specialisation (5 months)': 'data-science',
+  'AI Beginner Bootcamp (8 weeks)': 'bootcamp',
+};
 
 const BACKGROUNDS = [
   { value: '',                               label: 'Select your background…' },
@@ -145,13 +161,41 @@ function LeftPanel({ noMotion }: { noMotion: boolean }) {
   );
 }
 
+/**
+ * RC-1: staggered row wrapper — hoisted to module scope. It previously
+ * lived inside RegisterForm's render body, which meant a brand-new
+ * function reference was created on every re-render (every keystroke,
+ * since typing updates `fields` state). React treats each render's
+ * `<Row>` as a different component type in the same tree position and
+ * unmounts + remounts the whole subtree — including the actual <input>
+ * DOM node — on every single keystroke. That silently dropped typed
+ * text (confirmed with a real browser: after "filling" every field,
+ * every text input read back empty) — this was a genuine, user-facing
+ * data-loss bug on the site's main registration form, not just the
+ * "components created during render" lint warning it also happened to
+ * trip. Calls useReducedMotion() itself rather than threading it down
+ * as a prop through all seven call sites — same value, smaller diff.
+ */
+function Row({ delay, children }: { delay: number; children: React.ReactNode }) {
+  const noMotion = useReducedMotion();
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: noMotion ? 0 : 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, delay: noMotion ? 0 : delay, ease: 'easeOut' }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 /* ════════════════════════════════════════════════════════════════════════════
    Main component
    ════════════════════════════════════════════════════════════════════════════ */
 export function RegisterForm() {
   const noMotion = useReducedMotion();
   const [focused, setFocused] = useState<string | null>(null);
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const { status, submit } = useLeadCapture();
   const [fields, setFields] = useState<Fields>({
     name: '', email: '', phone: '', city: '',
     program: '', goal: '', background: '', blocker: '',
@@ -166,30 +210,64 @@ export function RegisterForm() {
     fields.city.trim() && fields.program && fields.goal.trim() && fields.background
   );
 
-  /* EmailJS submit — logic unchanged */
+  /**
+   * RC-1: /api/leads is now the primary, awaited call — its result
+   * decides success/error, not EmailJS. A program selection that maps
+   * to a real catalog slug also creates a Registration (this is the
+   * one form on the site that represents an actual "sign me up for
+   * program X" intent, as opposed to a general inquiry — see
+   * PROGRAM_SLUGS above). EmailJS keeps sending the same notification
+   * it always has, now as a best-effort secondary step.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit || status === 'sending') return;
-    setStatus('sending');
-    try {
-      await emailjs.send(
-        EJS_SERVICE,
-        EJS_REGISTER_TEMPLATE,
-        {
-          name:       fields.name,
-          email:      fields.email,
-          phone:      fields.phone,
-          city:       fields.city,
-          program:    fields.program,
-          goal:       fields.goal,
-          background: fields.background,
-          blocker:    fields.blocker || '(not answered)',
-        },
-        EJS_KEY,
-      );
-      setStatus('success');
-    } catch {
-      setStatus('error');
+
+    const result = await submit({
+      lead: {
+        name: fields.name,
+        email: fields.email,
+        phone: fields.phone,
+        program: fields.program,
+        source: 'register-page',
+        message: [
+          `City: ${fields.city}`,
+          `Background: ${fields.background}`,
+          `Goal: ${fields.goal}`,
+          fields.blocker ? `Blocker: ${fields.blocker}` : null,
+        ].filter(Boolean).join(' | '),
+      },
+      analyticsEvent: 'CompleteRegistration',
+      analyticsParams: { formName: 'RegisterForm', program: fields.program, background: fields.background },
+      notify: () =>
+        emailjs.send(
+          EJS_SERVICE,
+          EJS_REGISTER_TEMPLATE,
+          {
+            name:       fields.name,
+            email:      fields.email,
+            phone:      fields.phone,
+            city:       fields.city,
+            program:    fields.program,
+            goal:       fields.goal,
+            background: fields.background,
+            blocker:    fields.blocker || '(not answered)',
+          },
+          EJS_KEY,
+        ),
+    });
+
+    const programSlug = PROGRAM_SLUGS[fields.program];
+    if (result.success && result.leadId && programSlug) {
+      const registrationResult = await submitRegistration({
+        leadId: result.leadId,
+        programSlug,
+        programName: fields.program,
+        source: 'register-page',
+      });
+      if (!registrationResult.success) {
+        console.error('[RegisterForm] /api/registrations failed (lead was still created):', registrationResult.errors);
+      }
     }
   };
 
@@ -227,17 +305,6 @@ export function RegisterForm() {
     resize: 'none' as const,
     lineHeight: 1.65,
   });
-
-  /* Staggered row wrapper */
-  const Row = ({ delay, children }: { delay: number; children: React.ReactNode }) => (
-    <motion.div
-      initial={{ opacity: 0, y: noMotion ? 0 : 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, delay: noMotion ? 0 : delay, ease: 'easeOut' }}
-    >
-      {children}
-    </motion.div>
-  );
 
   /* ── Success state ─────────────────────────────────────────────────── */
   if (status === 'success') {

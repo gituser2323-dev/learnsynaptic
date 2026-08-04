@@ -22,6 +22,7 @@ import {
   MessageCircle,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTrackClick } from '@/lib/services/analytics/useTrackClick';
 
 const programs = [
   {
@@ -101,6 +102,7 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const trackClick = useTrackClick();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [programsOpen, setProgramsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -154,7 +156,7 @@ export default function Navbar() {
       </AnimatePresence>
 
       <header
-        className="fixed inset-x-0 z-50 transition-[top] duration-300"
+        className="fixed inset-x-0 z-50 transition-[top] duration-[250ms] ease-in-out"
         style={{ top: announcementVisible ? 'calc(36px + 8px)' : 16 }}
       >
         <div className="mx-auto max-w-7xl px-4">
@@ -167,7 +169,7 @@ export default function Navbar() {
                 : '0 4px 20px rgba(15,23,42,0.05)',
             }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="overflow-visible rounded-[22px] border border-slate-200/70 bg-white/85 backdrop-blur-xl"
+            className="overflow-visible rounded-[22px] border border-slate-200/70 bg-white/98 backdrop-blur-xl"
           >
             <nav className="flex h-full items-center justify-between px-5 sm:px-7">
               {/* Logo — extra left spacing, premium feel */}
@@ -279,6 +281,7 @@ export default function Navbar() {
                 <Link
                   href="/programs"
                   className="group flex items-center gap-1.5 rounded-xl bg-[#1447E6] px-4 py-2.5 text-[14px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(20,71,230,0.55)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_28px_-8px_rgba(20,71,230,0.65)]"
+                  onClick={() => trackClick('enroll_now', 'navbar_desktop')}
                 >
                   Enroll Now
                   <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -364,6 +367,7 @@ export default function Navbar() {
                   <Link
                     href="/programs"
                     className="flex items-center justify-center gap-1.5 rounded-xl bg-[#1447E6] px-4 py-3 text-[14px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(20,71,230,0.55)] transition-transform active:scale-[0.98]"
+                    onClick={() => trackClick('enroll_now', 'navbar_mobile')}
                   >
                     Enroll Now
                     <ArrowRight size={15} />

@@ -1,5 +1,7 @@
 'use client'
 
+import { analytics } from '@/lib/services/analytics'
+
 export function WhatsAppButton() {
   const phone = '919763969449'
   const message = encodeURIComponent("Hi! I'm interested in LearnSynaptic programs.")
@@ -12,6 +14,7 @@ export function WhatsAppButton() {
       rel="noopener noreferrer"
       aria-label="Chat with us on WhatsApp"
       className="wa-float"
+      onClick={() => analytics.trackClick('whatsapp_float', 'global_float_button')}
     >
       {/* Official WhatsApp icon SVG */}
       <svg

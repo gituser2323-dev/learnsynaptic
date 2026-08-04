@@ -8,6 +8,7 @@ import { CurriculumAccordion } from '@/components/CurriculumAccordion';
 import { ProgramFAQ } from '@/components/ProgramFAQ';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/programs/bootcamp' },
   title: 'AI Beginner Bootcamp — 8 Weeks | LearnSynaptic',
   description:
     'Zero experience to building with AI in 8 weeks. Python, prompt engineering, ChatGPT API, and automation tools. No coding background needed. Pune-based, pan-India batches.',

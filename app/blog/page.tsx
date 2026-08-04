@@ -4,6 +4,7 @@ import { ArrowRight, Clock } from 'lucide-react';
 import { blogPosts } from '@/lib/blog-posts';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/blog' },
   title: 'Blog — AI, Full Stack & Career Advice',
   description:
     'Practical guides on AI engineering, full-stack development, career transitions, and the tech job market in India.',

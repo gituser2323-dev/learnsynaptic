@@ -37,6 +37,7 @@ const currentMonth = new Date().toLocaleString("en-US", {
 const heading = `${currentMonth} Admissions Are Now Open`;
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/' },
   title: 'LearnSynaptic — AI, Full Stack & Data Science Training in India',
   description:
     'Build your tech career with LearnSynaptic. Industry-led AI, Full Stack Dev, GenAI, and Data Science programs. Pune-based, training students across India. 85% placement rate.',
@@ -856,9 +857,15 @@ to-[#0D47D9]
           🚀 {currentMonth} Admissions Open • Limited Seats
         </span>
 
-        {/* Heading */}
+        {/* Heading — h2, not h1: HeroSection.tsx (rendered first on this
+            page) already has the page's one true h1; a second h1 here
+            broke both "one h1 per page" and, downstream, the footer's
+            heading order (h1 → h3 skips h2, flagged by Lighthouse).
+            Same classes, so this renders visually identical — still the
+            largest, boldest heading on the page (Module 10 performance
+            audit). */}
 
-        <h1
+        <h2
           className="
           mx-auto
           mt-8
@@ -891,7 +898,7 @@ to-[#0D47D9]
 
           </span>
 
-        </h1>
+        </h2>
 
         {/* Subtitle */}
 

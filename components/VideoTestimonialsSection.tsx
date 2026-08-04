@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { Play, Pause, Loader2, Video as VideoIcon, VideoOff } from 'lucide-react'
 
 interface Testimonial {
@@ -118,12 +119,14 @@ function TestimonialCard({ testimonial, isActive, onActivate }: CardProps) {
         {hasVideo ? (
           <>
             {showPoster && (
-              <img
-                src={testimonial.posterSrc}
+              <Image
+                src={testimonial.posterSrc as string}
                 alt=""
+                fill
+                sizes="(max-width: 1024px) 50vw, 320px"
                 aria-hidden="true"
                 onError={() => setPosterFailed(true)}
-                className="absolute inset-0 h-full w-full object-cover"
+                className="object-cover"
               />
             )}
 

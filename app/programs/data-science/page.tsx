@@ -8,6 +8,7 @@ import { CurriculumAccordion } from '@/components/CurriculumAccordion';
 import { ProgramFAQ } from '@/components/ProgramFAQ';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/programs/data-science' },
   title: 'Data Science AI/ML Specialisation — 5 Months | LearnSynaptic',
   description:
     'Master Python, machine learning, deep learning, NLP, and Power BI in 5 months. Pune-based Data Science program with 85% placement rate across India.',

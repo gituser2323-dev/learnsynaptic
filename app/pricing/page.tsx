@@ -6,6 +6,7 @@ import {
 import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/AnimateOnScroll';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/pricing' },
   title: 'Fees & EMI — LearnSynaptic Programs',
   description:
     'LearnSynaptic program details, features, and payment options. 0% EMI available. Book a free counselling call to discuss exact pricing for the program that fits your goals.',

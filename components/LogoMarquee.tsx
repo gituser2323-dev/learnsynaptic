@@ -22,7 +22,7 @@ export function LogoMarquee() {
   return (
     <section className="border-y border-slate-200 bg-white py-10 overflow-hidden">
 
-      <p className="mb-8 text-center text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">
+      <p className="mb-8 text-center text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">
         Our Graduates Are Working At
       </p>
 
@@ -37,7 +37,7 @@ export function LogoMarquee() {
       key={`${company}-${index}`}
       className="flex items-center gap-8 shrink-0"
     >
-      <span className="text-base font-medium text-slate-400 hover:text-slate-800 transition">
+      <span className="text-base font-medium text-slate-500 hover:text-slate-800 transition">
         {company}
       </span>
 

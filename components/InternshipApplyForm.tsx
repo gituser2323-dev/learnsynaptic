@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, Loader2, AlertTriangle } from 'lucide-react'
+import { useLeadCapture } from '@/components/lead-capture/useLeadCapture'
 
 const enrolledPrograms = [
   'AI Powered Full Stack Dev + DevOps',
@@ -27,7 +28,7 @@ export function InternshipApplyForm() {
     program: '',
     buildNote: '',
   })
-  const [submitted, setSubmitted] = useState(false)
+  const { status, errorMessage, submit } = useLeadCapture()
 
   function onChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -35,10 +36,26 @@ export function InternshipApplyForm() {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
-  function onSubmit(e: React.FormEvent) {
+  /* RC-1: this form previously did nothing but flip a local boolean —
+   * the applicant saw "received" while the data went nowhere. Now the
+   * real, awaited /api/leads call decides the success/error state. No
+   * EmailJS notification existed for this form before, so none is
+   * added here — the backend write is now the only, and correct,
+   * source of truth. */
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    // TODO: wire to CRM / email integration
-    setSubmitted(true)
+    await submit({
+      lead: {
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        program: form.program,
+        source: 'internship-apply',
+        message: form.buildNote,
+      },
+      analyticsEvent: 'Lead',
+      analyticsParams: { formName: 'InternshipApplyForm', program: form.program },
+    })
   }
 
   const inputStyle: React.CSSProperties = {
@@ -61,7 +78,7 @@ export function InternshipApplyForm() {
     marginBottom: 5,
   }
 
-  if (submitted) {
+  if (status === 'success') {
     return (
       <div style={{ textAlign: 'center', padding: '40px 24px' }}>
         <div
@@ -91,6 +108,17 @@ export function InternshipApplyForm() {
 
   return (
     <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+      {status === 'error' && (
+        <div
+          className="flex items-start gap-3 rounded-xl p-4"
+          style={{ background: '#fef2f2', border: '1px solid #fecaca' }}
+        >
+          <AlertTriangle size={18} style={{ color: '#dc2626', flexShrink: 0, marginTop: 1 }} />
+          <p style={{ color: '#dc2626', fontSize: '0.9rem' }}>
+            {errorMessage ?? 'Something went wrong — please try again.'}
+          </p>
+        </div>
+      )}
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="it-name" style={labelStyle}>Full name</label>
@@ -190,10 +218,18 @@ export function InternshipApplyForm() {
       <div>
         <button
           type="submit"
+          disabled={status === 'sending'}
           className="ls-btn-primary"
-          style={{ justifyContent: 'center', padding: '13px 32px' }}
+          style={{ justifyContent: 'center', padding: '13px 32px', opacity: status === 'sending' ? 0.7 : 1 }}
         >
-          Submit Application
+          {status === 'sending' ? (
+            <>
+              <Loader2 size={16} className="animate-spin" />
+              Submitting…
+            </>
+          ) : (
+            'Submit Application'
+          )}
         </button>
         <p style={{ fontSize: '0.8rem', color: 'var(--ls-muted)', marginTop: 10, lineHeight: 1.5 }}>
           Pratik reviews every application personally and responds within 2 business days.

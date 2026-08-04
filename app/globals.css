@@ -480,3 +480,280 @@ html.custom-cursor-active * {
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ADMIN DASHBOARD — /admin only. Scoped entirely under .admin-shell so the
+   public site (light-only --ls-* tokens) and /bootcamp (.builders tokens)
+   are completely unaffected — same isolation pattern as .builders above.
+   Dark-first; [data-theme="light"] overrides for the header's theme switch.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.admin-shell {
+  --adm-bg:              #08090d;
+  --adm-bg-elevated:     #0c0e14;
+  --adm-surface:         #12141c;
+  --adm-surface-hover:   #181b26;
+  --adm-surface-2:       #1a1d29;
+  --adm-border:          rgba(255, 255, 255, 0.08);
+  --adm-border-strong:   rgba(255, 255, 255, 0.15);
+  --adm-overlay:         rgba(4, 5, 8, 0.72);
+
+  --adm-text:            #f5f6f8;
+  --adm-text-secondary:  #a3a8b8;
+  --adm-text-muted:      #6c7180;
+
+  --adm-accent:          #6366f1;
+  --adm-accent-hover:    #797bf6;
+  --adm-accent-soft:     rgba(99, 102, 241, 0.16);
+  --adm-accent-2:        #22d3ee;
+
+  --adm-success:         #34d399;
+  --adm-success-soft:    rgba(52, 211, 153, 0.14);
+  --adm-warning:         #fbbf24;
+  --adm-warning-soft:    rgba(251, 191, 36, 0.14);
+  --adm-danger:          #f87171;
+  --adm-danger-soft:     rgba(248, 113, 113, 0.14);
+  --adm-info:            #60a5fa;
+  --adm-info-soft:       rgba(96, 165, 250, 0.14);
+
+  --adm-radius-sm:   8px;
+  --adm-radius-md:   12px;
+  --adm-radius-lg:   16px;
+  --adm-radius-xl:   22px;
+  --adm-radius-full: 9999px;
+
+  --adm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --adm-shadow-md: 0 6px 20px -6px rgba(0, 0, 0, 0.45);
+  --adm-shadow-lg: 0 16px 48px -12px rgba(0, 0, 0, 0.6);
+  --adm-glow:      0 0 0 1px rgba(99, 102, 241, 0.28), 0 10px 36px -10px rgba(99, 102, 241, 0.4);
+
+  --adm-ease:          cubic-bezier(0.16, 1, 0.3, 1);
+  --adm-duration-fast: 120ms;
+  --adm-duration:      200ms;
+  --adm-duration-slow: 420ms;
+
+  --adm-space-1: 4px;
+  --adm-space-2: 8px;
+  --adm-space-3: 12px;
+  --adm-space-4: 16px;
+  --adm-space-5: 20px;
+  --adm-space-6: 24px;
+  --adm-space-8: 32px;
+  --adm-space-10: 40px;
+  --adm-space-12: 48px;
+
+  --adm-header-h: 64px;
+  --adm-sidebar-w: 248px;
+  --adm-sidebar-w-collapsed: 76px;
+
+  background:
+    radial-gradient(ellipse 900px 480px at 12% -8%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(ellipse 700px 420px at 100% 0%, rgba(34, 211, 238, 0.08), transparent 55%),
+    var(--adm-bg);
+  color: var(--adm-text);
+  font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+  min-height: 100vh;
+  isolation: isolate;
+  -webkit-font-smoothing: antialiased;
+}
+
+.admin-shell[data-theme="light"] {
+  --adm-bg:            #f5f6fa;
+  --adm-bg-elevated:   #ffffff;
+  --adm-surface:       #ffffff;
+  --adm-surface-hover: #f2f3f8;
+  --adm-surface-2:     #edeff5;
+  --adm-border:        #e6e8f0;
+  --adm-border-strong: #d5d8e6;
+  --adm-overlay:       rgba(20, 22, 31, 0.4);
+
+  --adm-text:           #14161f;
+  --adm-text-secondary: #585d6e;
+  --adm-text-muted:     #8b90a0;
+
+  --adm-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --adm-shadow-md: 0 6px 20px -6px rgba(15, 23, 42, 0.10);
+  --adm-shadow-lg: 0 16px 40px -10px rgba(15, 23, 42, 0.14);
+
+  background:
+    radial-gradient(ellipse 900px 480px at 12% -8%, rgba(99, 102, 241, 0.08), transparent 60%),
+    radial-gradient(ellipse 700px 420px at 100% 0%, rgba(34, 211, 238, 0.05), transparent 55%),
+    var(--adm-bg);
+}
+
+.admin-shell * {
+  border-color: var(--adm-border);
+}
+
+.admin-shell h1, .admin-shell h2, .admin-shell h3, .admin-shell h4 {
+  color: var(--adm-text);
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+.admin-shell p { color: inherit; line-height: 1.6; }
+
+/* ─── Surfaces ─────────────────────────────────────────────────────────── */
+.adm-card {
+  background: var(--adm-surface);
+  border: 1px solid var(--adm-border);
+  border-radius: var(--adm-radius-lg);
+  box-shadow: var(--adm-shadow-sm);
+  transition: border-color var(--adm-duration) var(--adm-ease), box-shadow var(--adm-duration) var(--adm-ease), transform var(--adm-duration) var(--adm-ease);
+}
+.adm-card-hover:hover {
+  border-color: var(--adm-border-strong);
+  box-shadow: var(--adm-shadow-md);
+  transform: translateY(-2px);
+}
+
+.adm-glass {
+  background: color-mix(in srgb, var(--adm-surface) 72%, transparent);
+  border: 1px solid var(--adm-border);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+.adm-gradient-text {
+  background: linear-gradient(120deg, var(--adm-text) 30%, var(--adm-accent) 75%, var(--adm-accent-2) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ─── Focus ring ───────────────────────────────────────────────────────── */
+.adm-focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--adm-bg), 0 0 0 4px var(--adm-accent);
+  border-radius: var(--adm-radius-sm);
+}
+
+/* ─── Buttons ──────────────────────────────────────────────────────────── */
+.adm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  border-radius: var(--adm-radius-md);
+  padding: 0 14px;
+  height: 38px;
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background var(--adm-duration) var(--adm-ease), border-color var(--adm-duration) var(--adm-ease), transform var(--adm-duration-fast) var(--adm-ease), box-shadow var(--adm-duration) var(--adm-ease);
+}
+.adm-btn:active { transform: scale(0.97); }
+.adm-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.adm-btn-primary {
+  background: linear-gradient(135deg, var(--adm-accent), #4f52e0);
+  color: #fff;
+  box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.12) inset, var(--adm-shadow-sm);
+}
+.adm-btn-primary:hover:not(:disabled) { box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.16) inset, var(--adm-glow); }
+
+.adm-btn-secondary {
+  background: var(--adm-surface-2);
+  color: var(--adm-text);
+  border-color: var(--adm-border);
+}
+.adm-btn-secondary:hover:not(:disabled) { background: var(--adm-surface-hover); border-color: var(--adm-border-strong); }
+
+.adm-btn-ghost {
+  background: transparent;
+  color: var(--adm-text-secondary);
+}
+.adm-btn-ghost:hover:not(:disabled) { background: var(--adm-surface-hover); color: var(--adm-text); }
+
+.adm-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--adm-radius-md);
+  color: var(--adm-text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background var(--adm-duration) var(--adm-ease), color var(--adm-duration) var(--adm-ease), border-color var(--adm-duration) var(--adm-ease);
+}
+.adm-icon-btn:hover { background: var(--adm-surface-hover); color: var(--adm-text); border-color: var(--adm-border); }
+
+/* ─── Inputs ───────────────────────────────────────────────────────────── */
+.adm-input {
+  height: 38px;
+  width: 100%;
+  border-radius: var(--adm-radius-md);
+  border: 1px solid var(--adm-border);
+  background: var(--adm-surface-2);
+  color: var(--adm-text);
+  padding: 0 12px;
+  font-size: 0.8125rem;
+  outline: none;
+  transition: border-color var(--adm-duration) var(--adm-ease), background var(--adm-duration) var(--adm-ease), box-shadow var(--adm-duration) var(--adm-ease);
+}
+.adm-input::placeholder { color: var(--adm-text-muted); }
+.adm-input:hover { border-color: var(--adm-border-strong); }
+.adm-input:focus {
+  border-color: var(--adm-accent);
+  background: var(--adm-surface);
+  box-shadow: 0 0 0 3px var(--adm-accent-soft);
+}
+
+/* ─── Badges / chips ───────────────────────────────────────────────────── */
+.adm-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  border-radius: var(--adm-radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+}
+.adm-chip-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+/* ─── Scrollbars (admin only) ──────────────────────────────────────────── */
+.admin-shell ::-webkit-scrollbar { width: 8px; height: 8px; }
+.admin-shell ::-webkit-scrollbar-track { background: transparent; }
+.admin-shell ::-webkit-scrollbar-thumb { background: var(--adm-border-strong); border-radius: 999px; }
+.admin-shell ::-webkit-scrollbar-thumb:hover { background: var(--adm-text-muted); }
+
+/* ─── Motion ───────────────────────────────────────────────────────────── */
+@keyframes adm-fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.adm-animate-in {
+  animation: adm-fade-up var(--adm-duration-slow) var(--adm-ease) both;
+}
+@keyframes adm-shimmer {
+  0%   { background-position: -300px 0; }
+  100% { background-position: 300px 0; }
+}
+.adm-skeleton {
+  background: linear-gradient(90deg, var(--adm-surface-2) 25%, var(--adm-surface-hover) 37%, var(--adm-surface-2) 63%);
+  background-size: 600px 100%;
+  animation: adm-shimmer 1.6s ease-in-out infinite;
+}
+@keyframes adm-scale-in {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.adm-animate-pop { animation: adm-scale-in var(--adm-duration) var(--adm-ease) both; }
+
+@keyframes adm-pulse-ring {
+  0%   { box-shadow: 0 0 0 0 var(--adm-accent-soft); }
+  100% { box-shadow: 0 0 0 8px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-shell .adm-animate-in,
+  .admin-shell .adm-animate-pop,
+  .admin-shell .adm-skeleton {
+    animation-duration: 0.01ms !important;
+  }
+}

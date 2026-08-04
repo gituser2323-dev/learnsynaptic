@@ -6,29 +6,40 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "playwright test",
+    "test:unit": "vitest run"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1100.0",
+    "@aws-sdk/s3-request-presigner": "^3.1100.0",
     "@emailjs/browser": "^4.4.1",
-    "@splinetool/react-spline": "^4.1.0",
-    "@splinetool/runtime": "^1.12.97",
+    "bcryptjs": "^3.0.3",
     "framer-motion": "^12.40.0",
-    "gsap": "^3.15.0",
+    "jose": "^6.2.4",
     "lucide-react": "^1.22.0",
-    "next": "16.2.9",
+    "mongoose": "^9.8.0",
+    "next": "^16.2.11",
+    "papaparse": "^5.5.4",
+    "qrcode": "^1.5.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-hook-form": "^7.81.0"
+    "react-hook-form": "^7.81.0",
+    "recharts": "^3.10.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/papaparse": "^5.5.2",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "playwright": "^1.61.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

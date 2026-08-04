@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPostBySlug(slug);
   if (!post) return {};
   return {
+    alternates: { canonical: `/blog/${slug}` },
     title: post.title,
     description: post.metaDescription,
   };

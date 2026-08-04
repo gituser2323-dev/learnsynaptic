@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/blob-report/
 
 # next.js
 /.next/
@@ -35,6 +38,10 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+# File Storage (Phase 6, Module 6.2) — local dev provider's own
+# uploaded bytes, never committed, never served as a static asset.
+/.storage-uploads/
 
 # typescript
 *.tsbuildinfo

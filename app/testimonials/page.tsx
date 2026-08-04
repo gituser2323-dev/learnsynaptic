@@ -4,6 +4,7 @@ import { ArrowRight, Quote } from 'lucide-react';
 import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/AnimateOnScroll';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/testimonials' },
   title: 'Student Testimonials — Real Outcomes from LearnSynaptic',
   description:
     'Read what LearnSynaptic graduates say about their career transitions. Before and after role outcomes from students across AI Full Stack, GenAI Builder, Data Science, and Bootcamp programs.',

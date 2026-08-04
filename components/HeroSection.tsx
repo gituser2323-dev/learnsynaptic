@@ -7,6 +7,7 @@ import {
   Briefcase,
   ArrowRight,
   Download,
+  User,
 } from "lucide-react";
 
 import { AnimatePresence, motion } from "framer-motion";
@@ -249,14 +250,23 @@ const { openModal } = useLeadModal();
               </div>
             </div>
             <div className="mt-6 flex flex-col items-center justify-center gap-1.5 sm:flex-row sm:justify-center sm:gap-3 lg:justify-start">
+              {/* Stylized avatar row — deliberately abstract (icon, not a
+                  photo). No individual student headshots exist for this
+                  aggregate "trusted by" stat, and inventing fake ones
+                  would misrepresent real people; this is the same
+                  honest-placeholder approach already used for the
+                  founder's photo on the About page, adapted for a
+                  compact multi-avatar row. */}
               <div className="flex -space-x-2.5 sm:-space-x-3">
-                {["1", "2", "3", "4", "5"].map((id) => (
-                  <img
-                    key={id}
-                    src={`/students/${id}.jpg`}
-                    alt=""
-                    className="h-8 w-8 rounded-full border-2 border-white object-cover sm:h-10 sm:w-10"
-                  />
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <div
+                    key={n}
+                    aria-hidden="true"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white sm:h-10 sm:w-10"
+                    style={{ background: "var(--ls-blue-tint)" }}
+                  >
+                    <User size={14} style={{ color: "var(--ls-blue-primary)" }} strokeWidth={2.25} />
+                  </div>
                 ))}
               </div>
 

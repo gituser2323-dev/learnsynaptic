@@ -14,6 +14,8 @@ import {
 import SuccessScreen from "./SuccessScreen";
 import { useLeadModal } from "./LeadModalContext";
 import { sendLeadEmail } from "@/app/utils/email";
+import { analytics, getAttribution } from "@/lib/services/analytics";
+import { submitLead } from "@/lib/services/leads/client";
 
 const programs = [
   "AI Full Stack + DevOps",
@@ -76,6 +78,33 @@ export default function LeadForm({ source = "Website" }: LeadFormProps) {
     try {
       setLoading(true);
 
+      const attribution = getAttribution();
+      const utm = attribution?.last
+        ? {
+            utmSource: attribution.last.utm_source,
+            utmMedium: attribution.last.utm_medium,
+            utmCampaign: attribution.last.utm_campaign,
+            utmContent: attribution.last.utm_content,
+            utmTerm: attribution.last.utm_term,
+          }
+        : undefined;
+
+      // Best-effort: /api/leads (Module 1) is new and additive. A failure
+      // here must never block the EmailJS-based success path below,
+      // which is still the site's only production-proven lead-capture
+      // mechanism. Fired concurrently with sendLeadEmail, not awaited
+      // until after it, so neither call waits on the other.
+      const leadApiPromise = submitLead({
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        program: form.program,
+        source,
+        utm,
+      }).catch((err) => {
+        console.error("[LeadForm] /api/leads submission failed (non-blocking):", err);
+      });
+
       await sendLeadEmail({
         name: form.name,
         phone: form.phone,
@@ -84,6 +113,9 @@ export default function LeadForm({ source = "Website" }: LeadFormProps) {
         source,
       });
 
+      await leadApiPromise;
+
+      analytics.track("Lead", { formName: "LeadModal", source, program: form.program });
       setSuccess(true);
     } catch (err) {
       console.error(err);
@@ -102,6 +134,7 @@ export default function LeadForm({ source = "Website" }: LeadFormProps) {
       <Input
         icon={<User size={18} />}
         placeholder="Full Name"
+        aria-label="Full Name"
         name="name"
         value={form.name}
         onChange={handleChange}
@@ -111,6 +144,7 @@ export default function LeadForm({ source = "Website" }: LeadFormProps) {
       <Input
         icon={<Phone size={18} />}
         placeholder="Mobile Number"
+        aria-label="Mobile Number"
         name="phone"
         type="tel"
         value={form.phone}
@@ -121,6 +155,7 @@ export default function LeadForm({ source = "Website" }: LeadFormProps) {
       <Input
         icon={<Mail size={18} />}
         placeholder="Email Address"
+        aria-label="Email Address"
         name="email"
         type="email"
         value={form.email}
@@ -136,6 +171,7 @@ export default function LeadForm({ source = "Website" }: LeadFormProps) {
         />
         <select
           name="program"
+          aria-label="Program"
           value={form.program}
           onChange={handleChange}
           className={`h-12 w-full appearance-none rounded-2xl border bg-white pl-12 pr-4 text-sm font-medium outline-none transition focus:ring-4 sm:h-14 sm:pl-14 ${

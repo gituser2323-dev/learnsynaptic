@@ -5,6 +5,7 @@ import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll';
 import { ContactForm, CallbackForm } from '@/components/ContactForm';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/contact' },
   title: 'Contact Us — LearnSynaptic',
   description:
     'Get in touch with the LearnSynaptic team. Ask about programs, book a free counselling session, or request a callback. Pune-based, available pan-India.',

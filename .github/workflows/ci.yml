@@ -1,0 +1,48 @@
+name: CI
+
+# RC-1 stabilization — the automated gate that previously didn't exist
+# between "compiles on my machine" and "it's live." Runs the same three
+# checks this project has manually verified before every change all
+# session: type-check, lint, and (new) an end-to-end smoke suite. No
+# MONGODB_URI is set — the in-memory repository fallback is exactly
+# what a CI run wants (fresh, empty state every time, no external
+# service to provision just to run tests).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end smoke suite
+        run: npm run test:e2e
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

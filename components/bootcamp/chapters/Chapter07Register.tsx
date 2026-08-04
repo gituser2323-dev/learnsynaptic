@@ -8,6 +8,7 @@ import {
   Loader2, AlertTriangle, CheckCircle2, MessageCircle, Sparkles, Plus, Minus,
 } from 'lucide-react';
 import { sendBootcampRegistration, type BootcampRegistration } from '@/config/email';
+import { useLeadCapture } from '@/components/lead-capture/useLeadCapture';
 import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll';
 import { Confetti } from '../Confetti';
 import { ChapterMark, GridBackdrop, NoiseOverlay, GlowOrbs, Magnetic, BuildersCountdown, TOTAL_SEATS, SEATS_TAKEN } from './primitives';
@@ -260,7 +261,7 @@ function FaqAccordion() {
 }
 
 export function ChapterRegister({ target, batchDateLabel }: { target: Date; batchDateLabel: string }) {
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const { status, submit } = useLeadCapture();
   const {
     register,
     handleSubmit,
@@ -273,14 +274,23 @@ export function ChapterRegister({ target, batchDateLabel }: { target: Date; batc
   const filledCount = requiredFields.filter((f) => !!values[f]).length;
   const progressPct = Math.max(4, Math.round((filledCount / requiredFields.length) * 100));
 
+  /* RC-1: /api/leads is now the primary, awaited call; the existing
+   * EmailJS-backed sendBootcampRegistration() becomes a best-effort
+   * secondary notification. */
   const onSubmit = async (data: FormValues) => {
-    setStatus('sending');
-    try {
-      await sendBootcampRegistration(data);
-      setStatus('success');
-    } catch {
-      setStatus('error');
-    }
+    await submit({
+      lead: {
+        name: data.name,
+        email: data.email,
+        phone: data.phone,
+        program: 'AI Beginner Bootcamp — 7-Day Chapter',
+        source: 'bootcamp-chapter-register',
+        message: `Organisation: ${data.organisation} | Status: ${data.status} | Skill level: ${data.skillLevel} | Goal: ${data.goal}`,
+      },
+      analyticsEvent: 'CompleteRegistration',
+      analyticsParams: { formName: 'ChapterRegister' },
+      notify: () => sendBootcampRegistration(data),
+    });
   };
 
   const seatsPct = Math.round((SEATS_TAKEN / TOTAL_SEATS) * 100);

@@ -7,6 +7,7 @@ import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/
 import { AboutGallery } from '@/components/AboutGallery';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/about' },
   title: 'About Pratik Sabale — Founder, LearnSynaptic',
   description:
     'MERN Stack Developer and EdTech founder based in Pune. 3-4 years building real products and training developers. LearnSynaptic is already running — 5+ batches, 200+ students trained.',

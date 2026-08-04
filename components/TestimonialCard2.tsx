@@ -58,11 +58,14 @@ export function TestimonialCard2({ name, role, quote, badge, initials }: Testimo
 
     <div className="flex-1">
 
-      <h4 className="font-semibold text-slate-900">
+      {/* h3 for the same reason as TestimonialCard.tsx's identical fix —
+          this component currently has no importer, but keeping it
+          consistent rather than leaving a stale h4 if it's wired up later. */}
+      <h3 className="font-semibold text-slate-900">
 
         {name}
 
-      </h4>
+      </h3>
 
       <p className="text-xs text-slate-500">
 

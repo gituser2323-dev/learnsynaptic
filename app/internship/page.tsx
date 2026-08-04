@@ -14,6 +14,7 @@ import {
 import { InternshipApplyForm } from '@/components/InternshipApplyForm'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/internship' },
   title: 'Internship Track — Real Projects for Enrolled Students',
   description:
     'Included with select LearnSynaptic programs — work on a real project brief with mentorship and walk away with a deployed, demoable build and experience letter.',

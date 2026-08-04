@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence, type Transition } from 'framer-motion'
 import { X, Loader2, AlertTriangle } from 'lucide-react'
 import emailjs from '@emailjs/browser'
+import { useLeadCapture } from '@/components/lead-capture/useLeadCapture'
+import { syntheticEmailFromPhone } from '@/lib/services/leads/phoneOnlyEmail'
 
 const STORAGE_KEY = 'ls_lead_popup_shown'
 
@@ -25,7 +27,7 @@ const ease = [0.0, 0.0, 0.2, 1.0] as const
 export function LeadCapturePopup() {
   const pathname = usePathname()
   const [visible, setVisible] = useState(false)
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle')
+  const { status, submit } = useLeadCapture()
   const [form, setForm] = useState({ name: '', phone: '', program: '' })
   const firedRef = useRef(false)
 
@@ -78,26 +80,36 @@ export function LeadCapturePopup() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
+  /* RC-1: exit-intent popup only ever collected name/phone — no email
+   * field, by design. A synthesized, non-deliverable placeholder fills
+   * Lead.email's requirement without adding a field to this popup. */
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    setStatus('sending')
-    try {
-      await emailjs.send(
-        EJS_SERVICE,
-        EJS_TEMPLATE,
-        {
-          name: form.name,
-          phone: form.phone,
-          program: form.program || 'Not specified',
-          email: '',
-          message: `Lead popup enquiry — program interest: ${form.program || 'Not specified'}`,
-        },
-        EJS_KEY,
-      )
-      setStatus('success')
-    } catch {
-      setStatus('error')
-    }
+    await submit({
+      lead: {
+        name: form.name,
+        email: syntheticEmailFromPhone(form.phone),
+        phone: form.phone,
+        program: form.program || undefined,
+        source: 'exit-intent-popup',
+        message: `Lead popup enquiry — program interest: ${form.program || 'Not specified'}`,
+      },
+      analyticsEvent: 'Lead',
+      analyticsParams: { formName: 'LeadCapturePopup', program: form.program || 'not-specified' },
+      notify: () =>
+        emailjs.send(
+          EJS_SERVICE,
+          EJS_TEMPLATE,
+          {
+            name: form.name,
+            phone: form.phone,
+            program: form.program || 'Not specified',
+            email: '',
+            message: `Lead popup enquiry — program interest: ${form.program || 'Not specified'}`,
+          },
+          EJS_KEY,
+        ),
+    })
   }
 
   const backdropTransition: Transition = { duration: 0.2, ease }

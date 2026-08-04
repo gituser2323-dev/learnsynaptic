@@ -1,9 +1,8 @@
+import dynamic from "next/dynamic";
 import "./ai-generalist.css";
 import { LanguageProvider } from "./LanguageContext";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { RegisterModalProvider } from "./RegisterModalContext";
-import { RegistrationModal } from "./RegistrationModal";
-import { SuccessModal } from "./SuccessModal";
 import { FloatingCTA } from "./FloatingCTA";
 import { Hero } from "./sections/Hero";
 import { AwarenessCards } from "./sections/AwarenessCards";
@@ -13,6 +12,11 @@ import { AudienceComparison } from "./sections/AudienceComparison";
 import { ProjectsCurriculum } from "./sections/ProjectsCurriculum";
 import { MentorBonuses } from "./sections/MentorBonuses";
 import { FaqClosing } from "./sections/FaqClosing";
+
+// Code splitting (Module 10 performance audit) — see the identical note
+// in ../ai-bootcamp/LandingPage.tsx.
+const RegistrationModal = dynamic(() => import("./RegistrationModal").then((mod) => mod.RegistrationModal));
+const SuccessModal = dynamic(() => import("./SuccessModal").then((mod) => mod.SuccessModal));
 
 export function AiGeneralistLandingPage() {
   return (

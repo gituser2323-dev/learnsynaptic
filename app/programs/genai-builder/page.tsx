@@ -8,6 +8,7 @@ import { CurriculumAccordion } from '@/components/CurriculumAccordion';
 import { ProgramFAQ } from '@/components/ProgramFAQ';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/programs/genai-builder' },
   title: 'GenAI Builder → Freelancer Program — 3 Months | LearnSynaptic',
   description:
     'Build LangChain apps, RAG systems, and AI chatbots — then launch your freelancing career. 3-month intensive GenAI program from LearnSynaptic. Pune-based, pan-India batches.',

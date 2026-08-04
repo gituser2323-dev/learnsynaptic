@@ -32,7 +32,12 @@ export function TestimonialCard({ name, role, quote, badge, initials }: Testimon
       </div>
 
       <div>
-        <h4 className="font-semibold text-slate-900">{name}</h4>
+        {/* h3, not h4: the nearest section heading on pages that render
+            this card is h2 (e.g. "Real students. Real outcomes." on the
+            homepage) — h4 skipped a level. Same classes, so no visual
+            change (Module 10 performance audit — Lighthouse flagged
+            this specific node). */}
+        <h3 className="font-semibold text-slate-900">{name}</h3>
 
         <p className="text-xs text-slate-500">{role}</p>
       </div>

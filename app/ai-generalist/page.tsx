@@ -17,6 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/ai-generalist' },
   title: "FREE 7-Day AI for Business Bootcamp — LearnSynaptic",
   description:
     "AI is no longer optional. It's essential. Join LearnSynaptic's free 7-day live AI for Business Bootcamp and get back 10+ hours a week with zero coding.",

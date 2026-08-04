@@ -16,20 +16,32 @@ import { LeadCapturePopup } from '@/components/LeadCapturePopup';
  * systems (an imported Claude Design) so they also skip the ambient cursor
  * glow / custom cursor micro-interactions that belong to the existing
  * site's visual identity, keeping the designs from ever blending.
+ *
+ * /admin (Module 11 — CRM Dashboard UI) is a third category: not a
+ * marketing microsite at all, an internal tool with its own shell
+ * (app/admin/(dashboard)/layout.tsx — sidebar, header, no Navbar/Footer/
+ * WhatsApp bubble/lead popup/cursor effects). It renders bare children
+ * here; its own layout provides `id="main-content"` for the skip link
+ * instead of this component doing it.
  */
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isAdminDashboard = pathname?.startsWith('/admin');
   const isAiBootcamp = pathname?.startsWith('/ai-bootcamp') || pathname?.startsWith('/ai-generalist');
   const isIsolatedMicrosite = pathname?.startsWith('/bootcamp') || isAiBootcamp;
 
+  if (isAdminDashboard) {
+    return <>{children}</>;
+  }
+
   if (isAiBootcamp) {
-    return <main className="flex-1">{children}</main>;
+    return <main id="main-content" className="flex-1">{children}</main>;
   }
 
   if (isIsolatedMicrosite) {
     return (
       <>
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1">{children}</main>
         <SpotlightGlow />
         <CustomCursor />
       </>
@@ -39,7 +51,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Navbar />
-      <main className="flex-1">{children}</main>
+      <main id="main-content" className="flex-1">{children}</main>
       <Footer />
       <WhatsAppButton />
       <SpotlightGlow />

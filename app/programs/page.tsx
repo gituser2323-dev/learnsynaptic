@@ -6,6 +6,7 @@ import {
 import { AnimateOnScroll, StaggerContainer, StaggerItem, HoverCard } from '@/components/ui/AnimateOnScroll';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/programs' },
   title: 'All Programs — AI, Full Stack & Data Science Courses in India',
   description:
     'Compare all 4 LearnSynaptic programs: AI Full Stack Dev + DevOps, GenAI Builder Freelancer, Data Science AI/ML, and AI Beginner Bootcamp. Find the right program for your career.',

@@ -17,6 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/ai-bootcamp' },
   title: "FREE 7-Day AI Engineering Bootcamp — LearnSynaptic",
   description:
     "The Next Big Opportunity Starts With AI. Join LearnSynaptic's free 7-day live AI Engineering Bootcamp — 7 real projects shipped, 1:1 mentorship, zero cost.",

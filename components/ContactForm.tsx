@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { CheckCircle2, ArrowRight, Loader2, AlertTriangle } from 'lucide-react';
+import { useLeadCapture } from '@/components/lead-capture/useLeadCapture';
+import { syntheticEmailFromPhone } from '@/lib/services/leads/phoneOnlyEmail';
 
 const EJS_SERVICE = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!;
 const EJS_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!;
@@ -32,33 +34,42 @@ export function ContactForm() {
   const [fields, setFields] = useState({
     name: '', email: '', phone: '', program: '', message: '',
   });
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const { status, submit } = useLeadCapture();
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const set = (k: keyof typeof fields) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
       setFields((f) => ({ ...f, [k]: e.target.value }));
 
+  /* RC-1: /api/leads is now the primary, awaited call; EmailJS is a
+   * best-effort secondary notification — see useLeadCapture.ts. */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('sending');
-    try {
-      await emailjs.send(
-        EJS_SERVICE,
-        EJS_TEMPLATE,
-        {
-          name: fields.name,
-          email: fields.email,
-          phone: fields.phone,
-          program: fields.program || 'Not specified',
-          message: fields.message,
-        },
-        EJS_KEY,
-      );
-      setStatus('success');
-    } catch {
-      setStatus('error');
-    }
+    await submit({
+      lead: {
+        name: fields.name,
+        email: fields.email,
+        phone: fields.phone,
+        program: fields.program || undefined,
+        source: 'contact-page',
+        message: fields.message,
+      },
+      analyticsEvent: 'Lead',
+      analyticsParams: { formName: 'ContactForm', program: fields.program || 'not-specified' },
+      notify: () =>
+        emailjs.send(
+          EJS_SERVICE,
+          EJS_TEMPLATE,
+          {
+            name: fields.name,
+            email: fields.email,
+            phone: fields.phone,
+            program: fields.program || 'Not specified',
+            message: fields.message,
+          },
+          EJS_KEY,
+        ),
+    });
   };
 
   if (status === 'success') {
@@ -288,33 +299,44 @@ const timeslots = [
 
 export function CallbackForm() {
   const [fields, setFields] = useState({ name: '', phone: '', time: '' });
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const { status, submit } = useLeadCapture();
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const set = (k: keyof typeof fields) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
       setFields((f) => ({ ...f, [k]: e.target.value }));
 
+  /* RC-1: this form only ever collected name/phone — no email field, by
+   * design (a callback request is inherently phone-first). Lead.email
+   * is required, so a clearly-marked, non-deliverable placeholder is
+   * synthesized from the phone number rather than adding a field to a
+   * form that was intentionally kept minimal. See phoneOnlyEmail.ts. */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('sending');
-    try {
-      await emailjs.send(
-        EJS_SERVICE,
-        EJS_TEMPLATE,
-        {
-          name: fields.name,
-          phone: fields.phone,
-          message: `Callback request — preferred time: ${fields.time || 'Any time'}`,
-          email: '',
-          program: '',
-        },
-        EJS_KEY,
-      );
-      setStatus('success');
-    } catch {
-      setStatus('error');
-    }
+    await submit({
+      lead: {
+        name: fields.name,
+        email: syntheticEmailFromPhone(fields.phone),
+        phone: fields.phone,
+        source: 'contact-page-callback',
+        message: `Callback request — preferred time: ${fields.time || 'Any time'}`,
+      },
+      analyticsEvent: 'Lead',
+      analyticsParams: { formName: 'CallbackForm', preferredTime: fields.time || 'any' },
+      notify: () =>
+        emailjs.send(
+          EJS_SERVICE,
+          EJS_TEMPLATE,
+          {
+            name: fields.name,
+            phone: fields.phone,
+            message: `Callback request — preferred time: ${fields.time || 'Any time'}`,
+            email: '',
+            program: '',
+          },
+          EJS_KEY,
+        ),
+    });
   };
 
   if (status === 'success') {

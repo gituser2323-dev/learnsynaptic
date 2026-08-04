@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getNextBootcampStart, formatBatchDate } from '@/lib/bootcampDates';
+import { SITE_URL } from '@/config/site';
 import { ChapterHero } from '@/components/bootcamp/chapters/Chapter01Hero';
 import { ChapterReckoning } from '@/components/bootcamp/chapters/Chapter02Reckoning';
 import { ChapterWhyNow } from '@/components/bootcamp/chapters/Chapter03WhyNow';
@@ -15,6 +16,7 @@ import { ChapterFinalCTA } from '@/components/bootcamp/chapters/Chapter12FinalCT
 import { StickyCTA } from '@/components/bootcamp/StickyCTA';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/bootcamp' },
   title: 'FREE AI Full Stack + GenAI Bootcamp — 7 Days Live | LearnSynaptic',
   description:
     'Join LearnSynaptic\'s FREE 7-day LIVE AI Full Stack Bootcamp. Build real AI applications with React, Node.js, OpenAI APIs, MCP, and Cursor AI. Limited seats, zero cost.',
@@ -43,7 +45,7 @@ export default function BootcampPage() {
     provider: {
       '@type': 'Organization',
       name: 'LearnSynaptic',
-      sameAs: 'https://learnsynaptic.com',
+      sameAs: SITE_URL,
     },
     offers: {
       '@type': 'Offer',

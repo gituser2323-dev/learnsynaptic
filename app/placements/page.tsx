@@ -8,6 +8,7 @@ import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/
 import VideoTestimonialsSection from '@/components/VideoTestimonialsSection';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/placements' },
   title: 'Placements & Hiring Outcomes — LearnSynaptic',
   description:
     '90% placement rate across 5+ batches. 200+ students trained. See LearnSynaptic graduates placed at top companies across India. Pune-based, pan-India outcomes.',

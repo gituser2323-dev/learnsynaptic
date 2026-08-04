@@ -134,12 +134,12 @@ export default function Footer() {
 
           {/* Programs */}
           <div>
-            <h4
+            <h3
               className="text-sm font-semibold uppercase tracking-wider mb-4"
               style={{ color: 'var(--ls-text)' }}
             >
               Programs
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               {programs.map((p) => (
                 <li key={p.href}>
@@ -157,12 +157,12 @@ export default function Footer() {
 
           {/* Resources */}
           <div>
-            <h4
+            <h3
               className="text-sm font-semibold uppercase tracking-wider mb-4"
               style={{ color: 'var(--ls-text)' }}
             >
               Resources
-            </h4>
+            </h3>
             <ul className="space-y-2.5">
               {resources.map((r) => (
                 <li key={r.href}>
@@ -180,12 +180,12 @@ export default function Footer() {
 
           {/* Company */}
           <div>
-            <h4
+            <h3
               className="text-sm font-semibold uppercase tracking-wider mb-4"
               style={{ color: 'var(--ls-text)' }}
             >
               Company
-            </h4>
+            </h3>
             <ul className="space-y-2.5 mb-6">
               {company.map((c) => (
                 <li key={c.href}>

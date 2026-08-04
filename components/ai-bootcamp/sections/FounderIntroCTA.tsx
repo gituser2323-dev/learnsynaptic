@@ -1,9 +1,12 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { useRegisterModal } from "../RegisterModalContext";
 
 export function FounderIntroCTA() {
   const { openRegister } = useRegisterModal();
+  const [videoReady, setVideoReady] = useState(false);
 
   return (
     <>
@@ -38,14 +41,26 @@ export function FounderIntroCTA() {
               aspectRatio: "16/9",
             }}
           >
+            {/* A native `poster` attribute bypasses next/image entirely —
+                browsers fetch it directly, unoptimized. This layers a
+                next/image-optimized poster behind the video instead,
+                cross-fading out once the video has data to paint. */}
+            <Image
+              src="/bootcamplogos/me.png"
+              alt=""
+              fill
+              sizes="(max-width: 820px) 100vw, 820px"
+              style={{ objectFit: "cover", opacity: videoReady ? 0 : 1, transition: "opacity 300ms ease" }}
+              aria-hidden="true"
+            />
             <video
               className="absolute inset-0 h-full w-full object-cover"
-              poster="/bootcamplogos/me.png"
               autoPlay
               muted
               loop
               playsInline
               preload="metadata"
+              onCanPlay={() => setVideoReady(true)}
             >
               <source src="/videos/founder-intro.mp4" type="video/mp4" />
               Your browser does not support the video tag.

@@ -5,6 +5,7 @@ import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll';
 import { FAQAccordion } from '@/components/FAQAccordion';
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/faq' },
   title: 'FAQ — Frequently Asked Questions · LearnSynaptic',
   description:
     'Common questions about LearnSynaptic programs, pricing, batch structure, refund policy, and what placement support actually includes — answered honestly.',

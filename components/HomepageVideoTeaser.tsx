@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Play, Pause, Loader2, ArrowRight } from 'lucide-react'
 import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll'
 
@@ -96,12 +97,14 @@ function VideoCard({
         }}
       >
         {showPoster && (
-          <img
+          <Image
             src={t.posterSrc}
             alt=""
+            fill
+            sizes="(max-width: 1024px) 60vw, 480px"
             aria-hidden
             onError={() => setPosterFailed(true)}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="object-cover"
           />
         )}
 
