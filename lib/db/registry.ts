@@ -12,6 +12,7 @@ import { inMemoryCampaignTemplateRepository } from "./repositories/campaignTempl
 import { inMemoryMessageRepository } from "./repositories/message.inMemory.repository";
 import { inMemoryMessageAttemptRepository } from "./repositories/messageAttempt.inMemory.repository";
 import { inMemoryOrganizationRepository } from "./repositories/organization.inMemory.repository";
+import { inMemoryTeamInvitationRepository } from "./repositories/teamInvitation.inMemory.repository";
 import { inMemoryActivityRepository } from "./repositories/activity.inMemory.repository";
 import { inMemoryTagRepository } from "./repositories/tag.inMemory.repository";
 import { inMemoryCustomFieldDefinitionRepository } from "./repositories/customFieldDefinition.inMemory.repository";
@@ -46,9 +47,12 @@ import { inMemoryMfaRecoveryCodeRepository } from "./repositories/mfaRecoveryCod
 import { inMemoryTrustedDeviceRepository } from "./repositories/trustedDevice.inMemory.repository";
 import { inMemoryOAuthAccountRepository } from "./repositories/oauthAccount.inMemory.repository";
 import { inMemoryMfaEmailOtpRepository } from "./repositories/mfaEmailOtp.inMemory.repository";
+import { inMemoryDataExportRequestRepository } from "./repositories/dataExportRequest.inMemory.repository";
+import { inMemoryBackupLogRepository } from "./repositories/backupLog.inMemory.repository";
 import { inMemoryLeadRepository } from "@/lib/services/leads/repositories/inMemory.repository";
 import type { LeadRepository } from "@/lib/services/leads/types";
 import type { OrganizationRepository } from "@/lib/services/organizations/types";
+import type { TeamInvitationRepository } from "@/lib/services/onboarding/invitationTypes";
 import type { ActivityRepository } from "@/lib/services/crm/activities/types";
 import type { TagRepository } from "@/lib/services/crm/tags/types";
 import type { CustomFieldDefinitionRepository } from "@/lib/services/crm/customFields/types";
@@ -71,6 +75,8 @@ import type { WebhookEndpointRepository, WebhookDeliveryAttemptRepository } from
 import type { PaymentRepository, PaymentWebhookEventRepository } from "@/lib/services/payments/types";
 import type { PlanRepository, SubscriptionRepository, UsageCounterRepository, FeatureFlagRepository } from "@/lib/services/billing/types";
 import type { BrandConfigurationRepository } from "@/lib/services/branding/types";
+import type { DataExportRequestRepository } from "@/lib/services/dataExport/types";
+import type { BackupLogRepository } from "@/lib/services/backupMonitoring/types";
 import type {
   UserRepository,
   RefreshTokenRepository,
@@ -306,6 +312,16 @@ export async function getOrganizationRepository(): Promise<OrganizationRepositor
     return mongodbOrganizationRepository;
   });
   return organizationRepo;
+}
+
+let teamInvitationRepo: TeamInvitationRepository | null = null;
+export async function getTeamInvitationRepository(): Promise<TeamInvitationRepository> {
+  if (teamInvitationRepo) return teamInvitationRepo;
+  teamInvitationRepo = await selectRepository(inMemoryTeamInvitationRepository, async () => {
+    const { mongodbTeamInvitationRepository } = await import("./repositories/teamInvitation.mongodb.repository");
+    return mongodbTeamInvitationRepository;
+  });
+  return teamInvitationRepo;
 }
 
 // ─── Enterprise CRM (Phase 1) ───────────────────────────────────────────
@@ -598,4 +614,25 @@ export async function getBrandConfigurationRepository(): Promise<BrandConfigurat
     return mongodbBrandConfigurationRepository;
   });
   return brandConfigurationRepo;
+}
+
+// RC-5 — Backup, Restore & Disaster Recovery
+let dataExportRequestRepo: DataExportRequestRepository | null = null;
+export async function getDataExportRequestRepository(): Promise<DataExportRequestRepository> {
+  if (dataExportRequestRepo) return dataExportRequestRepo;
+  dataExportRequestRepo = await selectRepository(inMemoryDataExportRequestRepository, async () => {
+    const { mongodbDataExportRequestRepository } = await import("./repositories/dataExportRequest.mongodb.repository");
+    return mongodbDataExportRequestRepository;
+  });
+  return dataExportRequestRepo;
+}
+
+let backupLogRepo: BackupLogRepository | null = null;
+export async function getBackupLogRepository(): Promise<BackupLogRepository> {
+  if (backupLogRepo) return backupLogRepo;
+  backupLogRepo = await selectRepository(inMemoryBackupLogRepository, async () => {
+    const { mongodbBackupLogRepository } = await import("./repositories/backupLog.mongodb.repository");
+    return mongodbBackupLogRepository;
+  });
+  return backupLogRepo;
 }

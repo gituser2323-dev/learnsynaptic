@@ -63,6 +63,38 @@ export const AUDIT_ACTIONS = {
   LEAD_BULK_ASSIGNED: "lead.bulk_assigned",
   LEAD_BULK_TAGGED: "lead.bulk_tagged",
   LEAD_BULK_ARCHIVED: "lead.bulk_archived",
+  /** RC-5 — Backup, Restore & Disaster Recovery: the undo path for
+   *  lead.bulk_deleted (which is a soft-delete, not a real deletion). */
+  LEAD_BULK_RESTORED: "lead.bulk_restored",
+  /** RC-5 — organization-level data export (lib/services/dataExport). */
+  DATA_EXPORT_REQUESTED: "data_export.requested",
+  DATA_EXPORT_COMPLETED: "data_export.completed",
+  /** RC-5 — operator-triggered tenant restore
+   *  (scripts/db/restoreTenantLeadsFromExport.ts) — never a self-service
+   *  admin action, so this is written directly by the script itself,
+   *  not through a route's own ApiRouteContext. */
+  TENANT_RESTORE_APPLIED: "tenant_restore.applied",
+  // RC-6 — Platform Super Admin & SaaS Operations Console. Every
+  // sensitive platform-operator action, all written with
+  // entityType:"Organization" (target org) except the bootstrap pair
+  // (entityType:"User" — no organization is the target, a platform
+  // grant/revoke is about the OPERATOR account itself).
+  /** scripts/bootstrapPlatformSuperAdmin.ts only — never a route. */
+  PLATFORM_SUPER_ADMIN_GRANTED: "platform.super_admin_granted",
+  PLATFORM_SUPER_ADMIN_REVOKED: "platform.super_admin_revoked",
+  PLATFORM_ORG_SUSPENDED: "platform.org_suspended",
+  PLATFORM_ORG_REACTIVATED: "platform.org_reactivated",
+  PLATFORM_ORG_TRIAL_EXTENDED: "platform.org_trial_extended",
+  /** Plan assignment itself reuses subscriptionService.assignPlan's own
+   *  existing subscription.plan_assigned/subscription.plan_changed
+   *  audit actions (entityType:"Subscription") — no separate platform-
+   *  specific action needed there, the reused method already records
+   *  who/what/when accurately. */
+  PLATFORM_ORG_FEATURE_OVERRIDDEN: "platform.org_feature_overridden",
+  PLATFORM_ORG_LIMIT_OVERRIDDEN: "platform.org_limit_overridden",
+  PLATFORM_JOB_RETRIED: "platform.job_retried",
+  PLATFORM_ANNOUNCEMENT_PUBLISHED: "platform.announcement_published",
+  PLATFORM_CONFIG_CHANGED: "platform.config_changed",
   /** AI CRM (Phase 5), Module 5.1 — only ever recorded for a manual
    *  "Analyze Again" click (a deliberate, person-initiated action, the
    *  same threshold as lead.tagged above). An automation-triggered
@@ -220,6 +252,31 @@ export const AUDIT_ACTIONS = {
    *  reason to bloat the audit row) — just which fields changed. */
   BRAND_CONFIGURATION_UPDATED: "brand_configuration.updated",
   BRAND_CONFIGURATION_RESET: "brand_configuration.reset",
+
+  /** RC-7 — Customer Onboarding & SaaS Activation. Reuses this same
+   *  registry (never a second, parallel event/analytics service — see
+   *  onboardingAnalytics.ts's own doc comment for why) for the
+   *  mission's own "registration_completed, organization_created,
+   *  trial_started, team_invited, whatsapp_connected, leads_imported,
+   *  onboarding_completed" funnel. Several of those are deliberately
+   *  NOT new entries here: registration is USER_CREATED (with
+   *  `metadata.source: "self_registration"` distinguishing it from a
+   *  CLI-provisioned account), trial start is the existing
+   *  SUBSCRIPTION_TRIAL_STARTED, a WhatsApp connection is the existing
+   *  WHATSAPP_SIGNUP_CONNECTED, and a lead import is the existing
+   *  LEAD_IMPORTED — reusing the real event each already represents
+   *  rather than duplicating it under an onboarding-specific name. */
+  ORGANIZATION_CREATED: "organization.created",
+  TEAM_INVITATION_SENT: "team_invitation.sent",
+  TEAM_INVITATION_RESENT: "team_invitation.resent",
+  TEAM_INVITATION_REVOKED: "team_invitation.revoked",
+  TEAM_INVITATION_ACCEPTED: "team_invitation.accepted",
+  /** `metadata.step` carries which onboarding step was completed —
+   *  one flexible action rather than one constant per step, since the
+   *  mission's own step list is itself described as adaptable ("adapt
+   *  naming to existing architecture"). */
+  ONBOARDING_STEP_COMPLETED: "onboarding.step_completed",
+  ONBOARDING_ACTIVATED: "onboarding.activated",
 } as const;
 
 /**
@@ -276,4 +333,11 @@ export const SECURITY_AUDIT_ACTIONS = {
   OAUTH_ACCOUNT_LINKED: "user.oauth_account_linked",
   OAUTH_ACCOUNT_UNLINKED: "user.oauth_account_unlinked",
   OAUTH_LOGIN_SUCCEEDED: "user.oauth_login_succeeded",
+  /** RC-7 — the session a self-registered user gets auto-signed-into
+   *  immediately after account creation. Deliberately its own action
+   *  rather than reusing USER_LOGIN_SUCCEEDED — a security investigator
+   *  reading "login succeeded" for an account created the same
+   *  millisecond would need this distinction to not misread it as a
+   *  compromised/reused-immediately credential. */
+  USER_SELF_REGISTERED: "user.self_registered",
 } as const;

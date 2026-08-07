@@ -39,6 +39,8 @@ function matchesFilters(lead: Lead, filters: LeadListFilters): boolean {
   if (filters.utmCampaign && lead.utm?.utmCampaign !== filters.utmCampaign) return false;
   if (filters.health && lead.health !== filters.health) return false;
   if (filters.archived !== undefined && lead.archived !== filters.archived) return false;
+  if (filters.deleted === true && !lead.deletedAt) return false;
+  if (filters.deleted === false && lead.deletedAt) return false;
   if (filters.search) {
     const query = filters.search.toLowerCase();
     const haystack = `${lead.name} ${lead.email} ${lead.phone} ${lead.program ?? ""}`.toLowerCase();
@@ -126,10 +128,25 @@ export const inMemoryLeadRepository: LeadRepository = {
   },
 
   async bulkDelete(ids: string[]): Promise<string[]> {
-    const matched = scopeToTenant(store).filter((l) => ids.includes(l.id)).map((l) => l.id);
-    for (const id of matched) {
-      const index = store.findIndex((l) => l.id === id);
-      if (index !== -1) store.splice(index, 1);
+    // RC-5 — soft-delete, mirroring the Mongo repository: recoverable
+    // via bulkRestore, never spliced out of the store.
+    const matched: string[] = [];
+    for (const lead of scopeToTenant(store)) {
+      if (ids.includes(lead.id)) {
+        lead.deletedAt = nowIso();
+        matched.push(lead.id);
+      }
+    }
+    return matched;
+  },
+
+  async bulkRestore(ids: string[]): Promise<string[]> {
+    const matched: string[] = [];
+    for (const lead of scopeToTenant(store)) {
+      if (ids.includes(lead.id)) {
+        lead.deletedAt = undefined;
+        matched.push(lead.id);
+      }
     }
     return matched;
   },
@@ -176,8 +193,8 @@ export const inMemoryLeadRepository: LeadRepository = {
     target.customFields = { ...source.customFields, ...target.customFields };
     target.updatedAt = nowIso();
 
-    const index = store.findIndex((l) => l.id === sourceId);
-    if (index !== -1) store.splice(index, 1);
+    // RC-5 — soft-delete the losing side, mirroring the Mongo repository.
+    source.deletedAt = nowIso();
     return target;
   },
 };

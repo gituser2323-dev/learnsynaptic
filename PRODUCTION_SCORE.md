@@ -1,9 +1,19 @@
 # Production Readiness Score — Post RC-1
 
+**Status: HISTORICAL.** "RC-1" here means the pre-blueprint
+stabilization pass documented in `RC_FIX_REPORT.md` — unrelated to the
+later "RC-1 — Authentication & Identity" that opens the Production
+Hardening Release Candidate track (RC-1 through RC-7). This score is
+frozen at that earlier point in the project and does not reflect the
+codebase's current state — see `RC_7_AUDIT.md` and `docs/README.md`
+for the current production-readiness picture.
+
 Companion to `RC_FIX_REPORT.md` (per-issue detail) and `CHANGELOG.md`'s
-"RC-1" entry (narrative). This is the updated scorecard and the final
-launch decision, re-scored after every Critical and High priority issue
-from the prior Release Candidate audit and End-to-End Journey Audit was
+old "RC-1 — Release Candidate Stabilization" entry (narrative, near the
+bottom of that file — not the "RC-1 — Authentication & Identity" entry
+near the top). This is the updated scorecard and the final launch
+decision, re-scored after every Critical and High priority issue from
+the prior Release Candidate audit and End-to-End Journey Audit was
 addressed.
 
 ---

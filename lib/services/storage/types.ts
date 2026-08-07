@@ -79,6 +79,13 @@ export interface StorageProvider {
    *  own authenticated proxy" rather than a real vendor-signed URL
    *  (see LocalStorageProvider/CloudinaryProvider's own doc comments). */
   getSignedUrl(storageKey: string, expiresInSeconds: number, downloadOptions?: StorageDownloadOptions): Promise<string>;
+  /** RC-5 — Backup, Restore & Disaster Recovery: enumerate every object
+   *  key this provider currently holds. Used ONLY by the offline
+   *  file/DB reconciliation tool (scripts/db/reconcileFileStorage.ts) —
+   *  never on a request-serving path, since a full bucket listing is a
+   *  bulk, potentially slow/paginated operation with no place in normal
+   *  upload/download flows. */
+  listAllKeys(): Promise<string[]>;
 }
 
 /**

@@ -39,6 +39,55 @@ describe("signAccessToken / verifyAccessToken — round trip", () => {
     const claims = await verifyAccessToken(token);
     expect(claims).toEqual({ sub: "user-1", email: "a@b.com", role: "counsellor", organizationId: undefined, sessionId: undefined });
   });
+
+  it("RC-6 — a token signed for a platform super admin carries and returns the platformRole claim", async () => {
+    const { token } = await signAccessToken({ sub: "operator-1", email: "ops@learnsynaptic.internal", role: "admin", platformRole: "super_admin" });
+    const claims = await verifyAccessToken(token);
+    expect(claims?.platformRole).toBe("super_admin");
+  });
+
+  it("RC-6 — an ordinary tenant user's token never carries a platformRole claim", async () => {
+    const { token } = await signAccessToken({ sub: "user-1", email: "a@b.com", role: "admin" });
+    const claims = await verifyAccessToken(token);
+    expect(claims?.platformRole).toBeUndefined();
+  });
+});
+
+describe("verifyAccessToken — RC-6 pentest: platform-role forgery/tampering", () => {
+  it("rejects an unrecognized platformRole value as absent (never trusted as-is) — signed with the app's own real secret", async () => {
+    const forged = await new SignJWT({ email: "a@b.com", role: "admin", platformRole: "root" })
+      .setProtectedHeader({ alg: "HS256" })
+      .setSubject("user-1")
+      .setIssuedAt()
+      .setExpirationTime("15m")
+      .sign(realAppSecretKey);
+    const claims = await verifyAccessToken(forged);
+    // The token itself is otherwise valid (real secret, real algorithm,
+    // valid role) — it must still verify, just with the bogus
+    // platformRole claim silently dropped, never trusted.
+    expect(claims).not.toBeNull();
+    expect(claims?.platformRole).toBeUndefined();
+  });
+
+  it("rejects a token whose payload was tampered with post-signing to inject platformRole:super_admin (an ordinary tenant admin trying to self-escalate)", async () => {
+    const { token } = await signAccessToken({ sub: "tenant-admin-1", email: "admin@tenant.com", role: "admin" });
+    const [header, payload, signature] = token.split(".");
+    const decodedPayload = JSON.parse(Buffer.from(payload!, "base64url").toString("utf8"));
+    decodedPayload.platformRole = "super_admin";
+    const tamperedPayload = Buffer.from(JSON.stringify(decodedPayload)).toString("base64url");
+    const tampered = `${header}.${tamperedPayload}.${signature}`;
+    expect(await verifyAccessToken(tampered)).toBeNull();
+  });
+
+  it("rejects a token forged with a completely different secret even when it claims platformRole:super_admin", async () => {
+    const forged = await new SignJWT({ email: "attacker@evil.com", role: "admin", platformRole: "super_admin" })
+      .setProtectedHeader({ alg: "HS256" })
+      .setSubject("attacker")
+      .setIssuedAt()
+      .setExpirationTime("15m")
+      .sign(wrongSecretKey);
+    expect(await verifyAccessToken(forged)).toBeNull();
+  });
 });
 
 describe("verifyAccessToken — pentest: JWT tampering / forgery", () => {

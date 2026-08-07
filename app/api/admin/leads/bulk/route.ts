@@ -4,7 +4,7 @@ import type { ApiRouteContext } from "@/lib/api";
 import { leadService } from "@/lib/services/leads";
 import type { LeadListFilters } from "@/lib/services/leads";
 
-type BulkAction = "update" | "delete" | "archive" | "unarchive" | "assign" | "tag";
+type BulkAction = "update" | "delete" | "restore" | "archive" | "unarchive" | "assign" | "tag";
 
 interface BulkRequestBody {
   action?: BulkAction;
@@ -30,14 +30,16 @@ interface BulkRequestBody {
  * per-action method, each independently audit-logged with the resolved
  * id list (see leadService.ts's own comment on why).
  *
- * ⚠️ RBAC: "manager" tier for update/archive/unarchive/assign/tag — bulk
- * CRM management is a Manager capability. `action: "delete"` is
+ * ⚠️ RBAC: "manager" tier for update/archive/unarchive/restore/assign/tag
+ * — bulk CRM management is a Manager capability. `action: "delete"` is
  * "admin"-only, checked inside the handler (a per-action distinction the
- * route-level `requiredRole` option can't express) — permanent,
- * irreversible data loss across many records at once is the one bulk
- * action this module reserves for the top tier. Bulk actions are the
- * highest blast-radius write surface in this module; role-gating here is
- * not optional.
+ * route-level `requiredRole` option can't express) — bulk-affecting many
+ * records at once is the one bulk action this module reserves for the
+ * top tier, even though it's a soft-delete (RC-5 — see
+ * leadService.bulkDelete's own doc comment; `action: "restore"` is the
+ * undo path, gated at the base "manager" tier like the rest). Bulk
+ * actions are the highest blast-radius write surface in this module;
+ * role-gating here is not optional.
  */
 async function handleBulkAction(request: Request, ctx: ApiRouteContext): Promise<NextResponse> {
   const body = (await parseJsonBody(request)) as BulkRequestBody;
@@ -57,7 +59,14 @@ async function handleBulkAction(request: Request, ctx: ApiRouteContext): Promise
       return apiSuccess({ result });
     }
     case "delete": {
+      // RC-5 — this is a soft-delete (leadService.bulkDelete sets
+      // Lead.deletedAt, never a real deleteMany) — see "restore" below
+      // for the undo path.
       const result = await leadService.bulkDelete(body.ids, body.filters, context);
+      return apiSuccess({ result });
+    }
+    case "restore": {
+      const result = await leadService.bulkRestore(body.ids, body.filters, context);
       return apiSuccess({ result });
     }
     case "archive": {
@@ -80,7 +89,7 @@ async function handleBulkAction(request: Request, ctx: ApiRouteContext): Promise
     }
     default:
       throw new ValidationApiError([
-        { field: "action", message: "action must be one of: update, delete, archive, unarchive, assign, tag." },
+        { field: "action", message: "action must be one of: update, delete, restore, archive, unarchive, assign, tag." },
       ]);
   }
 }

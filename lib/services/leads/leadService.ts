@@ -178,7 +178,10 @@ export const leadService = {
     // ...filters }` default back to undefined. Caught by inspection, not
     // a test — worth the explicit comment so it isn't "simplified" back
     // to the broken form later.
-    return repository.list({ ...filters, archived: filters.archived ?? false }, page, limit);
+    // RC-5 — same "??" ordering reasoning as archived above: soft-deleted
+    // leads are excluded from the default list view; a caller must
+    // explicitly pass `deleted: true` to see the recovery/trash view.
+    return repository.list({ ...filters, archived: filters.archived ?? false, deleted: filters.deleted ?? false }, page, limit);
   },
 
   /** Admin Dashboard Backend — UTM Analytics. */
@@ -309,6 +312,25 @@ export const leadService = {
     return { matchedCount: matched.length, matchedIds: matched };
   },
 
+  /** RC-5 — Backup, Restore & Disaster Recovery: the undo path for
+   *  bulkDelete. `filters` here is expected to carry `deleted: true`
+   *  (the trash/recovery view's own listing) when resolving by filter
+   *  rather than explicit ids — see _resolveBulkTargets, which passes
+   *  filters straight through to listAllIds unmodified. */
+  async bulkRestore(
+    ids: string[] | undefined,
+    filters: LeadListFilters | undefined,
+    context: AuditContext = {},
+  ): Promise<BulkOperationResult> {
+    const targets = await this._resolveBulkTargets(ids, filters);
+    if (targets.length === 0) return { matchedCount: 0, matchedIds: [] };
+
+    const repository = await getLeadRepository();
+    const matched = await repository.bulkRestore(targets);
+    await recordBulkAuditEntries(AUDIT_ACTIONS.LEAD_BULK_RESTORED, matched, context, {});
+    return { matchedCount: matched.length, matchedIds: matched };
+  },
+
   async bulkArchive(
     ids: string[] | undefined,
     filters: LeadListFilters | undefined,
@@ -352,11 +374,34 @@ export const leadService = {
     // if missing) — a flat bulkUpdate({ tags: [tagId] }) would instead
     // overwrite every other tag on every matched lead, which "bulk tag"
     // should never do.
+    //
+    // RC-9 — a real bug found via live cross-tenant pentesting: this
+    // method used to return `{matchedCount: targets.length, matchedIds:
+    // targets}` — i.e., it echoed the CALLER-SUPPLIED ids straight back
+    // as "matched," regardless of whether `repository.findById(id)`
+    // (the one call in this loop that's actually tenant-scoped) ever
+    // found a real, same-tenant lead for that id. Confirmed live: a
+    // caller-supplied id belonging to a DIFFERENT organization (or a
+    // completely fabricated, never-issued id) was reported as
+    // `matchedCount: 1`/2/etc. even though zero rows were ever read or
+    // written — a misleading API response, not a tenant-isolation
+    // vulnerability (the actual per-lead `findById`/`update` calls
+    // below were always correctly scoped and never touched another
+    // tenant's data — proven by a real cross-tenant retest reading the
+    // target lead's own tags afterward). `found`/`foundIds` now track
+    // which targets genuinely resolved to a real, same-tenant lead —
+    // this is what `matchedCount`/`matchedIds` report, matching every
+    // sibling bulk method's own real "matched from the database" shape
+    // (bulkDelete/bulkRestore/bulkArchive/bulkAssign all already report
+    // their repository call's real result, never raw input).
     const repository = await getLeadRepository();
     const changed: string[] = [];
+    const foundIds: string[] = [];
     for (const id of targets) {
       const lead = await repository.findById(id);
-      if (lead && !lead.tags.includes(tagId)) {
+      if (!lead) continue;
+      foundIds.push(id);
+      if (!lead.tags.includes(tagId)) {
         await repository.update(id, { tags: [...lead.tags, tagId] });
         changed.push(id);
       }
@@ -365,7 +410,7 @@ export const leadService = {
     // a lead that already had it wasn't touched, so it shouldn't show up
     // in that lead's own audit trail as if something changed.
     await recordBulkAuditEntries(AUDIT_ACTIONS.LEAD_BULK_TAGGED, changed, context, { tagId });
-    return { matchedCount: targets.length, matchedIds: targets };
+    return { matchedCount: foundIds.length, matchedIds: foundIds };
   },
 
   // ─── Duplicate Detection & Merge (Phase 1) ──────────────────────────

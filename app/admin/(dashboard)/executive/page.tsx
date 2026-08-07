@@ -264,7 +264,7 @@ export default function ExecutiveDashboardPage() {
             <FunnelViz
               title="Lead → Enrolled"
               stages={data.funnel.stages.map((s) => ({ label: s.label, value: s.count }))}
-              note="Independent per-stage counts within the selected range — see the Implementation Audit for why this app's real CRM stages replace the mission's suggested Qualified/Counselling labels."
+              note="Each stage shows how many leads reached it within the selected date range, counted independently — not a single cohort tracked stage-by-stage."
             />
           </section>
 

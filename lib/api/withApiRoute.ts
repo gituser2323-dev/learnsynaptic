@@ -2,15 +2,23 @@ import { randomUUID } from "crypto";
 import type { NextResponse } from "next/server";
 import { createRequestLogger, type RequestLogger } from "./logger";
 import { handleApiError } from "./handleError";
-import { ForbiddenApiError, PayloadTooLargeApiError, PlanEntitlementRequiredApiError, RateLimitedError, UnauthorizedApiError } from "./errors";
+import {
+  ForbiddenApiError,
+  PayloadTooLargeApiError,
+  PlanEntitlementRequiredApiError,
+  RateLimitedError,
+  ServiceUnavailableApiError,
+  UnauthorizedApiError,
+} from "./errors";
 import { inMemoryRateLimiter } from "./rateLimit/inMemory";
 import { getClientIp } from "./clientIp";
-import { getAuthContext, hasRequiredRole } from "./roles";
+import { getAuthContext, hasRequiredRole, hasPlatformRole } from "./roles";
 import { securityAuditLogService, SECURITY_AUDIT_ACTIONS } from "@/lib/services/auditLog";
 import { runWithTenantContext } from "@/lib/tenancy/context";
-import { ensureDefaultOrganization } from "@/lib/services/organizations";
 import { entitlementService, EntitlementError, type PlanCapability } from "@/lib/services/billing";
-import type { AdminRole, AuthContext } from "./roles";
+import { getUserRepository, getOrganizationRepository } from "@/lib/db";
+import type { AdminRole, AuthContext, PlatformRole } from "./roles";
+
 
 export interface ApiRouteContext {
   logger: RequestLogger;
@@ -47,6 +55,20 @@ export interface WithApiRouteOptions {
    *  can't have this option meaningfully applied — such a route
    *  shouldn't set it. */
   requiredCapability?: PlanCapability;
+  /** RC-6 — Platform Super Admin & SaaS Operations Console. A THIRD,
+   *  entirely independent gate from `requiredRole` — see
+   *  `hasPlatformRole`'s own doc comment (roles.ts) for why this never
+   *  reads/compares against tenant `role`. A route setting this should
+   *  almost never also set `requiredRole` (they answer different
+   *  questions — "is this a platform operator" vs. "what tenant rank
+   *  does this user hold" — and every platform route is about
+   *  cross-tenant operations a tenant role is irrelevant to). Also
+   *  enforces the mission's own explicit MFA requirement for the most
+   *  privileged account class in the system: a platform route rejects
+   *  the request (not just logs a warning) if the acting user's own
+   *  `mfaEnabled` is false, even if `platformRole` matches — see
+   *  `assertPlatformMfaSatisfied` below. */
+  requiredPlatformRole?: PlatformRole;
 }
 
 type Handler = (request: Request, ctx: ApiRouteContext) => Promise<NextResponse>;
@@ -86,6 +108,61 @@ function isRequestBodyTooLarge(request: Request): boolean {
   return Number.isFinite(bytes) && bytes > MAX_REQUEST_BODY_BYTES;
 }
 
+const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS"]);
+
+/** RC-5 — Backup, Restore & Disaster Recovery: the evaluated-and-
+ *  deliberately-minimal "recovery mode" this mission's own instruction
+ *  asks for. NOT a full maintenance-mode platform (no DB-backed flag,
+ *  no admin UI toggle, no per-route allowlist beyond the two rules
+ *  below) — see DR_RUNBOOK.md §14 for why a heavier mechanism wasn't
+ *  built: this app's own restore procedure already avoids the main
+ *  danger window architecturally (§3.2's restore tooling refuses to
+ *  write over the live database without an explicit override — see
+ *  scripts/db/restoreDatabase.ts). This is the cheap, real remainder:
+ *  a single env var an operator can flip during an ACTIVELY UNFOLDING
+ *  incident (suspected live data corruption, a security incident being
+ *  contained) to freeze every write immediately, reversible by
+ *  unsetting it and redeploying — no new infrastructure, no new
+ *  moving part that could itself fail.
+ *
+ *  Read requests (GET/HEAD/OPTIONS) are never blocked — investigating
+ *  an incident requires being able to read data. `auth.*`-named routes
+ *  are exempt too — blocking login during an incident would be
+ *  actively counterproductive (an operator needs to be able to sign in
+ *  to investigate/respond at all). Every other mutating route is
+ *  refused uniformly, before the handler ever runs. */
+function isReadOnlyModeActive(): boolean {
+  return process.env.MAINTENANCE_READ_ONLY_MODE === "true";
+}
+
+/** RC-6 — Platform Super Admin & SaaS Operations Console: TENANT
+ *  suspension, a separate concept from §14's GLOBAL
+ *  MAINTENANCE_READ_ONLY_MODE above (deployment-wide vs. one
+ *  organization). Same shape, same exemptions (`GET`/`HEAD`/`OPTIONS`
+ *  and `auth.*` routes always pass — a suspended org's users can still
+ *  read their own data and sign in to see why, per the mission's own
+ *  "historical data should remain intact" instruction), plus one more:
+ *  a `requiredPlatformRole` route is NEVER blocked by this check — a
+ *  platform operator's own request resolves to THEIR OWN tenant
+ *  context (irrelevant to whatever org they're managing, which is
+ *  identified by a route param/body, not this field), and blocking it
+ *  would make it impossible to ever reactivate the very org this
+ *  would otherwise freeze.
+ *
+ *  Deliberately does NOT block background jobs — the scheduler's own
+ *  processing loop (schedulerService.ts's runDueScheduledJobs) checks
+ *  organization status itself before executing a job, independently of
+ *  this HTTP-request-only gate (see that file's own doc comment). */
+async function assertOrganizationNotSuspended(organizationId: string): Promise<void> {
+  const organizationRepository = await getOrganizationRepository();
+  const organization = await organizationRepository.findById(organizationId);
+  if (organization?.status === "suspended") {
+    throw new ForbiddenApiError(
+      "This organization's account is currently suspended. Contact support for assistance.",
+    );
+  }
+}
+
 /**
  * Wraps a route handler with the cross-cutting concerns every route
  * needs: structured request logging, optional rate limiting, optional
@@ -115,6 +192,11 @@ export function withApiRoute(
     let userIdForErrorContext: string | undefined;
 
     try {
+      if (!SAFE_METHODS.has(request.method) && !routeName.startsWith("auth.") && isReadOnlyModeActive()) {
+        logger.warn("request.blocked_read_only_mode", { routeName, method: request.method });
+        throw new ServiceUnavailableApiError();
+      }
+
       if (isRequestBodyTooLarge(request)) {
         throw new PayloadTooLargeApiError();
       }
@@ -144,6 +226,26 @@ export function withApiRoute(
         throw authContext.role ? new ForbiddenApiError() : new UnauthorizedApiError();
       }
 
+      if (options.requiredPlatformRole) {
+        if (!hasPlatformRole(authContext, options.requiredPlatformRole)) {
+          logger.warn("request.forbidden_platform", {
+            requiredPlatformRole: options.requiredPlatformRole,
+            platformRole: authContext.platformRole,
+          });
+          void recordForbiddenPlatformAccess(routeName, authContext, options.requiredPlatformRole, requestId);
+          throw authContext.userId ? new ForbiddenApiError() : new UnauthorizedApiError();
+        }
+        // Fails closed on ANY lookup problem (missing user, DB hiccup) —
+        // never treats "couldn't confirm MFA" as "MFA is fine." This is
+        // the one gate in this file that does its own extra DB read
+        // before the handler runs; justified by MFA being the mission's
+        // own explicit requirement for the platform tier specifically,
+        // the same "worth an extra async lookup per gated request"
+        // trade-off `assertRequiredCapability` below already makes for
+        // entitlements.
+        await assertPlatformMfaSatisfied(authContext.userId!, routeName, requestId);
+      }
+
       logger.info("request.start");
       // Business OS Phase 8, Module 8.1 — two genuinely different
       // "no organizationId" cases, handled differently:
@@ -159,17 +261,45 @@ export function withApiRoute(
       //     responsibility sits there, not here.
       //
       //  2. Authenticated, but the token carries no organizationId
-      //     claim (userId present, organizationId absent — a legacy or
-      //     test-minted token predating this field, or a real User row
-      //     with none set yet — see tokens.ts's own verifyAccessToken
-      //     doc). This is a real, verified identity that still needs a
-      //     real tenant to operate in, so it resolves the deployment's
-      //     one real default organization the exact same way
-      //     authService.ts's own resolveOrganizationId() does for a
-      //     real login — never a second, disconnected fake default.
+      //     claim (userId present, organizationId absent). RC-7 changed
+      //     what this means: `authService.ts`'s `resolveOrganizationId()`
+      //     used to silently substitute the deployment's real default
+      //     organization here ("a legacy token predating the field"),
+      //     but that fallback is gone — confirmed against the live
+      //     deployment that every real user already has an
+      //     `organizationId` stamped at creation, so the ONLY way to
+      //     reach this branch today is a genuinely brand-new,
+      //     self-registered RC-7 account mid-onboarding, before it has
+      //     created (or joined) an organization. Silently scoping such
+      //     a request into the real default org's tenant context would
+      //     be a cross-tenant leak (a stranger reading/writing
+      //     LearnSynaptic's own production data); running the handler
+      //     with NO tenant context at all would be worse
+      //     (`tenantScopePlugin.ts`'s own doc comment: with no context
+      //     active, every scoping hook is a no-op — an unscoped query
+      //     against a tenant-owned collection returns EVERY
+      //     organization's rows). So this case is rejected outright
+      //     unless the route is explicitly safe for a pre-organization
+      //     identity: `auth.*` (sign in/out/refresh/verify must keep
+      //     working) and `onboarding.*` (the handful of routes that
+      //     exist specifically to get this user out of this state —
+      //     check onboarding status, create their organization). Both
+      //     of those only ever touch `User`/`Organization`, neither of
+      //     which is `tenantScopePlugin`-scoped (see that file's own
+      //     module doc), so running them with no tenant context
+      //     established is genuinely safe, not just convenient.
       organizationId = authContext.organizationId;
       if (authContext.userId && !organizationId) {
-        organizationId = (await ensureDefaultOrganization()).id;
+        // A `requiredPlatformRole` route is exempt for the same reason
+        // the suspension check below is: a platform operator's own
+        // request is about whatever org THEY specify via a route
+        // param/body, never about their own (possibly nonexistent)
+        // organizationId.
+        if (!options.requiredPlatformRole && !routeName.startsWith("auth.") && !routeName.startsWith("onboarding.")) {
+          logger.warn("request.forbidden_no_organization", { routeName });
+          void recordForbiddenNoOrganizationAccess(routeName, authContext, requestId);
+          throw new ForbiddenApiError("Complete your organization setup to continue.");
+        }
       }
       userIdForErrorContext = authContext.userId;
 
@@ -179,6 +309,15 @@ export function withApiRoute(
         // route-configuration guarantee, not a real end-user path (see
         // the option's own doc comment).
         throw new UnauthorizedApiError();
+      }
+
+      if (
+        organizationId &&
+        !options.requiredPlatformRole &&
+        !SAFE_METHODS.has(request.method) &&
+        !routeName.startsWith("auth.")
+      ) {
+        await assertOrganizationNotSuspended(organizationId);
       }
 
       const response = organizationId
@@ -236,4 +375,79 @@ async function recordForbiddenAccess(
     requestId,
     metadata: { routeName, requiredRole, actualRole: authContext.role },
   });
+}
+
+/** RC-7 — the pre-organization-gate equivalent of recordForbiddenAccess
+ *  above. A separate function for the same reason recordForbiddenPlatformAccess
+ *  is: this metadata answers a different question ("did a mid-onboarding
+ *  user try to reach a route their session genuinely can't touch yet,"
+ *  not "did a tenant member of the wrong rank try to reach an
+ *  admin-only route") — useful signal for RC-7's own onboarding-funnel/
+ *  abandonment visibility (see platformAdmin's onboarding funnel view),
+ *  not just a generic security log entry. */
+async function recordForbiddenNoOrganizationAccess(routeName: string, authContext: AuthContext, requestId: string): Promise<void> {
+  await securityAuditLogService.record({
+    action: SECURITY_AUDIT_ACTIONS.ACCESS_FORBIDDEN,
+    entityType: "User",
+    entityId: authContext.userId ?? "anonymous",
+    actorId: authContext.userId,
+    actorType: authContext.userId ? "user" : "api",
+    requestId,
+    metadata: { routeName, reason: "no_organization" },
+  });
+}
+
+/** RC-6 — the platform-gate equivalent of recordForbiddenAccess above.
+ *  Deliberately a separate function (not an overload) so the recorded
+ *  metadata shape stays specific to what a platform-access rejection
+ *  actually needs to answer later ("was this a tenant admin probing
+ *  /api/admin/platform/*, or a real platform operator who lost their
+ *  privilege?") rather than reusing a shape designed for tenant-role
+ *  rejections. */
+async function recordForbiddenPlatformAccess(
+  routeName: string,
+  authContext: AuthContext,
+  requiredPlatformRole: PlatformRole,
+  requestId: string,
+): Promise<void> {
+  await securityAuditLogService.record({
+    action: SECURITY_AUDIT_ACTIONS.ACCESS_FORBIDDEN,
+    entityType: "User",
+    entityId: authContext.userId ?? "anonymous",
+    actorId: authContext.userId,
+    actorType: authContext.userId ? "user" : "api",
+    requestId,
+    metadata: {
+      routeName,
+      requiredPlatformRole,
+      actualPlatformRole: authContext.platformRole,
+      actualRole: authContext.role,
+      platformGate: true,
+    },
+  });
+}
+
+/** RC-6 — the mission's own explicit "require/verify MFA" instruction
+ *  for the platform tier, enforced here rather than left to each
+ *  platform route to remember. Fails closed on every branch: no user
+ *  found, or `mfaEnabled` false, both reject — there is no "couldn't
+ *  check, so let it through" path. This is the one place in this file
+ *  that does a live DB read as part of a security gate (justified by
+ *  MFA being genuinely security-critical for the most privileged
+ *  account class in the system, not a convenience check). */
+async function assertPlatformMfaSatisfied(userId: string, routeName: string, requestId: string): Promise<void> {
+  const userRepository = await getUserRepository();
+  const user = await userRepository.findById(userId);
+  if (!user || !user.mfaEnabled) {
+    await securityAuditLogService.record({
+      action: SECURITY_AUDIT_ACTIONS.ACCESS_FORBIDDEN,
+      entityType: "User",
+      entityId: userId,
+      actorId: userId,
+      actorType: "user",
+      requestId,
+      metadata: { routeName, reason: "platform_mfa_not_enabled", platformGate: true },
+    });
+    throw new ForbiddenApiError("Platform access requires multi-factor authentication to be enabled on this account.");
+  }
 }

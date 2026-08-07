@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { subscriptionService } from "./subscriptionService";
 import { planService } from "./planService";
+import { entitlementService } from "./entitlementService";
 import { INTERNAL_PLAN_ID, ensureInternalPlanSeeded } from "./internalPlan";
 
 describe("subscriptionService — trial / upgrade / downgrade / cancel / expire", () => {
@@ -126,5 +127,100 @@ describe("subscriptionService — trial / upgrade / downgrade / cancel / expire"
     await subscriptionService.markPastDue("org-sub-expire-grace");
     const graceExpired = await subscriptionService.expire("org-sub-expire-grace", "grace_period_ended");
     expect(graceExpired.status).toBe("expired");
+  });
+});
+
+describe("subscriptionService — RC-6 platform-operator overrides", () => {
+  it("extendTrial pushes trialEndsAt AND currentPeriodEnd forward together for a currently-trialing subscription", async () => {
+    await planService.createPlan({ id: "plan-rc6-trial", name: "RC6 Trial", description: "T", status: "active", billingInterval: "monthly", currency: "INR", basePriceInSmallestUnit: 100, capabilities: [], limits: {}, trialDays: 7 });
+    const sub = await subscriptionService.assignPlan("org-rc6-extend-trial", "plan-rc6-trial");
+    const originalTrialEndsAt = sub.trialEndsAt!;
+
+    const extended = await subscriptionService.extendTrial("org-rc6-extend-trial", 5);
+    expect(new Date(extended.trialEndsAt!).getTime()).toBe(new Date(originalTrialEndsAt).getTime() + 5 * 24 * 60 * 60 * 1000);
+    expect(extended.currentPeriodEnd).toBe(extended.trialEndsAt);
+  });
+
+  it("extendTrial throws for a subscription that is not currently trialing (never fabricates a trial state)", async () => {
+    await ensureInternalPlanSeeded();
+    await subscriptionService.assignPlan("org-rc6-extend-not-trial", INTERNAL_PLAN_ID);
+    await expect(subscriptionService.extendTrial("org-rc6-extend-not-trial", 5)).rejects.toThrow(/not currently on a trial/);
+  });
+
+  it("overrideCapability grants a capability the plan doesn't include, without touching the Plan document itself", async () => {
+    await planService.createPlan({ id: "plan-rc6-no-ai", name: "RC6 No AI", description: "T", status: "active", billingInterval: "monthly", currency: "INR", basePriceInSmallestUnit: 100, capabilities: ["crm"], limits: {} });
+    await subscriptionService.assignPlan("org-rc6-override-grant", "plan-rc6-no-ai");
+
+    const entitlementsBefore = await entitlementService.getEntitlements("org-rc6-override-grant");
+    expect(entitlementsBefore.capabilities.has("ai_crm")).toBe(false);
+
+    await subscriptionService.overrideCapability("org-rc6-override-grant", "ai_crm", true);
+    const entitlementsAfter = await entitlementService.getEntitlements("org-rc6-override-grant");
+    expect(entitlementsAfter.capabilities.has("ai_crm")).toBe(true);
+
+    const planAfter = await planService.getPlan("plan-rc6-no-ai");
+    expect(planAfter?.capabilities).toEqual(["crm"]); // the shared Plan document is untouched.
+  });
+
+  it("overrideCapability revokes a capability the plan DOES include (a support/compliance action)", async () => {
+    await planService.createPlan({ id: "plan-rc6-with-ai", name: "RC6 With AI", description: "T", status: "active", billingInterval: "monthly", currency: "INR", basePriceInSmallestUnit: 100, capabilities: ["crm", "ai_crm"], limits: {} });
+    await subscriptionService.assignPlan("org-rc6-override-revoke", "plan-rc6-with-ai");
+
+    await subscriptionService.overrideCapability("org-rc6-override-revoke", "ai_crm", false);
+    const entitlements = await entitlementService.getEntitlements("org-rc6-override-revoke");
+    expect(entitlements.capabilities.has("ai_crm")).toBe(false);
+  });
+
+  it("overrideCapability with granted:null clears a previously-set override, reverting to the plan's own value", async () => {
+    await planService.createPlan({ id: "plan-rc6-clear", name: "RC6 Clear", description: "T", status: "active", billingInterval: "monthly", currency: "INR", basePriceInSmallestUnit: 100, capabilities: ["crm"], limits: {} });
+    await subscriptionService.assignPlan("org-rc6-override-clear", "plan-rc6-clear");
+
+    await subscriptionService.overrideCapability("org-rc6-override-clear", "ai_crm", true);
+    expect((await entitlementService.getEntitlements("org-rc6-override-clear")).capabilities.has("ai_crm")).toBe(true);
+
+    await subscriptionService.overrideCapability("org-rc6-override-clear", "ai_crm", null);
+    expect((await entitlementService.getEntitlements("org-rc6-override-clear")).capabilities.has("ai_crm")).toBe(false);
+  });
+
+  it("overrideCapability setting one capability never clobbers a different, already-set override", async () => {
+    await planService.createPlan({ id: "plan-rc6-multi", name: "RC6 Multi", description: "T", status: "active", billingInterval: "monthly", currency: "INR", basePriceInSmallestUnit: 100, capabilities: [], limits: {} });
+    await subscriptionService.assignPlan("org-rc6-override-multi", "plan-rc6-multi");
+
+    await subscriptionService.overrideCapability("org-rc6-override-multi", "ai_crm", true);
+    await subscriptionService.overrideCapability("org-rc6-override-multi", "automation", true);
+    const entitlements = await entitlementService.getEntitlements("org-rc6-override-multi");
+    expect(entitlements.capabilities.has("ai_crm")).toBe(true);
+    expect(entitlements.capabilities.has("automation")).toBe(true);
+  });
+
+  it("overrideLimit increases a numeric limit for one org without touching the shared Plan", async () => {
+    await planService.createPlan({ id: "plan-rc6-limit", name: "RC6 Limit", description: "T", status: "active", billingInterval: "monthly", currency: "INR", basePriceInSmallestUnit: 100, capabilities: [], limits: { seats: 5 } });
+    await subscriptionService.assignPlan("org-rc6-override-limit", "plan-rc6-limit");
+
+    expect(await entitlementService.getLimit("org-rc6-override-limit", "seats")).toBe(5);
+    await subscriptionService.overrideLimit("org-rc6-override-limit", "seats", 50);
+    expect(await entitlementService.getLimit("org-rc6-override-limit", "seats")).toBe(50);
+
+    const planAfter = await planService.getPlan("plan-rc6-limit");
+    expect(planAfter?.limits.seats).toBe(5); // the shared Plan document is untouched.
+  });
+
+  it("overrideLimit with value:null sets unlimited for this org only", async () => {
+    await planService.createPlan({ id: "plan-rc6-limit-unlimited", name: "RC6 Limit Unlimited", description: "T", status: "active", billingInterval: "monthly", currency: "INR", basePriceInSmallestUnit: 100, capabilities: [], limits: { leads: 100 } });
+    await subscriptionService.assignPlan("org-rc6-override-unlimited", "plan-rc6-limit-unlimited");
+
+    await subscriptionService.overrideLimit("org-rc6-override-unlimited", "leads", null);
+    expect(await entitlementService.getLimit("org-rc6-override-unlimited", "leads")).toBeNull();
+  });
+
+  it("overrideLimit with clear:true removes the override, reverting to the plan's own limit", async () => {
+    await planService.createPlan({ id: "plan-rc6-limit-clear", name: "RC6 Limit Clear", description: "T", status: "active", billingInterval: "monthly", currency: "INR", basePriceInSmallestUnit: 100, capabilities: [], limits: { seats: 3 } });
+    await subscriptionService.assignPlan("org-rc6-override-limit-clear", "plan-rc6-limit-clear");
+
+    await subscriptionService.overrideLimit("org-rc6-override-limit-clear", "seats", 99);
+    expect(await entitlementService.getLimit("org-rc6-override-limit-clear", "seats")).toBe(99);
+
+    await subscriptionService.overrideLimit("org-rc6-override-limit-clear", "seats", null, { clear: true });
+    expect(await entitlementService.getLimit("org-rc6-override-limit-clear", "seats")).toBe(3);
   });
 });

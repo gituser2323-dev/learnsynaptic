@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { Loader2, ArrowRight, ShieldCheck, KeyRound } from "lucide-react";
-import { login, listOAuthProviders, oauthAuthorizeHref, oauthMfaVerify, mfaRequestEmailOtp, type OAuthProviderSummary } from "@/components/admin/apiClient";
+import { login, listOAuthProviders, oauthAuthorizeHref, oauthMfaVerify, mfaRequestEmailOtp, getOnboardingStatus, type OAuthProviderSummary } from "@/components/admin/apiClient";
 
 /**
  * /admin/login — the one dashboard page with no sidebar/header shell
@@ -103,7 +103,12 @@ function OAuthMfaStep({ pendingToken, provider }: { pendingToken: string; provid
       setLoading(false);
       return;
     }
-    router.push("/admin");
+    // RC-7 — same "don't land a mid-onboarding user on a broken
+    // dashboard" reasoning as the password-login path's own
+    // followFromParam() below.
+    const statusResult = await getOnboardingStatus();
+    const resumeStep = statusResult.success ? statusResult.data.status.resumeStep : "done";
+    router.push(resumeStep === "verify_email" || resumeStep === "create_organization" ? "/admin/onboarding" : "/admin");
     router.refresh();
   }
 
@@ -159,7 +164,30 @@ function LoginForm() {
   const oauthMfaPending = searchParams.get("oauthMfaPending");
   const oauthProvider = searchParams.get("oauthProvider");
 
-  function followFromParam() {
+  async function followFromParam() {
+    // RC-7 — a mid-onboarding user (verified but no organization yet,
+    // or genuinely unverified) has no working dashboard to land on:
+    // every /api/admin/* route now 403s for them (withApiRoute.ts's
+    // own pre-organization gate) — landing them on /admin would just
+    // show a page full of "Access Denied" panels. Route them to
+    // /admin/onboarding instead, which itself resolves the exact right
+    // screen from this same status. A user who already has an
+    // organization (mid-optional-steps, or fully activated) is
+    // completely unaffected — their dashboard works normally, and
+    // mission §34's own "do not trap users" instruction is why this
+    // ONLY redirects for the two states where the dashboard is
+    // genuinely unusable, never for "wizard" (optional steps remain,
+    // dashboard already works) or "done."
+    const statusResult = await getOnboardingStatus();
+    if (statusResult.success) {
+      const { resumeStep } = statusResult.data.status;
+      if (resumeStep === "verify_email" || resumeStep === "create_organization") {
+        router.push("/admin/onboarding");
+        router.refresh();
+        return;
+      }
+    }
+
     // Only ever follow ?from= back into the dashboard itself — never an
     // arbitrary external/absolute URL an attacker could plant in the
     // query string (open-redirect prevention).
@@ -192,7 +220,7 @@ function LoginForm() {
       return;
     }
 
-    followFromParam();
+    await followFromParam();
   }
 
   async function handleRequestEmailOtp() {

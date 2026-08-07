@@ -51,8 +51,17 @@ export const inMemorySubscriptionRepository: SubscriptionRepository = {
     const subscription = store.find((s) => s.organizationId === organizationId);
     if (!subscription) throw new Error(`Subscription for organization "${organizationId}" not found`);
     if (input.cancelAt === null) delete subscription.cancelAt;
-    const { cancelAt, ...rest } = input;
-    Object.assign(subscription, rest, cancelAt !== undefined && cancelAt !== null ? { cancelAt } : {}, { updatedAt: nowIso() });
+    if (input.capabilityOverrides === null) delete subscription.capabilityOverrides;
+    if (input.limitOverrides === null) delete subscription.limitOverrides;
+    const { cancelAt, capabilityOverrides, limitOverrides, ...rest } = input;
+    Object.assign(
+      subscription,
+      rest,
+      cancelAt !== undefined && cancelAt !== null ? { cancelAt } : {},
+      capabilityOverrides !== undefined && capabilityOverrides !== null ? { capabilityOverrides } : {},
+      limitOverrides !== undefined && limitOverrides !== null ? { limitOverrides } : {},
+      { updatedAt: nowIso() },
+    );
     return subscription;
   },
 

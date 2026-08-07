@@ -43,6 +43,7 @@ let getScheduledJobRepository: typeof import("@/lib/db").getScheduledJobReposito
 let retryScheduledJob: typeof import("./schedulerService").retryScheduledJob;
 let cancelScheduledJob: typeof import("./schedulerService").cancelScheduledJob;
 let getQueueMetrics: typeof import("./schedulerService").getQueueMetrics;
+let getOrganizationRepository: typeof import("@/lib/db").getOrganizationRepository;
 
 function makeJobType(): string {
   return `unit-test-job-${Math.random().toString(36).slice(2)}`;
@@ -55,7 +56,7 @@ describe("schedulerService — due-job selection and retry branching", () => {
     vi.resetModules();
     ({ enqueueJob, runDueScheduledJobs, retryScheduledJob, cancelScheduledJob, getQueueMetrics } = await import("./schedulerService"));
     ({ registerJobHandler } = await import("./registry"));
-    ({ getScheduledJobRepository } = await import("@/lib/db"));
+    ({ getScheduledJobRepository, getOrganizationRepository } = await import("@/lib/db"));
   });
 
   afterEach(() => {
@@ -560,6 +561,72 @@ describe("schedulerService — due-job selection and retry branching", () => {
       const metrics = await getQueueMetrics("org-a");
       expect(metrics.countsByStatus.pending).toBe(1);
       expect(metrics.oldestPendingJobAgeSeconds).toBeNull();
+    });
+  });
+
+  describe("RC-6 — tenant suspension: background workers must respect it", () => {
+    it("a due job for a SUSPENDED organization is never executed — deferred (still 'pending', rescheduled) instead", async () => {
+      const orgRepo = await getOrganizationRepository();
+      const org = await orgRepo.create({ name: "Suspended Scheduler Test Org", slug: `suspended-sched-${Math.random().toString(36).slice(2)}` });
+      await orgRepo.update(org.id, { status: "suspended", suspendedAt: new Date().toISOString(), suspendedReason: "test" });
+
+      const jobType = makeJobType();
+      let handlerCalled = false;
+      registerJobHandler(jobType, async () => {
+        handlerCalled = true;
+        return { result: "completed" } satisfies JobOutcome;
+      });
+      await enqueueJob({ jobType, payload: {}, runAt: new Date().toISOString(), organizationId: org.id });
+
+      const result = await runDueScheduledJobs();
+
+      // "processed" counts jobs this poll cycle looked at, not jobs
+      // whose handler actually ran — a deferred job was still visited
+      // (claimed, checked, rescheduled), same as every other outcome
+      // branch in processJob().
+      expect(handlerCalled).toBe(false);
+      expect(result.processed).toBe(1);
+
+      const repository = await getScheduledJobRepository();
+      const jobs = await repository.list({ jobType }, 1, 10);
+      expect(jobs.items[0]?.status).toBe("pending");
+      // Rescheduled into the future (SUSPENDED_ORG_RECHECK_MINUTES), not
+      // left at its original past-due runAt — a second immediate poll
+      // must not busy-loop re-checking the same suspended job forever.
+      expect(new Date(jobs.items[0]!.runAt).getTime()).toBeGreaterThan(Date.now());
+    });
+
+    it("a due job for an ACTIVE organization executes normally — the suspension check is not a blanket regression", async () => {
+      const orgRepo = await getOrganizationRepository();
+      const org = await orgRepo.create({ name: "Active Scheduler Test Org", slug: `active-sched-${Math.random().toString(36).slice(2)}` });
+
+      const jobType = makeJobType();
+      let handlerCalled = false;
+      registerJobHandler(jobType, async () => {
+        handlerCalled = true;
+        return { result: "completed" } satisfies JobOutcome;
+      });
+      await enqueueJob({ jobType, payload: {}, runAt: new Date().toISOString(), organizationId: org.id });
+
+      const result = await runDueScheduledJobs();
+
+      expect(handlerCalled).toBe(true);
+      expect(result.processed).toBe(1);
+    });
+
+    it("a global/system job with no organizationId is never affected by any organization's suspension state", async () => {
+      const jobType = makeJobType();
+      let handlerCalled = false;
+      registerJobHandler(jobType, async () => {
+        handlerCalled = true;
+        return { result: "completed" } satisfies JobOutcome;
+      });
+      await enqueueJob({ jobType, payload: {}, runAt: new Date().toISOString() });
+
+      const result = await runDueScheduledJobs();
+
+      expect(handlerCalled).toBe(true);
+      expect(result.processed).toBe(1);
     });
   });
 });

@@ -6,6 +6,7 @@ export { featureFlagService } from "./featureFlagService";
 export { usageService, currentBillingPeriod, LIFETIME_USAGE_PERIOD } from "./usageService";
 export type { UsageCheckResult } from "./usageService";
 export { INTERNAL_PLAN_ID, ensureInternalPlanSeeded } from "./internalPlan";
+export { TRIAL_PLAN_ID, ensureTrialPlanSeeded } from "./trialPlan";
 export { billingPaymentIntegration, registerBillingPaymentSubscriber, SUBSCRIPTION_RENEWAL_PURPOSE } from "./paymentIntegration";
 export { registerBillingPeriodCheckHandler, ensureBillingPeriodCheckTickScheduled } from "./schedulerIntegration";
 export {

@@ -125,6 +125,34 @@ export const sessionService = {
     });
   },
 
+  /** RC-5 — Backup, Restore & Disaster Recovery: the admin-on-behalf-of
+   *  variant `revokeAllOtherSessions` above deliberately doesn't cover
+   *  (that one only ever acts on the CALLER's own sessions). This is
+   *  the real, load-bearing mechanism the "compromised tenant admin
+   *  account" incident-response procedure (DR_RUNBOOK.md §12) depends
+   *  on — without it, that procedure would be documentation with no
+   *  actual capability behind it. Revokes EVERY refresh token for the
+   *  target user, no exception (unlike the self-service version, there
+   *  is no "current session" to preserve — an admin acting on someone
+   *  else's account should end all of it). Tenant ownership of
+   *  `targetUserId` must be verified by the CALLER before this runs —
+   *  see the route's own doc comment for why (User isn't
+   *  tenantScopePlugin-scoped, same as RefreshToken/Organization/
+   *  ScheduledJob). */
+  async adminRevokeAllSessions(targetUserId: string, context: AuditContext = {}): Promise<void> {
+    const repository = await getRefreshTokenRepository();
+    await repository.revokeAllForUser(targetUserId, undefined);
+    await securityAuditLogService.record({
+      action: SECURITY_AUDIT_ACTIONS.SESSIONS_REVOKED_ALL,
+      entityType: "User",
+      entityId: targetUserId,
+      actorId: context.actorId,
+      actorType: "user",
+      requestId: context.requestId,
+      metadata: { triggeredBy: "admin" },
+    });
+  },
+
   /** Newest-first, capped at a reasonable page size for a UI panel —
    *  this isn't a paginated audit-log browser, it's "your last N
    *  sign-in-related events." */

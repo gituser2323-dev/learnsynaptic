@@ -1,6 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Users, CheckCircle2, XCircle, ClipboardList } from "lucide-react";
 import { getAnalytics, type AdminAnalyticsResponse } from "@/components/admin/apiClient";
 import { useAdminData } from "@/components/admin/useAdminData";
@@ -12,6 +14,7 @@ import { StatCardsSkeleton, TableSkeleton } from "@/components/admin/Skeleton";
 import { DonutStat } from "@/components/admin/charts/DonutStat";
 import { BarComparison } from "@/components/admin/charts/BarComparison";
 import { ProgressRing } from "@/components/admin/charts/ProgressRing";
+import { SetupChecklist } from "@/components/onboarding/SetupChecklist";
 import type { UtmBreakdownRow } from "@/lib/services/leads";
 
 const PROGRAM_COLUMNS: TableColumn<{ programSlug: string; count: number }>[] = [
@@ -26,9 +29,33 @@ const UTM_COLUMNS: TableColumn<UtmBreakdownRow>[] = [
   { key: "leads", header: "Leads", align: "right", render: (row) => row.leadCount },
 ];
 
+/** RC-9 — a real, live-reproduced dead end in the self-service
+ *  onboarding funnel: middleware.ts's own doc comment claims `/admin`
+ *  "resolves onward to the onboarding wizard or the dashboard depending
+ *  on real server-side state," but nothing on this page actually did
+ *  that — a genuinely fresh, just-verified, self-registered user (no
+ *  organization created yet) landed here after signing in and hit a
+ *  flat "You don't have permission to view this" `ForbiddenState`
+ *  instead of being routed to finish setup. Root cause:
+ *  withApiRoute.ts's own pre-organization gate throws a specific,
+ *  distinguishable `ForbiddenApiError("Complete your organization setup
+ *  to continue.")` for exactly this case, but this page's `forbidden`
+ *  boolean collapsed that together with an ordinary role-based 403 and
+ *  showed the same dead-end state for both. */
+const ORG_SETUP_INCOMPLETE_MESSAGE_FRAGMENT = "organization setup";
+
 export default function AdminOverviewPage() {
   const { user } = useAdminAuth();
-  const { data, loading, error, forbidden, reload } = useAdminData<AdminAnalyticsResponse>(getAnalytics, []);
+  const router = useRouter();
+  const { data, loading, error, forbidden, forbiddenMessage, reload } = useAdminData<AdminAnalyticsResponse>(getAnalytics, []);
+
+  const needsOrganizationSetup = forbidden && (forbiddenMessage?.toLowerCase().includes(ORG_SETUP_INCOMPLETE_MESSAGE_FRAGMENT) ?? false);
+
+  useEffect(() => {
+    if (needsOrganizationSetup) {
+      router.replace("/admin/onboarding");
+    }
+  }, [needsOrganizationSetup, router]);
 
   const utmBySource = useMemo(() => {
     if (!data) return [];
@@ -40,7 +67,7 @@ export default function AdminOverviewPage() {
     return Array.from(totals, ([label, value]) => ({ label, value }));
   }, [data]);
 
-  if (loading) {
+  if (loading || needsOrganizationSetup) {
     return (
       <div className="space-y-6">
         <StatCardsSkeleton count={4} />
@@ -68,6 +95,34 @@ export default function AdminOverviewPage() {
           Registration, attendance, and lead-source performance across the whole funnel.
         </p>
       </div>
+
+      <SetupChecklist />
+
+      <Link
+        href="/admin/executive"
+        className="adm-focus-ring adm-card adm-card-hover adm-animate-in flex items-center justify-between gap-3 p-4 no-underline"
+      >
+        <div>
+          <p className="text-sm font-semibold" style={{ color: "var(--adm-text)" }}>
+            Looking for revenue, pipeline, and team performance?
+          </p>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--adm-text-muted)" }}>
+            The Executive Dashboard shows your whole business — revenue, leads, team, campaigns, WhatsApp, and automation health — in one place.
+          </p>
+        </div>
+        <span className="adm-btn adm-btn-secondary h-9 shrink-0 text-xs">Open Executive Dashboard</span>
+      </Link>
+
+      {registrations.totalRegistrations === 0 && (
+        <div className="adm-card adm-animate-in flex flex-wrap items-center justify-between gap-3 p-4" style={{ borderColor: "var(--adm-accent)" }}>
+          <p className="text-sm" style={{ color: "var(--adm-text-muted)" }}>
+            No registrations yet — import an existing lead list or start capturing new ones to fill the funnel.
+          </p>
+          <Link href="/admin/leads" className="adm-focus-ring adm-btn adm-btn-primary h-9 text-xs">
+            Import or add a lead
+          </Link>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Registrations" value={registrations.totalRegistrations} icon={ClipboardList} tone="accent" />

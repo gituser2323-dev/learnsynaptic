@@ -197,6 +197,24 @@ export interface Subscription {
   cancelledAt?: string;
   providerRef?: SubscriptionProviderRef;
   metadata?: Record<string, string>;
+  /** RC-6 — Platform Super Admin & SaaS Operations Console: a
+   *  per-organization, operator-granted override on top of whatever
+   *  the assigned Plan's own `capabilities` says — explicit, reversible
+   *  (unset an entry to remove it), never a Plan document edit (the
+   *  mission's own "do not modify global plan definitions merely to
+   *  help one customer" instruction). `true` grants a capability the
+   *  plan doesn't include; `false` revokes one the plan does include
+   *  (a support/compliance action, not just a grant mechanism).
+   *  Distinct from `FeatureFlag.organizationOverrides` (Module 8.3) —
+   *  that's a deployment-wide rollout switch's per-org exception, this
+   *  is a commercial/plan-inclusion exception for ONE customer. */
+  capabilityOverrides?: Partial<Record<PlanCapability, boolean>>;
+  /** RC-6 — same reasoning as capabilityOverrides, for numeric plan
+   *  limits. `null` in a value position means "unlimited for this org
+   *  only" (mirrors `PlanLimits`' own null-means-unlimited
+   *  convention); the entry itself being absent means "no override,
+   *  use the plan's own limit." */
+  limitOverrides?: Partial<Record<UsageMetric, number | null>>;
   createdAt: string;
   updatedAt: string;
 }
@@ -223,6 +241,12 @@ export interface UpdateSubscriptionInput {
   cancelledAt?: string;
   providerRef?: SubscriptionProviderRef;
   metadata?: Record<string, string>;
+  /** `null` clears every override entirely; an object REPLACES the
+   *  whole map (the service layer reads-then-writes the merged map, the
+   *  same "caller resolves the merge, repository just persists" contract
+   *  every other partial-object field in this codebase already uses). */
+  capabilityOverrides?: Partial<Record<PlanCapability, boolean>> | null;
+  limitOverrides?: Partial<Record<UsageMetric, number | null>> | null;
 }
 
 export interface SubscriptionRepository {

@@ -35,6 +35,7 @@ import {
   replayWebhookDelivery,
   connectNotificationWebhookUrl,
   testNotification,
+  testIntegrationConnection,
   setIntegrationCredentials,
   clearIntegrationCredentials,
   getSubscription,
@@ -125,6 +126,27 @@ const INTEGRATION_CATEGORY_LABELS: Record<IntegrationCategory, string> = {
   notifications: "Notifications",
   other: "Other",
 };
+
+/** Configuration & Integration Verification — mirrors
+ *  lib/services/integrations/connectionTest.ts's own hasConnectionTest()
+ *  exactly (kept as a plain client-side list rather than importing a
+ *  server-only module into this page). Calendar and notification-webhook
+ *  providers are deliberately excluded — they already render their own
+ *  "Sync now" / "Test Notification" buttons below. */
+const CONNECTION_TESTABLE_PROVIDER_IDS = new Set([
+  "openai",
+  "anthropic",
+  "gemini",
+  "aws_s3",
+  "cloudinary",
+  "email",
+  "whatsapp",
+  "razorpay",
+  "stripe",
+  "cashfree",
+  "phonepe",
+  "paypal",
+]);
 
 const CUSTOM_FIELD_TYPES: CustomFieldType[] = ["text", "number", "date", "dropdown", "checkbox", "radio", "multiselect"];
 const OPTIONS_FIELD_TYPES: CustomFieldType[] = ["dropdown", "radio", "multiselect"];
@@ -838,6 +860,7 @@ function IntegrationCard({ integration, onChanged }: { integration: IntegrationS
   const [webhookUrlInput, setWebhookUrlInput] = useState("");
   const [webhookUrlError, setWebhookUrlError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{ success: boolean; error?: string } | null>(null);
+  const [connectionTestResult, setConnectionTestResult] = useState<{ success: boolean; message: string } | null>(null);
 
   const { data: logsData, loading: logsLoading } = useAdminData(
     () =>
@@ -860,6 +883,13 @@ function IntegrationCard({ integration, onChanged }: { integration: IntegrationS
   // "Connect" here opens an inline paste-the-URL form instead of
   // either an OAuth redirect or an empty-body POST.
   const isNotificationWebhookProvider = provider.category === "notifications" && !provider.builtIn;
+
+  // Configuration & Integration Verification — every provider category
+  // that had no real connection test before this pass. Calendar keeps
+  // using isOAuthProvider's own "Sync now" above; notification webhooks
+  // keep using isNotificationWebhookProvider's own "Test Notification"
+  // above — this list deliberately excludes both.
+  const hasConnectionTestSupport = CONNECTION_TESTABLE_PROVIDER_IDS.has(provider.id);
 
   function handleConnect() {
     if (isOAuthProvider) {
@@ -900,6 +930,15 @@ function IntegrationCard({ integration, onChanged }: { integration: IntegrationS
     setBusy(false);
     if (result.success) setTestResult(result.data.result);
     else setTestResult({ success: false, error: result.errors[0]?.message ?? "Test failed." });
+  }
+
+  async function handleTestConnection() {
+    setBusy(true);
+    setConnectionTestResult(null);
+    const result = await testIntegrationConnection(provider.id);
+    setBusy(false);
+    if (result.success) setConnectionTestResult(result.data.result);
+    else setConnectionTestResult({ success: false, message: result.errors[0]?.message ?? "Connection test failed." });
   }
 
   async function handleDisconnect() {
@@ -1001,6 +1040,47 @@ function IntegrationCard({ integration, onChanged }: { integration: IntegrationS
               <TenantCredentialsForm integration={integration} onChanged={onChanged} />
             </>
           )}
+          {hasConnectionTestSupport && (
+            <div className="flex flex-wrap items-center gap-2">
+              <button type="button" onClick={handleTestConnection} disabled={busy} className="adm-focus-ring adm-btn adm-btn-secondary text-xs">
+                {busy && <Loader2 size={12} className="animate-spin" />}
+                Test Connection
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowLogs((v) => !v)}
+                className="adm-focus-ring flex items-center gap-1 text-xs font-medium"
+                style={{ color: "var(--adm-accent)" }}
+              >
+                Logs <ChevronDown size={12} style={{ transform: showLogs ? "rotate(180deg)" : undefined }} />
+              </button>
+            </div>
+          )}
+          {connectionTestResult && (
+            <p className="text-xs" style={{ color: connectionTestResult.success ? "var(--adm-success)" : "var(--adm-danger)" }}>
+              {connectionTestResult.message}
+            </p>
+          )}
+          {showLogs && (
+            <div className="space-y-1 border-t pt-2.5" style={{ borderColor: "var(--adm-border)" }}>
+              {logsLoading && <Skeleton className="h-3 w-full" />}
+              {!logsLoading && logsData && logsData.items.length === 0 && (
+                <p className="text-xs" style={{ color: "var(--adm-text-muted)" }}>
+                  No log entries yet.
+                </p>
+              )}
+              {!logsLoading &&
+                logsData &&
+                logsData.items.map((log) => (
+                  <div key={log.id} className="flex items-center justify-between gap-2 text-xs" style={{ color: "var(--adm-text-muted)" }}>
+                    <span>
+                      {log.eventType} — {log.detail}
+                    </span>
+                    <span className="shrink-0">{new Date(log.createdAt).toLocaleString()}</span>
+                  </div>
+                ))}
+            </div>
+          )}
         </>
       ) : (
         <>
@@ -1050,6 +1130,12 @@ function IntegrationCard({ integration, onChanged }: { integration: IntegrationS
                     Sync now
                   </button>
                 )}
+                {hasConnectionTestSupport && (
+                  <button type="button" onClick={handleTestConnection} disabled={busy} className="adm-focus-ring adm-btn adm-btn-secondary text-xs">
+                    {busy && <Loader2 size={12} className="animate-spin" />}
+                    Test Connection
+                  </button>
+                )}
                 {isNotificationWebhookProvider && (
                   <button type="button" onClick={handleTestNotification} disabled={busy} className="adm-focus-ring adm-btn adm-btn-secondary text-xs">
                     Test Notification
@@ -1096,6 +1182,12 @@ function IntegrationCard({ integration, onChanged }: { integration: IntegrationS
           {testResult && (
             <p className="text-xs" style={{ color: testResult.success ? "var(--adm-success)" : "var(--adm-danger)" }}>
               {testResult.success ? "Test notification sent successfully." : (testResult.error ?? "Test notification failed.")}
+            </p>
+          )}
+
+          {connectionTestResult && (
+            <p className="text-xs" style={{ color: connectionTestResult.success ? "var(--adm-success)" : "var(--adm-danger)" }}>
+              {connectionTestResult.message}
             </p>
           )}
 

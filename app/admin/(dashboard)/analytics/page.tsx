@@ -518,7 +518,7 @@ function RevenueAnalyticsSection({ range }: { range: DateRangeSelection }) {
           <FunnelViz
             title="Lead → Enrolled"
             stages={data.funnel.stages.map((s) => ({ label: s.label, value: s.count }))}
-            note="Independent per-stage counts within the selected range, not a tracked per-lead cohort — see the Implementation Audit for why."
+            note="Each stage shows how many leads reached it within the selected date range, counted independently — not a single cohort tracked stage-by-stage."
           />
           <div className="adm-card p-5">
             <p className="mb-3 text-sm font-semibold" style={{ color: "var(--adm-text)" }}>

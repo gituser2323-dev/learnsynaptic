@@ -48,6 +48,38 @@ const BLOCKED_HOSTNAME_PATTERNS = [
   /^\[?fd[0-9a-f]{2}:/i,
 ];
 
+/**
+ * RC-9 — extracted from validateRegisterEndpointInput's own inline
+ * check so every server-side URL-fetching capability in this app can
+ * share ONE real SSRF guard, not each grow (or fail to grow) its own
+ * copy. A real, live-proven gap found this pass: the Slack/Teams/
+ * Discord "Connect" route (webhook-url/route.ts) only ever validated
+ * that its `webhookUrl` input was a syntactically well-formed URL
+ * (`new URL(...)` not throwing) — never this hostname check — meaning
+ * a tenant Admin could register e.g. `http://127.0.0.1:3000/api/health`
+ * or a cloud metadata address as their "Slack webhook," and this
+ * server would make a real outbound POST to it on every subsequent
+ * team-notification trigger (a new lead, a failed payment, ...) or an
+ * immediate one via "Test Notification." Confirmed live: the server
+ * genuinely connected to and received a real response FROM ITSELF
+ * (a real 405 from its own /api/health route) before this fix.
+ */
+export function validateOutboundUrlForSsrf(urlRaw: string): { valid: true; url: URL } | { valid: false; message: string } {
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(urlRaw);
+  } catch {
+    return { valid: false, message: "url must be a valid URL." };
+  }
+  if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
+    return { valid: false, message: "url must be http or https." };
+  }
+  if (BLOCKED_HOSTNAME_PATTERNS.some((p) => p.test(parsedUrl.hostname))) {
+    return { valid: false, message: "url may not target a local/loopback/private-network address." };
+  }
+  return { valid: true, url: parsedUrl };
+}
+
 export function validateRegisterEndpointInput(input: unknown): { valid: true; data: ValidatedRegisterEndpointInput } | { valid: false; errors: WebhookValidationError[] } {
   const errors: WebhookValidationError[] = [];
   const body = (input && typeof input === "object" ? input : {}) as Record<string, unknown>;
@@ -56,20 +88,11 @@ export function validateRegisterEndpointInput(input: unknown): { valid: true; da
   if (!name) errors.push({ field: "name", message: "name is required." });
 
   const urlRaw = typeof body.url === "string" ? body.url.trim() : "";
-  let parsedUrl: URL | null = null;
   if (!urlRaw) {
     errors.push({ field: "url", message: "url is required." });
   } else {
-    try {
-      parsedUrl = new URL(urlRaw);
-      if (parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:") {
-        errors.push({ field: "url", message: "url must be http or https." });
-      } else if (BLOCKED_HOSTNAME_PATTERNS.some((p) => p.test(parsedUrl!.hostname))) {
-        errors.push({ field: "url", message: "url may not target a local/loopback address." });
-      }
-    } catch {
-      errors.push({ field: "url", message: "url must be a valid URL." });
-    }
+    const ssrfCheck = validateOutboundUrlForSsrf(urlRaw);
+    if (!ssrfCheck.valid) errors.push({ field: "url", message: ssrfCheck.message });
   }
 
   const subscribedEventTypesRaw = Array.isArray(body.subscribedEventTypes) ? body.subscribedEventTypes : [];

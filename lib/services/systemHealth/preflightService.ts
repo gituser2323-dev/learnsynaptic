@@ -191,6 +191,13 @@ function checkTenantIntegrations(): TenantIntegrationStatus[] {
     { integration: "Calendar — Google", configured: Boolean(GOOGLE_OAUTH_CONFIG.clientId && GOOGLE_OAUTH_CONFIG.clientSecret), detail: "Google Calendar / Google Meet OAuth app." },
     { integration: "Calendar — Microsoft", configured: Boolean(MICROSOFT_OAUTH_CONFIG.clientId && MICROSOFT_OAUTH_CONFIG.clientSecret), detail: "Outlook Calendar / Teams Meetings OAuth app." },
     { integration: "Calendar — Zoom", configured: Boolean(ZOOM_OAUTH_CONFIG.clientId && ZOOM_OAUTH_CONFIG.clientSecret), detail: "Zoom OAuth app." },
+    {
+      integration: "Webhooks (Outbound Delivery)",
+      configured: Boolean(process.env.WEBHOOK_SECRET_ENCRYPTION_SECRET),
+      detail: process.env.WEBHOOK_SECRET_ENCRYPTION_SECRET
+        ? "WEBHOOK_SECRET_ENCRYPTION_SECRET configured — an organization can register its own HMAC-signed endpoint in Settings → Integrations and it will actually be dispatched (via the same Queue/Cron this report checks separately)."
+        : "WEBHOOK_SECRET_ENCRYPTION_SECRET is not set (see Encryption category) — every endpoint an organization registers stays undeliverable, regardless of Queue/Cron status.",
+    },
   ];
 }
 

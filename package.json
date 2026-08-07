@@ -14,12 +14,22 @@
     "test:unit": "vitest run",
     "db:migrate": "tsx --env-file=.env.local scripts/runMigrations.ts",
     "db:sync-indexes": "tsx --env-file=.env.local scripts/syncIndexes.ts",
-    "preflight": "tsx --env-file=.env.local scripts/preflightCheck.ts"
+    "preflight": "tsx --env-file=.env.local scripts/preflightCheck.ts",
+    "db:backup": "tsx --env-file=.env.local scripts/db/backupDatabase.ts",
+    "db:restore": "tsx --env-file=.env.local scripts/db/restoreDatabase.ts",
+    "db:verify-backup": "tsx --env-file=.env.local scripts/db/verifyBackup.ts",
+    "db:seed-restore-drill-fixture": "tsx --env-file=.env.local scripts/db/seedRestoreDrillFixture.ts",
+    "db:verify-restore-drill": "tsx scripts/db/verifyRestoreDrillIntegrity.ts",
+    "db:reconcile-files": "tsx --env-file=.env.local scripts/db/reconcileFileStorage.ts",
+    "db:restore-tenant-leads": "tsx --env-file=.env.local scripts/db/restoreTenantLeadsFromExport.ts",
+    "platform:bootstrap-super-admin": "tsx --env-file=.env.local scripts/bootstrapPlatformSuperAdmin.ts",
+    "docs:generate-openapi": "tsx scripts/docs/generateOpenApiSpec.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1100.0",
     "@aws-sdk/s3-request-presigner": "^3.1100.0",
     "@emailjs/browser": "^4.4.1",
+    "@scalar/nextjs-api-reference": "^0.11.12",
     "bcryptjs": "^3.0.3",
     "framer-motion": "^12.40.0",
     "jose": "^6.2.4",

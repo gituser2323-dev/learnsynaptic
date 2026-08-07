@@ -94,6 +94,97 @@ export function validateCreateUserInput(input: unknown): ValidateCreateUserInput
   return { valid: true, data: { email, password, role: role as UserRole, name } };
 }
 
+export interface SelfRegistrationRequest {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export type ValidateSelfRegistrationInputResult =
+  | { valid: true; data: SelfRegistrationRequest }
+  | { valid: false; errors: AuthValidationError[] };
+
+/**
+ * RC-7 — Customer Onboarding & SaaS Activation. The one real difference
+ * from validateCreateUserInput above: no `role` field (a self-registering
+ * user always becomes their own future organization's Admin once they
+ * create it — see authService.registerUser()'s own doc comment — so
+ * there's nothing for the client to choose here), a required `name`
+ * (createUser's is optional, but a self-service signup should always
+ * capture who's signing up), a real password-strength check (reusing
+ * validatePasswordStrength — createUser's own validator only checks
+ * length, a gap acceptable for operator-run CLI account creation but
+ * not for a public-facing form), and required `termsAccepted`.
+ */
+export function validateSelfRegistrationInput(input: unknown): ValidateSelfRegistrationInputResult {
+  const errors: AuthValidationError[] = [];
+
+  if (typeof input !== "object" || input === null) {
+    return { valid: false, errors: [{ field: "root", message: "Request body must be a JSON object." }] };
+  }
+  const record = input as Record<string, unknown>;
+
+  const email = typeof record.email === "string" ? record.email.trim().toLowerCase() : "";
+  if (!email) errors.push({ field: "email", message: "Email is required." });
+  else if (!EMAIL_RE.test(email)) errors.push({ field: "email", message: "Email must be a valid address." });
+
+  const name = typeof record.name === "string" ? record.name.trim() : "";
+  if (!name) errors.push({ field: "name", message: "Name is required." });
+
+  const password = typeof record.password === "string" ? record.password : "";
+  errors.push(...validatePasswordStrength(password));
+
+  if (record.termsAccepted !== true) {
+    errors.push({ field: "termsAccepted", message: "You must accept the Terms of Service to continue." });
+  }
+
+  if (errors.length > 0) return { valid: false, errors };
+  return { valid: true, data: { email, password, name } };
+}
+
+export interface AcceptInvitationRequest {
+  name: string;
+  password: string;
+}
+
+export type ValidateAcceptInvitationInputResult =
+  | { valid: true; data: AcceptInvitationRequest }
+  | { valid: false; errors: AuthValidationError[] };
+
+/**
+ * RC-7 — Customer Onboarding & SaaS Activation. The account-creation
+ * half of accepting a team invitation. Deliberately no `email` field
+ * here (unlike validateSelfRegistrationInput) — the email is never
+ * client-supplied for an invited account, it's whatever the
+ * invitation itself was addressed to (see
+ * invitationService.acceptInvitation()'s own doc comment); accepting a
+ * client-supplied email here would let someone redeem an invitation
+ * meant for one address under a completely different one. No
+ * `termsAccepted` either — same reasoning: this app has no concept of
+ * "invited but hasn't accepted terms," the recipient's real Terms
+ * acceptance is exactly this same click-through action, enforced by
+ * the accept-invite UI itself requiring the checkbox before this
+ * endpoint is ever reachable, not by a redundant server-side flag with
+ * nothing else to check it against.
+ */
+export function validateAcceptInvitationInput(input: unknown): ValidateAcceptInvitationInputResult {
+  const errors: AuthValidationError[] = [];
+
+  if (typeof input !== "object" || input === null) {
+    return { valid: false, errors: [{ field: "root", message: "Request body must be a JSON object." }] };
+  }
+  const record = input as Record<string, unknown>;
+
+  const name = typeof record.name === "string" ? record.name.trim() : "";
+  if (!name) errors.push({ field: "name", message: "Name is required." });
+
+  const password = typeof record.password === "string" ? record.password : "";
+  errors.push(...validatePasswordStrength(password));
+
+  if (errors.length > 0) return { valid: false, errors };
+  return { valid: true, data: { name, password } };
+}
+
 export type ValidatePasswordResetResult =
   | { valid: true; data: { email: string; newPassword: string } }
   | { valid: false; errors: AuthValidationError[] };

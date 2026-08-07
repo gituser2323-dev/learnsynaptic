@@ -27,6 +27,34 @@ const CSP_DIRECTIVES = [
 ].join("; ");
 
 /**
+ * RC-8 — the Scalar API reference UI (app/api/docs/reference/route.ts)
+ * renders its client-side app from a script tag, not an inline bundle,
+ * so it needs one additional trusted script origin beyond the base
+ * CSP above. Deliberately scoped to ONLY that one route (via this
+ * config's own per-`source` header matching, see `headers()` below) —
+ * the base CSP every other route gets is untouched. Pinned to the
+ * exact @scalar/api-reference version installed in package.json
+ * (never an unversioned/"latest" CDN URL) so this route can't silently
+ * start executing a different vendor's JS after a future jsdelivr
+ * update outside this repo's own dependency-review process. The
+ * route itself is `requiredRole: "admin"`-gated (see its own doc
+ * comment) — this CSP relaxation alone does not make the page public.
+ */
+const API_DOCS_CSP_DIRECTIVES = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+  "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+  "img-src 'self' data: https:",
+  "font-src 'self' data: https://cdn.jsdelivr.net",
+  "connect-src 'self'",
+  "frame-src 'self'",
+  "frame-ancestors 'none'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join("; ");
+
+/**
  * RC-2 Enterprise Security Hardening — every one of these APIs was
  * grepped for a real caller across app/ and components/ first
  * (`navigator.clipboard`/`requestFullscreen`/`autoplay`/etc.); only
@@ -130,6 +158,18 @@ const nextConfig: NextConfig = {
         // marketing pages.
         source: "/:path*",
         headers: SECURITY_HEADERS,
+      },
+      {
+        // Listed AFTER the blanket rule above so its Content-Security-Policy
+        // value wins for this one path (Next.js applies matching header
+        // sets in array order; a later entry's value for the same header
+        // key overrides an earlier one for the same request) — every
+        // other header from SECURITY_HEADERS (HSTS, X-Frame-Options,
+        // Permissions-Policy, etc.) still applies here too since only
+        // the CSP key is redeclared. See API_DOCS_CSP_DIRECTIVES's own
+        // doc comment for why this route alone needs a relaxed script-src.
+        source: "/api/docs/:path*",
+        headers: [{ key: "Content-Security-Policy", value: API_DOCS_CSP_DIRECTIVES }],
       },
     ];
   },

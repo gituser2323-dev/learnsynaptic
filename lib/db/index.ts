@@ -61,6 +61,13 @@ export {
   getTrustedDeviceRepository,
   getOAuthAccountRepository,
   getMfaEmailOtpRepository,
+  // RC-5 — Backup, Restore & Disaster Recovery
+  getDataExportRequestRepository,
+  getBackupLogRepository,
+  // RC-6 — Platform Super Admin & SaaS Operations Console
+  getOrganizationRepository,
+  // RC-7 — Customer Onboarding & SaaS Activation
+  getTeamInvitationRepository,
 } from "./registry";
 export { runInTransaction } from "./transaction";
 export { runPendingMigrations } from "./migrations";

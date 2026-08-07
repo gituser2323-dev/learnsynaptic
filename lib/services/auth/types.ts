@@ -1,3 +1,5 @@
+import type { ClientSession } from "mongoose";
+
 /**
  * Authentication domain layer (Module 9, extended by RC-1 — Production
  * Hardening: Authentication & Identity).
@@ -17,6 +19,22 @@
 /** Rank order matters — see lib/api/roles.ts's ROLE_RANK. Counsellor is
  *  day-to-day (lowest), Manager is mid-tier, Admin is full access. */
 export type UserRole = "counsellor" | "manager" | "admin";
+
+/** RC-6 — Platform Super Admin & SaaS Operations Console. A SEPARATE,
+ *  parallel authorization dimension from `UserRole` above — not a
+ *  fourth rank on top of "admin". A tenant `role` describes standing
+ *  within ONE organization; `platformRole` describes standing over the
+ *  whole deployment (every organization). The two are deliberately
+ *  never compared against each other (see lib/api/roles.ts's own
+ *  `hasPlatformRole`, which never reads `role`) — the mission's own
+ *  explicit "a tenant Admin must NEVER gain Platform Super Admin
+ *  privileges" requirement is enforced by this being an entirely
+ *  independent field, not a rank tenant admin could ever climb into.
+ *  Single value today ("do not unnecessarily create many roles" — the
+ *  mission's own instruction); the union shape leaves room for a
+ *  future "support"/"operations" tier without a schema/claim reshape
+ *  if one is ever genuinely justified. */
+export type PlatformRole = "super_admin";
 
 export type UserStatus = "active" | "disabled";
 
@@ -68,6 +86,12 @@ export interface User {
    *  change" (not built now — see authService's own disclosed scope
    *  note on why sessions aren't force-revoked on reset today). */
   passwordChangedAt?: string;
+  /** RC-6 — see PlatformRole's own doc comment. Unset for every
+   *  ordinary tenant user (the overwhelming majority of accounts) —
+   *  only ever set by the operator-controlled bootstrap script
+   *  (scripts/bootstrapPlatformSuperAdmin.ts), never by any HTTP route,
+   *  self-service flow, or tenant-admin action. */
+  platformRole?: PlatformRole;
   createdAt: string;
   updatedAt: string;
 }
@@ -81,6 +105,12 @@ export interface PublicUser {
   name?: string;
   emailVerified: boolean;
   mfaEnabled: boolean;
+  /** RC-6 — surfaced so the client can decide whether to render the
+   *  "Platform Console" entry point at all; the server-side gate on
+   *  every /api/admin/platform/* route is what actually enforces
+   *  access (see withApiRoute.ts's own doc comment — hiding UI is not
+   *  security). */
+  platformRole?: PlatformRole;
 }
 
 export function toPublicUser(user: User): PublicUser {
@@ -91,6 +121,7 @@ export function toPublicUser(user: User): PublicUser {
     name: user.name,
     emailVerified: Boolean(user.emailVerifiedAt),
     mfaEnabled: user.mfaEnabled,
+    platformRole: user.platformRole,
   };
 }
 
@@ -128,6 +159,20 @@ export interface UpdateUserInput {
   mfaSecretEncrypted?: string | null;
   passwordChangedAt?: string;
   name?: string;
+  /** RC-7 — set exactly once, by onboardingService.createOrganizationForUser()
+   *  (inside the same real transaction as the Organization's own
+   *  creation — see that function's own doc comment) or by a team
+   *  invitation's acceptance. Never accepted directly from a request
+   *  body anywhere — the same "trusted server context always wins,
+   *  never client-supplied" discipline tenantScopePlugin.ts's own doc
+   *  comment already established for tenant-owned collections. */
+  organizationId?: string;
+  /** RC-6 — `null` explicitly revokes platform access (same "null
+   *  clears, undefined leaves untouched" convention this interface
+   *  already uses above). Only ever set by
+   *  scripts/bootstrapPlatformSuperAdmin.ts — no HTTP route accepts
+   *  this field from a request body. */
+  platformRole?: PlatformRole | null;
 }
 
 export interface UserRepository {
@@ -146,8 +191,11 @@ export interface UserRepository {
    *  Mongoose `$unset` precedent (phoneNumber.mongodb.repository.ts's
    *  own `clearOrganization()`) already established, since a plain
    *  `undefined` in a partial update object is otherwise ambiguous
-   *  between the two. */
-  update(id: string, patch: UpdateUserInput): Promise<User>;
+   *  between the two. RC-7 — `session` threads an optional real
+   *  MongoDB transaction through, for onboardingService's own "create
+   *  the organization and assign its creator" atomic pair (see
+   *  OrganizationRepository.create's own identical doc comment). */
+  update(id: string, patch: UpdateUserInput, session?: ClientSession): Promise<User>;
   /** Enterprise CRM (Phase 1) — the staff directory Lead Assignment
    *  (manual + round robin) and Counsellor Tasks both need: "who can
    *  this be assigned to." Active users only. */
@@ -490,6 +538,23 @@ export type CreateUserResult =
   | { success: true; user: PublicUser }
   | { success: false; errors: AuthValidationError[] };
 
+/** RC-7 — Customer Onboarding & SaaS Activation. Mirrors LoginResult's
+ *  own success shape (a self-registered user is auto-signed-in, the
+ *  same "register, then land straight in the wizard" UX every modern
+ *  self-service SaaS uses) rather than CreateUserResult's shape, which
+ *  never issues tokens (createUser() is the CLI/admin-created-user
+ *  path, where the operator is never the new account's own session). */
+export type RegisterResult =
+  | { success: true; user: PublicUser; tokens: AuthTokens }
+  | { success: false; errors: AuthValidationError[] };
+
+/** RC-7 — the accept-a-team-invitation counterpart to RegisterResult.
+ *  Identical success shape (auto-signed-in, same as a real login) —
+ *  see authService.createUserFromInvitation()'s own doc comment. */
+export type CreateUserFromInvitationResult =
+  | { success: true; user: PublicUser; tokens: AuthTokens }
+  | { success: false; errors: AuthValidationError[] };
+
 export type RefreshFailureReason = "invalid" | "expired" | "reused" | "user_inactive";
 
 export type RefreshResult =
@@ -515,4 +580,12 @@ export interface AccessTokenPayload {
    *  a token minted before this field existed — treated the same
    *  tolerant way `organizationId` already is. */
   sessionId?: string;
+  /** RC-6 — additive optional claim, same tolerance pattern as
+   *  `organizationId`/`sessionId` above: absent on every token minted
+   *  before this field existed, and absent on every ordinary tenant
+   *  user's token forever (the overwhelming majority). Only ever set
+   *  from `user.platformRole` at token-issuance time (issueTokens(),
+   *  authService.ts) — never settable by a client, never derived from
+   *  tenant `role`. */
+  platformRole?: PlatformRole;
 }

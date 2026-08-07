@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Loader2, Plus, Trash2, X } from "lucide-react";
 import {
@@ -11,6 +11,7 @@ import {
   deletePipeline,
   moveOpportunityStage,
   listStaff,
+  listLeads,
 } from "@/components/admin/apiClient";
 import { useAdminData } from "@/components/admin/useAdminData";
 import { useAdminAuth } from "@/components/admin/AdminAuthContext";
@@ -31,7 +32,7 @@ import type { Opportunity, Pipeline, PipelineStage } from "@/lib/services/crm/pi
  * guess about which stage means "won."
  */
 
-function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
+function OpportunityCard({ opportunity, leadName }: { opportunity: Opportunity; leadName?: string }) {
   return (
     <div
       draggable
@@ -40,7 +41,7 @@ function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
       style={{ borderColor: "var(--adm-border)" }}
     >
       <p className="text-xs font-medium" style={{ color: "var(--adm-text)" }}>
-        Lead {opportunity.leadId.slice(-6)}
+        {leadName ?? `Lead ${opportunity.leadId.slice(-6)}`}
       </p>
       {opportunity.expectedRevenueInr !== undefined && (
         <p className="mt-1 text-xs" style={{ color: "var(--adm-text-muted)" }}>
@@ -58,10 +59,12 @@ function StageColumn({
   stage,
   opportunities,
   onDrop,
+  leadNamesById,
 }: {
   stage: PipelineStage;
   opportunities: Opportunity[];
   onDrop: (opportunityId: string, stageId: string) => void;
+  leadNamesById: Map<string, string>;
 }) {
   const [dragOver, setDragOver] = useState(false);
 
@@ -94,7 +97,7 @@ function StageColumn({
       </div>
       <div className="flex flex-col gap-2">
         {opportunities.map((opp) => (
-          <OpportunityCard key={opp.id} opportunity={opp} />
+          <OpportunityCard key={opp.id} opportunity={opp} leadName={leadNamesById.get(opp.leadId)} />
         ))}
       </div>
     </div>
@@ -327,6 +330,21 @@ export default function AdminPipelinePage() {
     reload,
   } = useAdminData(() => listOpportunities(pipeline ? { pipelineId: pipeline.id } : {}), [pipeline?.id]);
 
+  // Board cards show the lead's real name, not their raw id — this reuses
+  // the existing leads list endpoint (already tenant-scoped, no new API)
+  // rather than adding a leadName field to the Opportunity response. Bounded
+  // to one page (100, the route's own max) since a Kanban board's own
+  // working set is small; a lead outside that page falls back to the id
+  // rather than failing, so this can never leave a card broken.
+  const { data: leadsData } = useAdminData(() => listLeads({}, 1, 100), []);
+  const leadNamesById = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const lead of leadsData?.items ?? []) {
+      map.set(lead.id, lead.name);
+    }
+    return map;
+  }, [leadsData]);
+
   if (loadingPipelines) return <LoadingState label="Loading pipeline…" />;
   if (forbidden) return <ForbiddenState role={user?.role} />;
   if (pipelinesError || !pipeline) return <ErrorState message={pipelinesError ?? "Could not load the pipeline."} />;
@@ -407,6 +425,7 @@ export default function AdminPipelinePage() {
               stage={stage}
               opportunities={opportunities.filter((o) => o.stageId === stage.id)}
               onDrop={handleDrop}
+              leadNamesById={leadNamesById}
             />
           ))}
         </div>

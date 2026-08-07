@@ -169,7 +169,21 @@ export function validateUpload(input: ValidateUploadInput): { valid: true } | { 
   const errors: FileValidationError[] = [];
   const extension = getExtension(input.originalFilename);
 
-  if (DANGEROUS_EXTENSIONS.has(extension)) {
+  // RC-9 — a real bug found via live pentesting, not a security issue
+  // itself (the real storage key is always a fresh random id, never
+  // derived from `originalFilename` — path-traversal-shaped input like
+  // "../../../etc/passwd" never actually reaches the filesystem), but a
+  // real, unhandled 500: a filename with NO extension at all (which
+  // "../../../etc/passwd" — and, more mundanely, any ordinary file like
+  // "Dockerfile" or "README" — both have) was never rejected HERE, so
+  // it fell through to the FileAsset Mongoose schema's own `required`
+  // constraint on `extension`, surfacing as a raw, uncaught
+  // ValidationError (a 500 to the client) rather than this function's
+  // own clean, expected `{valid: false, errors}` shape every OTHER
+  // rejection reason already uses.
+  if (!extension) {
+    errors.push({ field: "file", message: "File must have a recognizable extension." });
+  } else if (DANGEROUS_EXTENSIONS.has(extension)) {
     errors.push({ field: "file", message: `Files with a ".${extension}" extension are not allowed.` });
   }
   if (DANGEROUS_MIME_TYPES.has(input.mimeType)) {

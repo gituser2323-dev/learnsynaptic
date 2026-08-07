@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { type ClientSession } from "mongoose";
 import { getConnection } from "@/lib/db/connection";
 import { UserModel, toUser } from "@/lib/db/models/user.model";
 import { DuplicateKeyError, isDuplicateKeyError } from "@/lib/db/types";
@@ -60,9 +60,9 @@ export const mongodbUserRepository: UserRepository = {
     return toUser(doc);
   },
 
-  async update(id: string, patch: UpdateUserInput): Promise<User> {
+  async update(id: string, patch: UpdateUserInput, session?: ClientSession): Promise<User> {
     await getConnection();
-    const doc = await UserModel.findByIdAndUpdate(id, buildUserUpdateOperation(patch), { new: true }).exec();
+    const doc = await UserModel.findByIdAndUpdate(id, buildUserUpdateOperation(patch), { new: true, session }).exec();
     if (!doc) throw new Error(`User ${id} not found`);
     return toUser(doc);
   },

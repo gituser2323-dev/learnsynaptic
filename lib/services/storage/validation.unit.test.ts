@@ -23,6 +23,27 @@ describe("validateUpload", () => {
     expect(result.valid).toBe(false);
   });
 
+  // RC-9 — a real bug found via live pentesting: a filename with no
+  // extension at all (e.g. "Dockerfile", or a path-traversal-shaped
+  // "../../../etc/passwd" — that specific case is not a real
+  // path-traversal risk, see generateStorageKey's own test below, but
+  // it does share "no dot in the basename" with an ordinary
+  // no-extension filename) used to pass this function's own validation
+  // silently, only to fail later at the FileAsset Mongoose schema's
+  // `extension` `required` constraint — a raw, uncaught
+  // ValidationError surfacing as a 500 rather than this function's own
+  // clean {valid:false, errors} shape every other rejection uses.
+  it("rejects a file with no extension at all", () => {
+    const result = validateUpload({ buffer: PNG_HEADER, originalFilename: "Dockerfile", mimeType: "image/png", category: "IMAGE" });
+    expect(result.valid).toBe(false);
+    if (!result.valid) expect(result.errors.some((e) => e.message.includes("recognizable extension"))).toBe(true);
+  });
+
+  it("rejects a path-traversal-shaped filename with no extension the same way (defense-in-depth is generateStorageKey's job, not this check's)", () => {
+    const result = validateUpload({ buffer: PNG_HEADER, originalFilename: "../../../etc/passwd", mimeType: "image/png", category: "IMAGE" });
+    expect(result.valid).toBe(false);
+  });
+
   it("rejects a MIME type not allowed for the category", () => {
     const result = validateUpload({ buffer: PNG_HEADER, originalFilename: "photo.exe", mimeType: "video/mp4", category: "IMAGE" });
     expect(result.valid).toBe(false);

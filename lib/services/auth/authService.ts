@@ -28,6 +28,8 @@ import { mfaService } from "./mfaService";
 import {
   validateLoginCredentials,
   validateCreateUserInput,
+  validateSelfRegistrationInput,
+  validateAcceptInvitationInput,
   validatePasswordReset,
   validateForgotPasswordInput,
   validateCompletePasswordResetInput,
@@ -41,7 +43,16 @@ import {
   sendAccountLockedEmail,
 } from "./authEmails";
 import { toPublicUser } from "./types";
-import type { AuthTokens, AuthValidationError, CreateUserResult, LoginResult, RefreshResult, User } from "./types";
+import type {
+  AuthTokens,
+  AuthValidationError,
+  CreateUserResult,
+  CreateUserFromInvitationResult,
+  LoginResult,
+  RefreshResult,
+  RegisterResult,
+  User,
+} from "./types";
 
 /**
  * Application layer for authentication — the module every auth route
@@ -64,18 +75,28 @@ import type { AuthTokens, AuthValidationError, CreateUserResult, LoginResult, Re
  * in the response).
  */
 
-/** Business OS Phase 8, Module 8.1 — every User row predates real
- *  tenant enforcement (organizationId has been optional scaffolding
- *  since Phase 0), so most existing accounts have none set yet even
- *  after the backfill script runs against Lead/Task/etc. (Users
- *  themselves are deliberately NOT auto-scoped by tenantScopePlugin —
- *  see that file's own module doc — so a User's own organizationId is
- *  just a plain field here, resolved once at token-issuance time, the
- *  same "fall back to the deployment's one default org" posture
- *  withApiRoute.ts's own doc comment describes for public routes). */
-async function resolveOrganizationId(user: User): Promise<string> {
-  if (user.organizationId) return user.organizationId;
-  return (await ensureDefaultOrganization()).id;
+/** RC-7 — Customer Onboarding & SaaS Activation. Historically this
+ *  fell back to `ensureDefaultOrganization()` for any user with no
+ *  `organizationId` set, on the theory that every User row predated
+ *  real tenant enforcement. That's no longer true: `authService.createUser()`
+ *  has stamped a real `organizationId` on every account it creates
+ *  since Module 8.3 shipped, confirmed against the live deployment (0
+ *  of N real users have none set) — the only way to reach this
+ *  function with `user.organizationId` unset today is a genuinely
+ *  brand-new, self-registered RC-7 account that hasn't created (or
+ *  joined) an organization yet.
+ *
+ *  Silently resolving such a user onto the deployment's real default
+ *  organization would be a serious cross-tenant leak — a stranger who
+ *  just registered would get a live session scoped into LearnSynaptic's
+ *  own production tenant data before ever creating their own. So this
+ *  now returns `undefined` rather than substituting anything: the
+ *  resulting access token simply carries no `organizationId` claim,
+ *  and `withApiRoute.ts`'s own gate (see its "RC-7 — pre-onboarding"
+ *  doc comment) is what actually decides which routes such a token may
+ *  reach — never this function silently deciding for it. */
+function resolveOrganizationId(user: User): string | undefined {
+  return user.organizationId;
 }
 
 interface IssueTokensOptions {
@@ -108,8 +129,9 @@ async function issueTokens(user: User, familyId: string, options: IssueTokensOpt
     sub: user.id,
     email: user.email,
     role: user.role,
-    organizationId: await resolveOrganizationId(user),
+    organizationId: resolveOrganizationId(user),
     sessionId: session.id,
+    platformRole: user.platformRole,
   });
 
   return { accessToken, accessTokenExpiresAt, refreshToken: rawRefreshToken, refreshTokenExpiresAt };
@@ -429,6 +451,181 @@ export const authService = {
   },
 
   /**
+   * RC-7 — Customer Onboarding & SaaS Activation. The self-service
+   * counterpart to createUser() above: a real, public
+   * `POST /api/auth/register` route calls this (createUser() itself
+   * stays CLI/admin-only, untouched). Deliberately creates the User
+   * with NO `organizationId` at all — see resolveOrganizationId()'s own
+   * doc comment for why silently defaulting them onto the deployment's
+   * real organization would be a cross-tenant leak — and `role: "admin"`
+   * fixed rather than client-supplied: a self-registering user always
+   * becomes the Admin of whatever organization they create next (the
+   * mission's own "the creator should receive the appropriate tenant
+   * Admin membership" requirement), so there's no real choice to expose
+   * here, and letting the client choose its own role would be exactly
+   * the "accept organization/role ownership from untrusted client
+   * input" pattern this codebase's tenant architecture already refuses
+   * elsewhere (see tenantScopePlugin.ts's own doc comment on stamping
+   * server-trusted context, never client-supplied values).
+   *
+   * Auto-signs-in the new account (issues real tokens, same shape
+   * login() returns) rather than requiring a separate login
+   * immediately after registering — the account is real and the
+   * password was just verified by the user typing it, so there's no
+   * security reason to make them re-enter it a second time. Email
+   * verification is requested (fire-and-forget) but NOT required to
+   * reach this session — it's required before organization creation
+   * instead (see onboardingService.createOrganization()'s own doc
+   * comment), matching the mission's own funnel order (ACCOUNT ->
+   * VERIFIED IDENTITY -> ORGANIZATION) and its "require verification
+   * before sensitive SaaS setup" instruction specifically, not before
+   * account creation itself.
+   */
+  async registerUser(input: unknown, context: AuditContext = {}): Promise<RegisterResult> {
+    const validation = validateSelfRegistrationInput(input);
+    if (!validation.valid) {
+      return { success: false, errors: validation.errors };
+    }
+
+    const passwordHash = await hashPassword(validation.data.password);
+    const userRepository = await getUserRepository();
+
+    let user: User;
+    try {
+      user = await userRepository.create({
+        email: validation.data.email,
+        passwordHash,
+        role: "admin",
+        name: validation.data.name,
+      });
+    } catch (error) {
+      if (error instanceof DuplicateKeyError) {
+        return {
+          success: false,
+          errors: [{ field: "email", message: `An account with email "${validation.data.email}" already exists.` }],
+        };
+      }
+      throw error;
+    }
+
+    await auditLogService.record({
+      action: AUDIT_ACTIONS.USER_CREATED,
+      entityType: "User",
+      entityId: user.id,
+      requestId: context.requestId,
+      metadata: { email: user.email, role: user.role, source: "self_registration" },
+    });
+
+    void this.requestEmailVerification(user.id, context);
+
+    const { browser, os, deviceName } = parseUserAgent(context.userAgent ?? null);
+    const tokens = await issueTokens(user, randomUUID(), {
+      rememberMe: false,
+      deviceName,
+      browser,
+      os,
+      ipAddress: context.ipAddress,
+    });
+
+    await securityAuditLogService.record({
+      action: SECURITY_AUDIT_ACTIONS.USER_SELF_REGISTERED,
+      entityType: "User",
+      entityId: user.id,
+      actorId: user.id,
+      actorType: "user",
+      requestId: context.requestId,
+      metadata: { email: user.email, ipAddress: context.ipAddress, userAgent: context.userAgent },
+    });
+
+    return { success: true, user: toPublicUser(user), tokens };
+  },
+
+  /**
+   * RC-7 — Customer Onboarding & SaaS Activation. The accept-a-team-
+   * invitation counterpart to registerUser() above: creates a real
+   * account with `organizationId`/`role` ALREADY set (never absent the
+   * way a fresh self-registration's is) because a validated,
+   * unexpired, still-pending TeamInvitation already establishes both —
+   * unlike registerUser(), there is no "verify email before you can do
+   * anything sensitive" gap to worry about here, since receiving and
+   * clicking a real invitation link already proves control of the
+   * email address the same way clicking a verification link would;
+   * `emailVerifiedAt` is stamped immediately rather than requiring a
+   * second, redundant verification email.
+   *
+   * `invitationService.acceptInvitation()` is this function's only
+   * real caller — it validates the invitation itself (token, expiry,
+   * pending status, seat limit) BEFORE ever calling this, so this
+   * function trusts `organizationId`/`role` completely rather than
+   * re-deriving them from anything client-supplied.
+   */
+  async createUserFromInvitation(
+    email: string,
+    organizationId: string,
+    role: User["role"],
+    input: unknown,
+    context: AuditContext = {},
+  ): Promise<CreateUserFromInvitationResult> {
+    const validation = validateAcceptInvitationInput(input);
+    if (!validation.valid) {
+      return { success: false, errors: validation.errors };
+    }
+
+    const passwordHash = await hashPassword(validation.data.password);
+    const userRepository = await getUserRepository();
+
+    let user: User;
+    try {
+      user = await userRepository.create({
+        email,
+        passwordHash,
+        role,
+        name: validation.data.name,
+        organizationId,
+      });
+    } catch (error) {
+      if (error instanceof DuplicateKeyError) {
+        return {
+          success: false,
+          errors: [{ field: "root", message: `An account with email "${email}" already exists.` }],
+        };
+      }
+      throw error;
+    }
+
+    user = await userRepository.update(user.id, { emailVerifiedAt: new Date().toISOString() });
+
+    await auditLogService.record({
+      action: AUDIT_ACTIONS.USER_CREATED,
+      entityType: "User",
+      entityId: user.id,
+      requestId: context.requestId,
+      metadata: { email: user.email, role: user.role, source: "team_invitation" },
+    });
+
+    const { browser, os, deviceName } = parseUserAgent(context.userAgent ?? null);
+    const tokens = await issueTokens(user, randomUUID(), {
+      rememberMe: false,
+      deviceName,
+      browser,
+      os,
+      ipAddress: context.ipAddress,
+    });
+
+    await securityAuditLogService.record({
+      action: SECURITY_AUDIT_ACTIONS.USER_SELF_REGISTERED,
+      entityType: "User",
+      entityId: user.id,
+      actorId: user.id,
+      actorType: "user",
+      requestId: context.requestId,
+      metadata: { email: user.email, ipAddress: context.ipAddress, userAgent: context.userAgent, source: "team_invitation" },
+    });
+
+    return { success: true, user: toPublicUser(user), tokens };
+  },
+
+  /**
    * Operator-initiated password reset via CLI script — kept exactly as
    * it was (scripts/resetAdminPassword.ts's only caller), untouched by
    * RC-1's own new SELF-service flow below (requestPasswordReset /
@@ -660,11 +857,34 @@ export const authService = {
   /** Enterprise CRM (Phase 1) — the staff directory Lead Assignment
    *  (manual + round robin) and Counsellor Tasks both read from. Never
    *  returns passwordHash — same PublicUser projection every other
-   *  auth-facing response already uses. */
+   *  auth-facing response already uses.
+   *
+   * RC-9 — a real, live-proven CRITICAL cross-tenant leak found via
+   * direct UI testing (not just scripted API attacks): `UserModel`
+   * (lib/db/models/user.model.ts) was never wired to `tenantScopePlugin`
+   * — `userRepository.listActive()` is a genuinely global, unscoped
+   * query by design, because Platform Super Admin's own dashboard/
+   * search/onboarding services (platformAdmin/*) correctly call it
+   * directly for real cross-org visibility. This method is the OTHER,
+   * tenant-facing caller of that same repository call — GET
+   * /api/admin/users (the Lead Assignment / Task assignee staff-picker
+   * endpoint), gated only at `requiredRole: "manager"`, not at
+   * organization boundary — so any Manager/Admin in ANY organization
+   * received every OTHER organization's full staff directory (name,
+   * real email, role) with no filtering at all. Confirmed live: Org A's
+   * own admin session's Lead-list "assigned counsellor" filter dropdown
+   * listed Org B's and Org C's real staff by name. Filtered here to the
+   * caller's own real organization (via the ambient tenant context
+   * `withApiRoute` already establishes for every authenticated
+   * request) rather than in the repository layer, so Platform Admin's
+   * own legitimate cross-org callers (which never run inside a
+   * single-org tenant context) are unaffected. */
   async listActiveStaff() {
     const userRepository = await getUserRepository();
     const users = await userRepository.listActive();
-    return users.map(toPublicUser);
+    const context = getTenantContext();
+    const scoped = context?.organizationId ? users.filter((u) => u.organizationId === context.organizationId) : users;
+    return scoped.map(toPublicUser);
   },
 
   /** RC-1 — the one place outside login() itself that needs to

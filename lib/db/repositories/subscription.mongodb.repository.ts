@@ -45,6 +45,10 @@ export const mongodbSubscriptionRepository: SubscriptionRepository = {
     if (input.metadata !== undefined) set.metadata = input.metadata;
     if (input.cancelAt === null) unset.cancelAt = "";
     else if (input.cancelAt !== undefined) set.cancelAt = new Date(input.cancelAt);
+    if (input.capabilityOverrides === null) unset.capabilityOverrides = "";
+    else if (input.capabilityOverrides !== undefined) set.capabilityOverrides = input.capabilityOverrides;
+    if (input.limitOverrides === null) unset.limitOverrides = "";
+    else if (input.limitOverrides !== undefined) set.limitOverrides = input.limitOverrides;
 
     const update: Record<string, unknown> = {};
     if (Object.keys(set).length > 0) update.$set = set;

@@ -25,6 +25,12 @@ export interface LeadDocument extends Document {
   health: string;
   assignedCounsellorId?: Types.ObjectId;
   archived: boolean;
+  /** RC-5 — Backup, Restore & Disaster Recovery: soft-delete only, same
+   *  pattern as FileAsset.deletedAt. Distinct from `archived` (a
+   *  workflow-visibility flag a counsellor toggles routinely) — this is
+   *  set only by an admin bulk-delete action, and is what makes that
+   *  action recoverable instead of a permanent `deleteMany`. */
+  deletedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,6 +62,7 @@ const leadSchema = new Schema<LeadDocument>(
     health: { type: String, enum: ["hot", "warm", "cold"], default: "cold" },
     assignedCounsellorId: { type: Schema.Types.ObjectId, ref: "User" },
     archived: { type: Boolean, default: false },
+    deletedAt: { type: Date },
   },
   { timestamps: true },
 );
@@ -69,6 +76,7 @@ leadSchema.index({ tags: 1 });
 leadSchema.index({ assignedCounsellorId: 1 });
 leadSchema.index({ health: 1 });
 leadSchema.index({ archived: 1 });
+leadSchema.index({ deletedAt: 1 });
 // Business OS Phase 8, Module 8.1 — organizationId-led compound index:
 // tenantScopePlugin now adds `organizationId` to every query this
 // model receives (see that file's own module doc), so the highest-
@@ -102,6 +110,7 @@ export function toLead(doc: LeadDocument): Lead {
     health: doc.health as Lead["health"],
     assignedCounsellorId: doc.assignedCounsellorId?.toString(),
     archived: doc.archived,
+    deletedAt: doc.deletedAt?.toISOString(),
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };

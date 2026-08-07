@@ -29,6 +29,7 @@ export async function signAccessToken(payload: AccessTokenPayload): Promise<Sign
     role: payload.role,
     organizationId: payload.organizationId,
     sessionId: payload.sessionId,
+    platformRole: payload.platformRole,
   })
     .setProtectedHeader({ alg: ALG })
     .setSubject(payload.sub)
@@ -42,6 +43,14 @@ function isUserRole(value: unknown): value is UserRole {
   return value === "counsellor" || value === "manager" || value === "admin";
 }
 
+/** RC-6 — the only valid value today (see PlatformRole's own doc
+ *  comment); anything else in a token's own `platformRole` claim
+ *  (forged, or a hypothetical future removed value) is treated as
+ *  absent, never trusted as-is. */
+function isPlatformRole(value: unknown): value is AccessTokenPayload["platformRole"] {
+  return value === "super_admin";
+}
+
 /**
  * Verifies signature + expiry and returns the normalized claims, or null
  * for anything invalid (expired, bad signature, malformed/missing
@@ -52,7 +61,7 @@ function isUserRole(value: unknown): value is UserRole {
 export async function verifyAccessToken(token: string): Promise<AccessTokenPayload | null> {
   try {
     const { payload } = await jwtVerify(token, secretKey, { algorithms: [ALG] });
-    const { sub, email, role, organizationId, sessionId } = payload;
+    const { sub, email, role, organizationId, sessionId, platformRole } = payload;
     if (typeof sub !== "string" || typeof email !== "string" || !isUserRole(role)) {
       return null;
     }
@@ -74,6 +83,7 @@ export async function verifyAccessToken(token: string): Promise<AccessTokenPaylo
       role,
       organizationId: typeof organizationId === "string" ? organizationId : undefined,
       sessionId: typeof sessionId === "string" ? sessionId : undefined,
+      platformRole: isPlatformRole(platformRole) ? platformRole : undefined,
     };
   } catch {
     return null;

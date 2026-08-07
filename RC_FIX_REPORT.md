@@ -1,5 +1,13 @@
 # RC-1 — Release Candidate Stabilization: Fix Report
 
+**Status: HISTORICAL.** This "RC-1" predates the 35-module Business OS
+blueprint and the later Production Hardening Release Candidate track
+(the "RC-1 — Authentication & Identity" through "RC-7 — Customer
+Onboarding & SaaS Activation" series, see `RC_6_AUDIT.md`/`RC_7_AUDIT.md`
+and `docs/README.md`) — the two "RC-1"s are unrelated and only share a
+name. Kept as the real historical record of an early stabilization
+pass; do not confuse this with the current RC track's own RC-1.
+
 This is a fix report, not a feature log. Scope was every Critical and
 High priority issue identified in the two prior audits this session
 produced (a full-codebase Release Candidate review, and an end-to-end

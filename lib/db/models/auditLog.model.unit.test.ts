@@ -43,6 +43,9 @@ const EXPECTED_AUDIT_ENTITY_TYPES = [
   "Subscription",
   "FeatureFlag",
   "BrandConfiguration",
+  "DataExportRequest",
+  "Organization",
+  "TeamInvitation",
 ];
 
 describe("AuditLogModel's entityType enum stays in sync with AuditEntityType", () => {

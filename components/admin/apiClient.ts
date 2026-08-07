@@ -2,7 +2,7 @@ import type { Lead, LeadListFilters, UtmBreakdownRow } from "@/lib/services/lead
 import type { Campaign, CampaignListFilters } from "@/lib/services/campaigns";
 import type { Registration, RegistrationListFilters, RegistrationAnalytics } from "@/lib/services/registrations";
 import type { Attendance, AttendanceListFilters, CreateAttendanceInput } from "@/lib/services/attendance";
-import type { UserRole } from "@/lib/services/auth";
+import type { UserRole, PlatformRole } from "@/lib/services/auth";
 import type { StudentStatusSummary } from "@/lib/services/adminAnalytics";
 import type {
   DateRange,
@@ -79,6 +79,9 @@ import type {
   NotificationProviderId,
 } from "@/lib/services/webhooks";
 import type { Payment, PaymentProviderId, PaymentStatus, PaymentWebhookEvent, PaymentWebhookOutcome } from "@/lib/services/payments";
+import type { Organization, OrganizationStatus } from "@/lib/services/organizations";
+import type { Subscription, Plan, PlanCapability, UsageMetric } from "@/lib/services/billing";
+import type { PlatformDashboardSnapshot, PlatformSearchResult } from "@/lib/services/platformAdmin";
 
 /**
  * Browser-side fetch layer for the CRM Dashboard (Module 11) — every
@@ -119,6 +122,13 @@ export interface DashboardUser {
    *  (mfaEnabled/emailVerified can change mid-session). */
   emailVerified?: boolean;
   mfaEnabled?: boolean;
+  /** RC-6 — undefined for every ordinary tenant user, forever. The
+   *  client uses this ONLY to decide whether to render the Platform
+   *  Console entry point — every /api/admin/platform/* route enforces
+   *  its own server-side gate regardless of what this says (hiding UI
+   *  is not security, see withApiRoute.ts's own requiredPlatformRole
+   *  doc comment). */
+  platformRole?: PlatformRole;
 }
 
 const GENERIC_ERROR: ApiFieldError[] = [{ field: "root", message: "Something went wrong. Please try again." }];
@@ -248,6 +258,108 @@ export function resendVerificationEmail(): Promise<ApiClientResult<{ status: "se
  *  status enum on a success payload. */
 export function verifyEmail(token: string): Promise<ApiClientResult<{ status: "verified"; message: string }>> {
   return apiFetch("/api/auth/verify-email", { method: "POST", body: JSON.stringify({ token }) });
+}
+
+// ─── Auth — RC-7 Self-service registration & team invitations ───────────
+
+export function registerAccount(input: {
+  email: string;
+  name: string;
+  password: string;
+  termsAccepted: boolean;
+}): Promise<ApiClientResult<{ user: DashboardUser }>> {
+  return apiFetch("/api/auth/register", { method: "POST", body: JSON.stringify(input) });
+}
+
+export function acceptTeamInvitation(input: { token: string; name: string; password: string }): Promise<ApiClientResult<{ user: DashboardUser }>> {
+  return apiFetch("/api/auth/invitations/accept", { method: "POST", body: JSON.stringify(input) });
+}
+
+// ─── RC-7 Onboarding ──────────────────────────────────────────────────────
+
+export type OnboardingStepId = "plan" | "team" | "whatsapp" | "email" | "ai" | "calendar" | "crm" | "import";
+export type OnboardingStepStatus = "skipped" | "completed";
+
+export interface OnboardingOrganization {
+  id: string;
+  name: string;
+  slug: string;
+  status: "active" | "suspended";
+  industry?: string;
+  teamSize?: "1-10" | "11-50" | "51-200" | "201-1000" | "1000+";
+  website?: string;
+  country?: string;
+  timezone?: string;
+  createdAt: string;
+}
+
+export interface OnboardingStatusResponse {
+  emailVerified: boolean;
+  organization: OnboardingOrganization | null;
+  resumeStep: "verify_email" | "create_organization" | "wizard" | "done";
+  steps: Partial<Record<OnboardingStepId, OnboardingStepStatus>>;
+  activatedAt?: string;
+}
+
+export function getOnboardingStatus(): Promise<ApiClientResult<{ status: OnboardingStatusResponse }>> {
+  return apiFetch("/api/onboarding/status");
+}
+
+export function createOnboardingOrganization(input: {
+  name: string;
+  industry?: string;
+  teamSize?: OnboardingOrganization["teamSize"];
+  website?: string;
+  country?: string;
+  timezone?: string;
+}): Promise<ApiClientResult<{ organization: OnboardingOrganization; alreadyExisted: boolean }>> {
+  return apiFetch("/api/onboarding/organization", { method: "POST", body: JSON.stringify(input) });
+}
+
+export interface OnboardingSelectablePlan {
+  id: string;
+  name: string;
+  description: string;
+  trialDays: number;
+  basePriceInSmallestUnit: number;
+  currency: string;
+}
+
+export function listOnboardingPlans(): Promise<ApiClientResult<{ plans: OnboardingSelectablePlan[] }>> {
+  return apiFetch("/api/onboarding/plans");
+}
+
+export function markOnboardingStep(step: OnboardingStepId, status: OnboardingStepStatus): Promise<ApiClientResult<{ organization: OnboardingOrganization }>> {
+  return apiFetch(`/api/onboarding/steps/${step}`, { method: "POST", body: JSON.stringify({ status }) });
+}
+
+export interface TeamInvitation {
+  id: string;
+  organizationId: string;
+  email: string;
+  role: UserRole;
+  status: "pending" | "accepted" | "revoked" | "expired";
+  invitedByUserId: string;
+  expiresAt: string;
+  acceptedAt?: string;
+  revokedAt?: string;
+  createdAt: string;
+}
+
+export function listTeamInvitations(page = 1, limit = 20): Promise<ApiClientResult<PaginatedResult<TeamInvitation>>> {
+  return apiFetch(`/api/admin/team/invitations?${buildQuery({ page, limit })}`);
+}
+
+export function sendTeamInvitation(email: string, role: UserRole): Promise<ApiClientResult<{ invitation: TeamInvitation }>> {
+  return apiFetch("/api/admin/team/invitations", { method: "POST", body: JSON.stringify({ email, role }) });
+}
+
+export function resendTeamInvitation(id: string): Promise<ApiClientResult<{ invitation: TeamInvitation }>> {
+  return apiFetch(`/api/admin/team/invitations/${id}/resend`, { method: "POST" });
+}
+
+export function revokeTeamInvitation(id: string): Promise<ApiClientResult<{ invitation: TeamInvitation }>> {
+  return apiFetch(`/api/admin/team/invitations/${id}/revoke`, { method: "POST" });
 }
 
 // ─── Auth — RC-1 Session management ──────────────────────────────────────
@@ -975,6 +1087,16 @@ export function testNotification(
   return apiFetch(`/api/admin/integrations/${providerId}/notification-test`, { method: "POST" });
 }
 
+/** Configuration & Integration Verification — the generic "Test
+ *  Connection" action for AI/Storage/Payments/Email/WhatsApp
+ *  providers (calendar keeps using syncCalendarProvider() above,
+ *  notification webhooks keep using testNotification() above). */
+export function testIntegrationConnection(
+  providerId: string,
+): Promise<ApiClientResult<{ result: { success: boolean; message: string } }>> {
+  return apiFetch(`/api/admin/integrations/${providerId}/test-connection`, { method: "POST" });
+}
+
 // ─── Settings ────────────────────────────────────────────────────────────
 
 export function getSettings(): Promise<ApiClientResult<{ settings: AdminSettingsSnapshot }>> {
@@ -1615,4 +1737,141 @@ export function retryJob(id: string): Promise<ApiClientResult<{ job: AdminSchedu
 
 export function cancelJob(id: string): Promise<ApiClientResult<{ job: AdminScheduledJob }>> {
   return apiFetch(`/api/admin/jobs/${id}/cancel`, { method: "POST" });
+}
+
+// ─── Platform Super Admin & SaaS Operations Console (RC-6) ─────────────────
+//
+// Every function below hits an /api/admin/platform/* route — every one of
+// those routes is gated on `requiredPlatformRole: "super_admin"`, never
+// `requiredRole` (see withApiRoute.ts's own doc comment on why the two are
+// separate, never-compared dimensions). An ordinary tenant admin's session
+// gets a real 403 from the server regardless of what this client code does
+// — nothing here is itself a security boundary, only a convenience layer
+// over routes that already enforce their own.
+
+export function getPlatformDashboard(): Promise<ApiClientResult<{ snapshot: PlatformDashboardSnapshot }>> {
+  return apiFetch("/api/admin/platform/dashboard");
+}
+
+// RC-7 — Customer Onboarding & SaaS Activation, Platform Console view.
+export interface OnboardingFunnelSnapshot {
+  generatedAt: string;
+  stages: Record<"registered" | "verified" | "organizationCreated" | "trialStarted" | "integrationConnected" | "activated", number>;
+}
+
+export interface OrganizationOnboardingSummary {
+  organizationId: string;
+  name: string;
+  status: "not_started" | "in_progress" | "activated";
+  stepsCompleted: number;
+  stepsSkipped: number;
+  activatedAt?: string;
+  createdAt: string;
+}
+
+export function getPlatformOnboardingFunnel(
+  page = 1,
+  limit = 20,
+): Promise<ApiClientResult<{ funnel: OnboardingFunnelSnapshot; organizations: { items: OrganizationOnboardingSummary[]; total: number } }>> {
+  return apiFetch(`/api/admin/platform/onboarding?${buildQuery({ page, limit })}`);
+}
+
+export function listPlatformOrganizations(
+  filters: { status?: OrganizationStatus; search?: string },
+  page: number,
+  limit: number,
+): Promise<ApiClientResult<{ result: PaginatedResult<Organization> }>> {
+  return apiFetch(`/api/admin/platform/organizations?${buildQuery({ ...filters, page, limit })}`);
+}
+
+export interface PlatformOrganizationDetail {
+  organization: Organization;
+  subscription: Subscription;
+  plan: Plan | null;
+  userCount: number;
+  entitlements: { capabilities: PlanCapability[]; limits: Partial<Record<UsageMetric, number | null>> } | null;
+}
+
+export function getPlatformOrganization(id: string): Promise<ApiClientResult<PlatformOrganizationDetail>> {
+  return apiFetch(`/api/admin/platform/organizations/${id}`);
+}
+
+export function suspendPlatformOrganization(id: string, reason: string): Promise<ApiClientResult<{ organization: Organization }>> {
+  return apiFetch(`/api/admin/platform/organizations/${id}/suspend`, { method: "POST", body: JSON.stringify({ reason }) });
+}
+
+export function reactivatePlatformOrganization(id: string): Promise<ApiClientResult<{ organization: Organization }>> {
+  return apiFetch(`/api/admin/platform/organizations/${id}/reactivate`, { method: "POST" });
+}
+
+export function extendPlatformOrganizationTrial(id: string, days: number): Promise<ApiClientResult<{ subscription: Subscription }>> {
+  return apiFetch(`/api/admin/platform/organizations/${id}/extend-trial`, { method: "POST", body: JSON.stringify({ days }) });
+}
+
+export function assignPlatformOrganizationPlan(id: string, planId: string): Promise<ApiClientResult<{ subscription: Subscription }>> {
+  return apiFetch(`/api/admin/platform/organizations/${id}/assign-plan`, { method: "POST", body: JSON.stringify({ planId }) });
+}
+
+export function overridePlatformOrganizationCapability(
+  id: string,
+  capability: PlanCapability,
+  granted: boolean | null,
+): Promise<ApiClientResult<{ subscription: Subscription }>> {
+  return apiFetch(`/api/admin/platform/organizations/${id}/override-capability`, {
+    method: "POST",
+    body: JSON.stringify({ capability, granted }),
+  });
+}
+
+export function overridePlatformOrganizationLimit(
+  id: string,
+  metric: UsageMetric,
+  value: number | null,
+  clear = false,
+): Promise<ApiClientResult<{ subscription: Subscription }>> {
+  return apiFetch(`/api/admin/platform/organizations/${id}/override-limit`, {
+    method: "POST",
+    body: JSON.stringify({ metric, value, clear }),
+  });
+}
+
+export function listPlatformJobs(
+  filters: { status?: AdminScheduledJob["status"]; jobType?: string; organizationId?: string },
+  page: number,
+  limit: number,
+): Promise<ApiClientResult<{ result: PaginatedResult<AdminScheduledJob> }>> {
+  return apiFetch(`/api/admin/platform/jobs?${buildQuery({ ...filters, page, limit })}`);
+}
+
+/** The route surfaces a replay-safety refusal (RC-5's own classification
+ *  — a job type with a real external side effect and no idempotency
+ *  guard) as a real 403 with the reason as the error message, not a
+ *  `success: true` payload with a refused flag — so the success shape
+ *  here is just the job, same as the tenant-scoped `retryJob` above. */
+export function retryPlatformJob(id: string): Promise<ApiClientResult<{ job: AdminScheduledJob }>> {
+  return apiFetch(`/api/admin/platform/jobs/${id}/retry`, { method: "POST" });
+}
+
+export function cancelPlatformJob(id: string): Promise<ApiClientResult<{ job: AdminScheduledJob }>> {
+  return apiFetch(`/api/admin/platform/jobs/${id}/cancel`, { method: "POST" });
+}
+
+export function getPlatformHealth(): Promise<ApiClientResult<{ report: unknown }>> {
+  return apiFetch("/api/admin/platform/health");
+}
+
+export function listPlatformSecurityEvents(
+  filters: { action?: string; search?: string },
+  page: number,
+  limit: number,
+): Promise<ApiClientResult<{ result: PaginatedResult<AuditLogEntry> }>> {
+  return apiFetch(`/api/admin/platform/security-events?${buildQuery({ ...filters, page, limit })}`);
+}
+
+export function listPlatformAuditLog(page: number, limit: number): Promise<ApiClientResult<{ result: PaginatedResult<AuditLogEntry> }>> {
+  return apiFetch(`/api/admin/platform/audit-log?${buildQuery({ page, limit })}`);
+}
+
+export function searchPlatform(q: string): Promise<ApiClientResult<{ result: PlatformSearchResult }>> {
+  return apiFetch(`/api/admin/platform/search?${buildQuery({ q })}`);
 }

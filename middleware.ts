@@ -1,6 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { AUTH_ACCESS_COOKIE_NAME } from "@/config/auth";
-import { AUTH_HEADER_EMAIL, AUTH_HEADER_ORG_ID, AUTH_HEADER_ROLE, AUTH_HEADER_USER_ID, AUTH_HEADER_SESSION_ID } from "@/lib/api/roles";
+import {
+  AUTH_HEADER_EMAIL,
+  AUTH_HEADER_ORG_ID,
+  AUTH_HEADER_ROLE,
+  AUTH_HEADER_USER_ID,
+  AUTH_HEADER_SESSION_ID,
+  AUTH_HEADER_PLATFORM_ROLE,
+} from "@/lib/api/roles";
 // Imports tokens.ts directly, NOT the lib/services/auth barrel — the
 // barrel also re-exports authService, which pulls in lib/db/registry.ts
 // (every entity's in-memory repository, several using node:crypto) and
@@ -11,14 +18,23 @@ import { AUTH_HEADER_EMAIL, AUTH_HEADER_ORG_ID, AUTH_HEADER_ROLE, AUTH_HEADER_US
 import { verifyAccessToken } from "@/lib/services/auth/tokens";
 
 const LOGIN_PAGE_PATH = "/admin/login";
+/** RC-7 — a second "auth entry" page alongside login: reachable with NO
+ *  session, and — like LOGIN_PAGE_PATH — redirects an ALREADY-
+ *  authenticated visitor away (to /admin, which itself resolves onward
+ *  to the onboarding wizard or the dashboard depending on real
+ *  server-side state — see the onboarding status route). A logged-in
+ *  user has no reason to see a fresh signup form. */
+const REGISTER_PAGE_PATH = "/admin/register";
 /** RC-1 — genuinely public `/admin/*` pages: reachable with NO session
- *  at all (unlike every other `/admin/*` page). Unlike LOGIN_PAGE_PATH,
- *  none of these redirect an already-authenticated visitor away — a
- *  logged-in user legitimately might still open a password-reset or
- *  email-verification link from their inbox (e.g. changing their email,
- *  or a second browser profile), and forcing them back to /admin first
- *  would just break that link for no real security benefit. */
-const OTHER_PUBLIC_PAGE_PATHS = new Set(["/admin/forgot-password", "/admin/reset-password", "/admin/verify-email"]);
+ *  at all (unlike every other `/admin/*` page). Unlike LOGIN_PAGE_PATH/
+ *  REGISTER_PAGE_PATH, none of these redirect an already-authenticated
+ *  visitor away — a logged-in user legitimately might still open a
+ *  password-reset, email-verification, or (RC-7) team-invitation link
+ *  from their inbox (e.g. changing their email, a second browser
+ *  profile, or an invite addressed to a different email than their
+ *  current session), and forcing them back to /admin first would just
+ *  break that link for no real security benefit. */
+const OTHER_PUBLIC_PAGE_PATHS = new Set(["/admin/forgot-password", "/admin/reset-password", "/admin/verify-email", "/admin/accept-invite"]);
 
 /**
  * The sole place authentication happens (Module 9). Verifies the
@@ -62,7 +78,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   const token = request.cookies.get(AUTH_ACCESS_COOKIE_NAME)?.value;
   const claims = token ? await verifyAccessToken(token) : null;
 
-  if (pathname === LOGIN_PAGE_PATH) {
+  if (pathname === LOGIN_PAGE_PATH || pathname === REGISTER_PAGE_PATH) {
     if (claims) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
@@ -91,6 +107,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   headers.delete(AUTH_HEADER_ROLE);
   headers.delete(AUTH_HEADER_ORG_ID);
   headers.delete(AUTH_HEADER_SESSION_ID);
+  headers.delete(AUTH_HEADER_PLATFORM_ROLE);
   headers.set(AUTH_HEADER_USER_ID, claims.sub);
   headers.set(AUTH_HEADER_EMAIL, claims.email);
   headers.set(AUTH_HEADER_ROLE, claims.role);
@@ -102,11 +119,22 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
   // which is exactly why that resolution can't happen in this file)
   // for an authenticated request that reaches it with no org header at
   // all.
+  // RC-7 — no longer resolved server-side "for free" when absent: a
+  // verified token with no organizationId claim is now a real,
+  // meaningful state (a mid-onboarding user — see withApiRoute.ts's own
+  // "RC-7" doc comment), not something withApiRoute silently
+  // substitutes a default for anymore.
   if (claims.organizationId) {
     headers.set(AUTH_HEADER_ORG_ID, claims.organizationId);
   }
   if (claims.sessionId) {
     headers.set(AUTH_HEADER_SESSION_ID, claims.sessionId);
+  }
+  // RC-6 — same "only forwarded when the verified token actually
+  // carries one" posture as organizationId/sessionId above. Absent for
+  // every ordinary tenant user's token, forever.
+  if (claims.platformRole) {
+    headers.set(AUTH_HEADER_PLATFORM_ROLE, claims.platformRole);
   }
 
   return NextResponse.next({ request: { headers } });
@@ -140,6 +168,30 @@ export const config = {
    */
   matcher: [
     "/api/admin/:path*",
+    // RC-7 — Customer Onboarding & SaaS Activation. These routes read
+    // ctx.authContext.userId/organizationId to make real authorization
+    // decisions (withApiRoute.ts's own pre-organization gate included)
+    // — without this matcher entry, a request would reach them with
+    // whatever raw x-auth-* headers the CLIENT sent directly, never
+    // stripped or re-verified, the exact full-authentication-bypass gap
+    // this matcher's own doc comment above warns every requiredRole
+    // route about. Not covered by "/api/admin/:path*" — these
+    // deliberately live outside that prefix (see onboarding.
+    // organization.create's own route doc comment).
+    "/api/onboarding/:path*",
+    // RC-8 — Documentation, API Documentation & Operational Knowledge
+    // Base. Both docs.* routes declare requiredRole: "admin" — the
+    // exact same real-authorization-decision shape the RC-7 comment
+    // above warns about. Found live, not by code review: a fresh
+    // manual verification pass (register → verify → create org →
+    // hit /api/docs/reference with a real admin session) returned
+    // "Authentication required" despite a valid session cookie, because
+    // this entry was missing and getAuthContext() never saw a trusted
+    // x-auth-* header for this prefix. Not covered by
+    // "/api/admin/:path*" — these deliberately live outside that
+    // prefix (see app/api/docs/openapi.json/route.ts's own doc
+    // comment for why).
+    "/api/docs/:path*",
     "/api/auth/me",
     "/api/auth/change-password",
     "/api/auth/resend-verification",

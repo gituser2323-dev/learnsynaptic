@@ -1,6 +1,7 @@
 import { subscribe } from "@/lib/events";
-import { getWorkflowRunRepository } from "@/lib/db";
+import { getWorkflowRunRepository, getLeadRepository } from "@/lib/db";
 import { createLogger } from "@/lib/logger";
+import { runCrossTenantSweep, runWithTenantContext } from "@/lib/tenancy/context";
 import { startWorkflowRun } from "./engine";
 import { listActiveDefinitionsByTrigger } from "./definitions";
 import { autoReplyService } from "./autoReply";
@@ -36,6 +37,52 @@ const SUPPORTED_TRIGGER_EVENT_TYPES = ["lead.created", "payment.success"];
 
 let registered = false;
 
+/**
+ * RC-9 — Full-System Validation, Load, Stress, Security & Failure
+ * Testing. A real, live-proven CRITICAL cross-tenant bug found and
+ * fixed this pass. `publish()` (lib/events/eventBus.ts) runs every
+ * subscriber with WHATEVER tenant context (if any) was active at the
+ * moment of the triggering write — and several of this app's own
+ * genuinely public, unauthenticated routes (`POST /api/leads`, `POST
+ * /api/registrations`) establish NO tenant context at all (see
+ * withApiRoute.ts's own doc comment on why — there is no session to
+ * derive one from). `listActiveDefinitionsByTrigger()`'s underlying
+ * query is tenant-scoped via `tenantScopePlugin`, which is a **no-op**
+ * with no context active (tenantScopePlugin.ts's own doc comment) — so
+ * calling it with no context returned EVERY organization's active
+ * definition for this trigger type, not none. `startWorkflowRun()` was
+ * then called for EACH of them against the same entityId, with no
+ * check that the entity actually belongs to that definition's own
+ * organization.
+ *
+ * Confirmed live: a `WorkflowDefinition` belonging to "RC9 Organization
+ * A" fired against Leads created through the real public lead-capture
+ * endpoint (which stamp the deployment's own DEFAULT organization, not
+ * "RC9 Organization A") — Organization A's own configured automation
+ * ran using another organization's lead data it was never entitled to
+ * see. The resulting `WorkflowRun` documents were created with **no
+ * `organizationId` at all** (tenantScopePlugin's own `pre("save")`
+ * hook only stamps one when a context is active — with none, it does
+ * nothing), leaving them orphaned: invisible to every tenant-scoped
+ * query, including the very organization whose automation ran.
+ *
+ * Fixed with the exact pattern this codebase already established for
+ * this precise "an event/job has no ambient tenant context of its own,
+ * but must ultimately touch tenant-owned data safely" shape (see
+ * `runCrossTenantSweep()`'s own doc comment, used by
+ * `schedulerService.ts` for the identical reason): look up matching
+ * definitions via a deliberate cross-tenant sweep (so this step
+ * genuinely sees every organization's own configured automation, not
+ * silently zero), then — for each candidate — establish that
+ * definition's OWN real tenant context and, within it, confirm the
+ * target entity genuinely belongs to that SAME organization (a
+ * tenant-scoped lookup that returns null for a cross-tenant or
+ * no-tenant entity, the same "cross-tenant id behaves like not-found"
+ * convention this app already holds everywhere else) before ever
+ * starting a run. A Lead that belongs to a different organization (or
+ * no organization at all, the exact public-lead-capture shape) now
+ * correctly triggers NOTHING for a definition it doesn't belong to.
+ */
 async function handleTriggerEvent(eventType: string, payload: { leadId?: string; entityId?: string }): Promise<void> {
   const entityId = payload.leadId ?? payload.entityId;
   if (!entityId) {
@@ -43,9 +90,30 @@ async function handleTriggerEvent(eventType: string, payload: { leadId?: string;
     return;
   }
 
-  const definitions = await listActiveDefinitionsByTrigger(eventType);
+  const definitions = await runCrossTenantSweep(() => listActiveDefinitionsByTrigger(eventType));
   for (const definition of definitions) {
-    await startWorkflowRun(definition.id, "Lead", entityId, payload as Record<string, unknown>);
+    if (!definition.organizationId) {
+      // A definition with no organizationId of its own predates
+      // tenant-scoping (Module 8.1) or was created outside any tenant
+      // context — there is no safe organization to run it as. Skipped,
+      // not silently run unscoped.
+      logger.warn("automation.trigger_definition_missing_org", { eventType, workflowId: definition.id });
+      continue;
+    }
+    await runWithTenantContext({ organizationId: definition.organizationId }, async () => {
+      const leadRepository = await getLeadRepository();
+      const entity = await leadRepository.findById(entityId);
+      if (!entity) {
+        // The tenant-scoped lookup found nothing — this entity does
+        // NOT belong to this definition's own organization (or
+        // belongs to none at all, e.g. a public-lead-capture Lead
+        // stamped to the deployment's default org). Never start a run
+        // using another organization's own configured automation
+        // against data it was never entitled to see.
+        return;
+      }
+      await startWorkflowRun(definition.id, "Lead", entityId, payload as Record<string, unknown>);
+    });
   }
 }
 
@@ -79,16 +147,32 @@ export function registerAutomationTriggers(): void {
     });
   }
 
+  // RC-9 — the same cross-tenant gap handleTriggerEvent's own doc
+  // comment describes, in a second real subscriber: "registration.created"
+  // fires with no tenant context on this app's own genuinely public
+  // registration route, so an unscoped findActiveByEntity()/update()
+  // pair here could read AND MUTATE (marking "completed") another
+  // organization's own WorkflowRun for a leadId this event's own
+  // payload happened to name. Fixed the same way: resolve the Lead's
+  // own real organization first (a deliberate cross-tenant lookup,
+  // since none is known yet), then do the actual read+mutate inside
+  // that organization's own real tenant context — never unscoped.
   subscribe("registration.created", async (event) => {
     const payload = event.payload as { leadId?: string };
     if (!payload.leadId) return;
 
-    const repository = await getWorkflowRunRepository();
-    const activeRuns = await repository.findActiveByEntity("Lead", payload.leadId);
-    for (const run of activeRuns) {
-      await repository.update(run.id, { status: "completed", completionReason: "converted" });
-      logger.info("automation.workflow_stopped_on_conversion", { runId: run.id, leadId: payload.leadId });
-    }
+    const leadRepository = await getLeadRepository();
+    const lead = await runCrossTenantSweep(() => leadRepository.findById(payload.leadId!));
+    if (!lead?.organizationId) return;
+
+    await runWithTenantContext({ organizationId: lead.organizationId }, async () => {
+      const repository = await getWorkflowRunRepository();
+      const activeRuns = await repository.findActiveByEntity("Lead", payload.leadId!);
+      for (const run of activeRuns) {
+        await repository.update(run.id, { status: "completed", completionReason: "converted" });
+        logger.info("automation.workflow_stopped_on_conversion", { runId: run.id, leadId: payload.leadId });
+      }
+    });
   });
 
   // Module 3.3 — Auto-Reply Engine. Published by

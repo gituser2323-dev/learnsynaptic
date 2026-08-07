@@ -1,5 +1,24 @@
 # WhatsApp API Documentation
 
+**Status: partially outdated, kept for its still-accurate detail below
+— see the RC-8 correction in this note before trusting the paragraph
+that follows.** Companion to `WHATSAPP_ARCHITECTURE.md` — written
+2026-07-24, before Module 2.5 (Campaign Enhancements) and
+`CAMPAIGN_ARCHITECTURE.md` existed. Its own original claim below ("no
+public HTTP endpoint for sending... the only HTTP surface is the
+inbound webhook") is **no longer accurate**: real, admin-authenticated
+HTTP routes that trigger a send now exist —
+`POST /api/admin/whatsapp-campaigns/[id]/send` and `.../schedule`
+(Module 2.5) — not literally *unauthenticated*-public, but a real HTTP
+surface beyond just the webhook, contradicting this doc's own original
+"only HTTP surface" framing. For the current, authoritative, whole-app
+API inventory (including every WhatsApp route), see
+[`docs/api/inventory.md`](docs/api/inventory.md); for WhatsApp-specific
+architecture context, see [`docs/integrations/whatsapp.md`](docs/integrations/whatsapp.md).
+The original 2026-07-24 text follows, unedited, for the endpoints it
+does still correctly describe (the inbound webhook detail below
+remains accurate):
+
 Companion to `WHATSAPP_ARCHITECTURE.md` — this documents every actual
 HTTP endpoint, service method, and provider contract that exists today.
 **There is currently no public HTTP endpoint for *sending* a WhatsApp

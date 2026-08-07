@@ -62,6 +62,13 @@ export const REFRESH_TOKEN_TTL_SECONDS_SHORT = Number(process.env.REFRESH_TOKEN_
  *  email, which can sit in an inbox or be forwarded). */
 export const PASSWORD_RESET_TOKEN_TTL_SECONDS = Number(process.env.PASSWORD_RESET_TOKEN_TTL_SECONDS) || 60 * 60;
 export const EMAIL_VERIFICATION_TOKEN_TTL_SECONDS = Number(process.env.EMAIL_VERIFICATION_TOKEN_TTL_SECONDS) || 24 * 60 * 60;
+/** RC-7 — Customer Onboarding & SaaS Activation. Longer than a
+ *  password-reset link (7 days vs. 1 hour) — an invitation is
+ *  typically addressed to someone who isn't actively waiting for it
+ *  the way a person who just clicked "forgot password" is; OWASP's own
+ *  guidance for invite-style tokens allows a longer window than a
+ *  security-recovery one. */
+export const TEAM_INVITATION_TTL_SECONDS = Number(process.env.TEAM_INVITATION_TTL_SECONDS) || 7 * 24 * 60 * 60;
 
 /** RC-1 — brute-force lockout. 5 failed attempts is OWASP's own commonly
  *  cited starting point for a staff/admin login (not a high-volume

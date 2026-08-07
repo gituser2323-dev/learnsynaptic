@@ -49,6 +49,11 @@ function buildQuery(filters: LeadListFilters): Record<string, unknown> {
   // pre-Phase-1 lead silently vanishes from the default list view.
   if (filters.archived === false) query.archived = { $ne: true };
   else if (filters.archived === true) query.archived = true;
+  // RC-5 — same "field absent counts as not-deleted" reasoning as
+  // archived above: every lead predating this field has no `deletedAt`
+  // key at all, not `deletedAt: null`.
+  if (filters.deleted === true) query.deletedAt = { $exists: true };
+  else if (filters.deleted === false) query.deletedAt = { $exists: false };
   return query;
 }
 
@@ -152,7 +157,17 @@ export const mongodbLeadRepository: LeadRepository = {
     await getConnection();
     const validIds = ids.filter((id) => mongoose.isValidObjectId(id));
     if (validIds.length === 0) return [];
-    await LeadModel.deleteMany({ _id: { $in: validIds } }).exec();
+    // RC-5 — soft-delete, not deleteMany: see Lead.deletedAt's own doc
+    // comment on why bulk delete must be recoverable.
+    await LeadModel.updateMany({ _id: { $in: validIds } }, { $set: { deletedAt: new Date() } }).exec();
+    return validIds;
+  },
+
+  async bulkRestore(ids: string[]): Promise<string[]> {
+    await getConnection();
+    const validIds = ids.filter((id) => mongoose.isValidObjectId(id));
+    if (validIds.length === 0) return [];
+    await LeadModel.updateMany({ _id: { $in: validIds } }, { $unset: { deletedAt: "" } }).exec();
     return validIds;
   },
 
@@ -199,7 +214,12 @@ export const mongodbLeadRepository: LeadRepository = {
     overrides.customFields = { ...source.customFields, ...target.customFields };
 
     const merged = await LeadModel.findByIdAndUpdate(targetId, { $set: overrides }, { new: true }).exec();
-    await LeadModel.deleteOne({ _id: sourceId }).exec();
+    // RC-5 — soft-delete the losing side, not deleteMany: a bad merge
+    // decision (wrong target chosen) is otherwise unrecoverable — the
+    // source row surviving (soft-deleted) means it can still be
+    // inspected/restored even though its fields are now folded into
+    // target too.
+    await LeadModel.findByIdAndUpdate(sourceId, { $set: { deletedAt: new Date() } }).exec();
     if (!merged) throw new Error(`Lead ${targetId} not found after merge`);
     return toLead(merged);
   },

@@ -1,2 +1,13 @@
-export { ensureDefaultOrganization } from "./organizationService";
-export type { Organization, CreateOrganizationInput, OrganizationRepository } from "./types";
+export { ensureDefaultOrganization, platformOrganizationService } from "./organizationService";
+export type {
+  Organization,
+  OrganizationStatus,
+  OrganizationTeamSize,
+  OnboardingStepId,
+  OnboardingStepStatus,
+  OnboardingState,
+  CreateOrganizationInput,
+  UpdateOrganizationInput,
+  OrganizationListFilters,
+  OrganizationRepository,
+} from "./types";

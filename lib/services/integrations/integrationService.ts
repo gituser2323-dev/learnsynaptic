@@ -323,10 +323,26 @@ export const integrationService = {
    *  threshold that already excludes plain Activity logging and
    *  5.1/5.3's own automation-triggered analysis runs). Only updates
    *  health/lastSuccessAt/lastFailureAt/lastError on the connection and
-   *  appends one IntegrationLog row. */
+   *  appends one IntegrationLog row.
+   *
+   *  Configuration & Integration Verification — a builtIn provider
+   *  (email/openai/anthropic/gemini; whatsapp too, unless it has its
+   *  own tenant-scoped connection) has no IntegrationConnection row to
+   *  update health on (toSummary() derives its status/health from
+   *  getBuiltInStatus() instead — see that function's own doc comment),
+   *  so the connection-update half below still only applies when a
+   *  real row exists. The IntegrationLog write is unconditional now:
+   *  a builtIn provider's own "Test Connection" result belongs in its
+   *  Logs panel exactly like every other provider's does, and writing
+   *  a log row has no such "which record do I update" ambiguity. */
   async recordSync(providerId: string, outcome: IntegrationLogOutcome, detail: string): Promise<void> {
     const provider = getProviderDescriptor(providerId);
-    if (!provider || provider.builtIn) return;
+    if (!provider) return;
+
+    const logRepository = await getIntegrationLogRepository();
+    await logRepository.create({ providerId, eventType: "sync", outcome, detail });
+
+    if (provider.builtIn) return;
 
     const connectionRepository = await getIntegrationConnectionRepository();
     const existing = await connectionRepository.findByProviderId(providerId);
@@ -337,9 +353,6 @@ export const integrationService = {
       health: outcome === "success" ? "ok" : "error",
       ...(outcome === "success" ? { lastSuccessAt: now } : { lastFailureAt: now, lastError: detail }),
     });
-
-    const logRepository = await getIntegrationLogRepository();
-    await logRepository.create({ providerId, eventType: "sync", outcome, detail });
   },
 
   async listLogs(providerId: string, page = 1, limit = 20): Promise<PaginatedResult<IntegrationLog>> {

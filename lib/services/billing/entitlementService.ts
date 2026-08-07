@@ -25,12 +25,27 @@ export const entitlementService = {
       // 500 into every route that resolves entitlements.
       throw new EntitlementError("no_subscription", `Subscription references unknown plan "${subscription.planId}".`, { organizationId, planId: subscription.planId });
     }
+    // RC-6 — Platform Super Admin & SaaS Operations Console: merge the
+    // per-org, operator-granted overrides (Subscription.capabilityOverrides/
+    // limitOverrides — see that field's own doc comment) on top of the
+    // plan's own values, never mutating the shared Plan document itself.
+    // `false` in capabilityOverrides revokes; `true` grants — both take
+    // priority over the plan's own inclusion/exclusion. An explicit
+    // (possibly `null`-for-unlimited) limitOverrides entry always wins
+    // over the plan's own limit for that metric.
+    const capabilities = new Set(plan.capabilities);
+    for (const [capability, granted] of Object.entries(subscription.capabilityOverrides ?? {})) {
+      if (granted) capabilities.add(capability as PlanCapability);
+      else capabilities.delete(capability as PlanCapability);
+    }
+    const limits = { ...plan.limits, ...subscription.limitOverrides };
+
     return {
       organizationId,
       plan,
       subscription,
-      capabilities: new Set(plan.capabilities),
-      limits: plan.limits,
+      capabilities,
+      limits,
     };
   },
 

@@ -64,6 +64,33 @@ export const localStorageProvider: StorageProvider = {
   async getSignedUrl(storageKey: string, expiresInSeconds: number, downloadOptions?: StorageDownloadOptions): Promise<string> {
     return createLocalSignedUrl(storageKey, expiresInSeconds, downloadOptions);
   },
+
+  async listAllKeys(): Promise<string[]> {
+    const root = path.join(process.cwd(), LOCAL_STORAGE_CONFIG.directory);
+    const keys: string[] = [];
+    async function walk(dir: string): Promise<void> {
+      let entries;
+      try {
+        entries = await fs.readdir(dir, { withFileTypes: true });
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") return;
+        throw error;
+      }
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          await walk(fullPath);
+        } else {
+          // storageKey is always POSIX-style ("category/uuid.ext" — see
+          // validation.ts's generateStorageKey) regardless of the host
+          // OS's own path separator.
+          keys.push(path.relative(root, fullPath).split(path.sep).join("/"));
+        }
+      }
+    }
+    await walk(root);
+    return keys;
+  },
 };
 
 /** Exported for the local-signed-URL delivery route only — reads the

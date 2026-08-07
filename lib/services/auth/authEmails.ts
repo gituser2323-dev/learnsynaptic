@@ -96,6 +96,19 @@ export async function sendMfaDisabledEmail(email: string): Promise<void> {
   );
 }
 
+/** RC-7 — Customer Onboarding & SaaS Activation. Reuses this exact
+ *  file/pattern rather than a second email-sending module for
+ *  invitations — see this file's own module doc. */
+export async function sendTeamInvitationEmail(email: string, rawToken: string, organizationName: string, inviterName: string): Promise<void> {
+  const link = `${baseUrl()}/admin/accept-invite?token=${rawToken}`;
+  await sendSafely(
+    email,
+    `You've been invited to join ${organizationName} on LearnSynaptic`,
+    `${inviterName} invited you to join ${organizationName}'s workspace on LearnSynaptic. Open this link to accept and set up your account:\n\n${link}\n\nThis invitation expires in 7 days. If you weren't expecting this, you can safely ignore this email.`,
+    "team_invitation",
+  );
+}
+
 export async function sendAccountLockedEmail(email: string, lockedUntil: string): Promise<void> {
   await sendSafely(
     email,

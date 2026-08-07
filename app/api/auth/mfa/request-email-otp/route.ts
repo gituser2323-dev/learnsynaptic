@@ -1,5 +1,6 @@
 import type { NextResponse } from "next/server";
 import { withApiRoute, apiSuccess, apiError } from "@/lib/api";
+import { assertEmailTargetRateLimitOk } from "@/lib/api/targetRateLimit";
 import { authService, mfaService } from "@/lib/services/auth";
 
 /**
@@ -23,6 +24,12 @@ async function handleRequestEmailOtp(request: Request): Promise<NextResponse> {
   if (typeof body.email !== "string" || typeof body.password !== "string") {
     return apiError([{ field: "root", message: "Email and password are required." }], 400);
   }
+  // RC-9 — second rate-limit dimension keyed on the target email, not
+  // just client IP — see lib/api/targetRateLimit.ts's own doc comment
+  // for the real, live-proven X-Forwarded-For spoofing gap this closes.
+  // A correct-password holder (attacker or otherwise) could otherwise
+  // flood the real account owner's inbox with OTP codes unthrottled.
+  await assertEmailTargetRateLimitOk("auth.mfa.requestEmailOtp", body.email, 5, 15 * 60 * 1000);
 
   const verified = await authService.verifyCredentialsForChallenge(body.email, body.password);
   if (verified?.mfaEnabled) {

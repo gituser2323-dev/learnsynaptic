@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand, HeadObjectCommand, GetObjectCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { getSignedUrl as getS3PresignedUrl } from "@aws-sdk/s3-request-presigner";
 import { AWS_S3_CONFIG } from "@/config/storage";
 import { StorageProviderNotConfiguredError, StorageProviderError } from "../errors";
@@ -96,5 +96,21 @@ export const awsS3StorageProvider: StorageProvider = {
     } catch (error) {
       throw new StorageProviderError("aws_s3", error instanceof Error ? error.message : "unknown signing error");
     }
+  },
+
+  async listAllKeys(): Promise<string[]> {
+    assertConfigured();
+    const keys: string[] = [];
+    let continuationToken: string | undefined;
+    do {
+      const response = await getClient().send(
+        new ListObjectsV2Command({ Bucket: AWS_S3_CONFIG.bucket, ContinuationToken: continuationToken }),
+      );
+      for (const object of response.Contents ?? []) {
+        if (object.Key) keys.push(object.Key);
+      }
+      continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined;
+    } while (continuationToken);
+    return keys;
   },
 };

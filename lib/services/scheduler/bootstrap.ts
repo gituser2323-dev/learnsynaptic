@@ -66,6 +66,20 @@ const bootstrappers: (() => Promise<void>)[] = [
     registerBillingPeriodCheckHandler();
     await ensureBillingPeriodCheckTickScheduled();
   },
+  // RC-5 — Backup, Restore & Disaster Recovery: the "tenant_export.generate"
+  // job type (organization-level data export — lib/services/dataExport).
+  async () => {
+    const { registerTenantExportJobHandler } = await import("@/lib/services/dataExport");
+    registerTenantExportJobHandler();
+  },
+  // RC-5 — the "backup.check_freshness" job type (lib/services/backupMonitoring).
+  async () => {
+    const { registerBackupFreshnessCheckHandler, ensureBackupFreshnessCheckScheduled } = await import(
+      "@/lib/services/backupMonitoring"
+    );
+    registerBackupFreshnessCheckHandler();
+    await ensureBackupFreshnessCheckScheduled();
+  },
 ];
 
 let bootstrapped = false;

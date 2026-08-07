@@ -4,7 +4,7 @@ import { auditLogService, AUDIT_ACTIONS } from "@/lib/services/auditLog";
 import type { AuditContext } from "@/lib/services/auditLog";
 import { planService } from "./planService";
 import { INTERNAL_PLAN_ID, ensureInternalPlanSeeded } from "./internalPlan";
-import type { Subscription, SubscriptionStatus } from "./types";
+import type { Subscription, SubscriptionStatus, PlanCapability, UsageMetric } from "./types";
 
 const YEARS_100_MS = 100 * 365 * 24 * 60 * 60 * 1000;
 
@@ -121,6 +121,109 @@ export const subscriptionService = {
       actorId: context.actorId,
       requestId: context.requestId,
       metadata: { organizationId, fromPlanId: existing.planId, toPlanId: planId },
+    });
+    return updated;
+  },
+
+  /** RC-6 — Platform Super Admin & SaaS Operations Console: a
+   *  platform-operator-only trial extension. Only meaningful for a
+   *  subscription currently `"trialing"` — throws otherwise, rather
+   *  than silently no-op'ing or fabricating a trial state that isn't
+   *  real (an `"active"`/`"past_due"` org has already converted or
+   *  lapsed; "extend the trial" doesn't mean anything for it — the
+   *  operator wants `assignPlan`/a real billing action instead). Both
+   *  `trialEndsAt` and `currentPeriodEnd` move together — they're the
+   *  same date for a trialing subscription (see `assignPlan`'s own
+   *  trial-start branch above), and leaving them out of sync would
+   *  make `ACTIVE_SUBSCRIPTION_STATUSES`-driven entitlement checks
+   *  disagree with what the trial banner shows. */
+  async extendTrial(organizationId: string, days: number, context: AuditContext = {}): Promise<Subscription> {
+    const repo = await getSubscriptionRepository();
+    const existing = await repo.findByOrganizationId(organizationId);
+    if (!existing) throw new Error(`No subscription found for organization "${organizationId}"`);
+    if (existing.status !== "trialing" || !existing.trialEndsAt) {
+      throw new Error(`Organization "${organizationId}" is not currently on a trial — nothing to extend.`);
+    }
+
+    const newTrialEndsAt = addDays(existing.trialEndsAt, days);
+    const updated = await repo.update(organizationId, { trialEndsAt: newTrialEndsAt, currentPeriodEnd: newTrialEndsAt });
+
+    await auditLogService.record({
+      action: AUDIT_ACTIONS.PLATFORM_ORG_TRIAL_EXTENDED,
+      entityType: "Organization",
+      entityId: organizationId,
+      actorId: context.actorId,
+      requestId: context.requestId,
+      metadata: { days, previousTrialEndsAt: existing.trialEndsAt, newTrialEndsAt },
+    });
+    return updated;
+  },
+
+  /** RC-6 — Platform Super Admin & SaaS Operations Console: grant
+   *  (`granted: true`), revoke (`granted: false`), or clear
+   *  (`granted: null` — reverts to whatever the plan itself says)
+   *  ONE capability override for ONE organization. Read-merge-write
+   *  against the existing override map so setting one capability never
+   *  clobbers any other already-set override — never touches the Plan
+   *  document. */
+  async overrideCapability(
+    organizationId: string,
+    capability: PlanCapability,
+    granted: boolean | null,
+    context: AuditContext = {},
+  ): Promise<Subscription> {
+    const repo = await getSubscriptionRepository();
+    const existing = await repo.findByOrganizationId(organizationId);
+    if (!existing) throw new Error(`No subscription found for organization "${organizationId}"`);
+
+    const nextOverrides = { ...existing.capabilityOverrides };
+    if (granted === null) delete nextOverrides[capability];
+    else nextOverrides[capability] = granted;
+
+    const updated = await repo.update(organizationId, {
+      capabilityOverrides: Object.keys(nextOverrides).length > 0 ? nextOverrides : null,
+    });
+    await auditLogService.record({
+      action: AUDIT_ACTIONS.PLATFORM_ORG_FEATURE_OVERRIDDEN,
+      entityType: "Organization",
+      entityId: organizationId,
+      actorId: context.actorId,
+      requestId: context.requestId,
+      metadata: { capability, granted },
+    });
+    return updated;
+  },
+
+  /** RC-6 — same reasoning as overrideCapability, for a numeric usage
+   *  limit. `value: null` sets "unlimited for this org only" (a real
+   *  override, distinct from clearing one — use `clear: true` for
+   *  that, since `null` is already meaningful per PlanLimits' own
+   *  convention). */
+  async overrideLimit(
+    organizationId: string,
+    metric: UsageMetric,
+    value: number | null,
+    options: { clear?: boolean } = {},
+    context: AuditContext = {},
+  ): Promise<Subscription> {
+    const repo = await getSubscriptionRepository();
+    const existing = await repo.findByOrganizationId(organizationId);
+    if (!existing) throw new Error(`No subscription found for organization "${organizationId}"`);
+
+    const nextOverrides = { ...existing.limitOverrides };
+    if (options.clear) delete nextOverrides[metric];
+    else nextOverrides[metric] = value;
+
+    const updated = await repo.update(organizationId, {
+      limitOverrides: Object.keys(nextOverrides).length > 0 ? nextOverrides : null,
+    });
+    await auditLogService.record({
+      action: AUDIT_ACTIONS.PLATFORM_ORG_LIMIT_OVERRIDDEN,
+      entityType: "Organization",
+      entityId: organizationId,
+      actorId: context.actorId,
+      requestId: context.requestId,
+      metadata: { metric, value: options.clear ? undefined : value, cleared: !!options.clear },
     });
     return updated;
   },

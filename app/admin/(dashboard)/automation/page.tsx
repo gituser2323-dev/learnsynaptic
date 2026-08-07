@@ -540,8 +540,8 @@ export default function AdminAutomationPage() {
             Automation
           </h1>
           <p className="mt-1 text-sm" style={{ color: "var(--adm-text-secondary)" }}>
-            Registered workflow definitions and their run history. No automatic cron is wired up yet — trigger a
-            tick manually below.
+            Registered workflow definitions and their run history. Runs are processed on a schedule — use &quot;Run Due
+            Jobs Now&quot; below to process anything due right away instead of waiting for the next run.
           </p>
         </div>
         <RunSchedulerTrigger />

@@ -35,6 +35,10 @@ async function handleMe(_request: Request, ctx: ApiRouteContext): Promise<NextRe
       id: ctx.authContext.userId,
       email: ctx.authContext.email,
       role: ctx.authContext.role,
+      // RC-6 — from the verified JWT claim (see roles.ts's own
+      // AuthContext doc), same trusted provenance as role/email above.
+      // Undefined for every ordinary tenant user, forever.
+      platformRole: ctx.authContext.platformRole,
       ...(status ? { name: status.name, emailVerified: status.emailVerified, mfaEnabled: status.mfaEnabled } : {}),
     },
   });

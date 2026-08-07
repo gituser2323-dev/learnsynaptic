@@ -94,3 +94,29 @@ export function getAiProvider(): AiProvider {
   }
   return meteredProvider(registry[AI_ACTIVE_PROVIDER]);
 }
+
+/**
+ * Configuration & Integration Verification — the platform owner's own
+ * "Test Connection" button needs to verify a SPECIFIC provider's real
+ * credential (e.g. confirm OpenAI works) independent of which one
+ * `AI_PROVIDER` currently has active, and without it counting against
+ * any organization's own `ai_requests` usage limit (a platform-level
+ * credential check, not a tenant's own AI feature use) — so this
+ * deliberately returns the raw, unmetered adapter rather than reusing
+ * `getAiProvider()`'s env-active-only, metered resolution.
+ */
+export function getRawAiProvider(id: AiProviderId): AiProvider {
+  return registry[id];
+}
+
+/** The same "is a real key present" check `isAiProviderConfigured()`
+ *  already does for the currently-active provider, generalized to any
+ *  specific provider id — env key first, then (if an organization
+ *  context is active) that org's own tenant credential. */
+export async function resolveAiApiKeyPresence(id: AiProviderId): Promise<boolean> {
+  if (API_KEY_BY_PROVIDER[id].length > 0) return true;
+  const organizationId = getTenantContext()?.organizationId;
+  if (!organizationId) return false;
+  const tenantKey = await resolveTenantCredential(organizationId, id, "apiKey");
+  return !!tenantKey;
+}

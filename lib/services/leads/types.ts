@@ -68,10 +68,17 @@ export interface Lead extends CreateLeadInput {
   /** Enterprise CRM (Phase 1) — a User id (counsellor/manager/admin
    *  role). See lib/services/crm/assignment. */
   assignedCounsellorId?: string;
-  /** Enterprise CRM (Phase 1) — soft-delete flag for bulk archive; an
-   *  archived lead is excluded from the default list view but never
-   *  hard-deleted (bulk delete is a separate, explicit action). */
+  /** Enterprise CRM (Phase 1) — workflow-visibility flag for bulk
+   *  archive; an archived lead is excluded from the default list view.
+   *  Distinct from `deletedAt` below — archiving is routine and
+   *  reversible day-to-day counsellor workflow, not a deletion. */
   archived: boolean;
+  /** RC-5 — Backup, Restore & Disaster Recovery: set only by the admin
+   *  "bulk delete" action. `bulkDelete()` is a soft-delete (this field),
+   *  never a real `deleteMany` — see leadService.bulkDelete's own doc
+   *  comment. A soft-deleted lead is excluded from the default list
+   *  view (same as archived) but recoverable via `bulkRestore()`. */
+  deletedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -104,6 +111,13 @@ export interface LeadListFilters {
   /** Defaults to false (archived leads excluded) at the service layer —
    *  not defaulted here, so a repository implementation can't guess wrong. */
   archived?: boolean;
+  /** RC-5 — same "not defaulted here" convention as `archived`.
+   *  `undefined`/`false` at the service layer means "exclude
+   *  soft-deleted leads" (the normal browse view); `true` means "only
+   *  soft-deleted leads" (the recovery/trash view a restore action reads
+   *  from) — never "include both," so a caller can't accidentally leak
+   *  deleted records into a normal list by omission. */
+  deleted?: boolean;
   /** Enterprise Analytics (Phase 7), module 7.2 — Campaign ROI's own
    *  "leads for this Campaign" lookup, matched against
    *  Lead.utm.utmCampaign (a string match, since Lead carries no direct
@@ -169,7 +183,13 @@ export interface LeadRepository {
    *  actually matched/updated, since a caller may request ids that don't
    *  exist or already satisfy the update. */
   bulkUpdate(ids: string[], input: UpdateLeadInput): Promise<string[]>;
+  /** RC-5 — Backup, Restore & Disaster Recovery: soft-delete (sets
+   *  `deletedAt`), never a real `deleteMany` — see Lead.deletedAt's own
+   *  doc comment. Idempotent against already-deleted ids (re-setting
+   *  `deletedAt` on a match is harmless). */
   bulkDelete(ids: string[]): Promise<string[]>;
+  /** RC-5 — the undo path for bulkDelete: clears `deletedAt`. */
+  bulkRestore(ids: string[]): Promise<string[]>;
   /** Enterprise CRM (Phase 1) — every id in the collection, for a
    *  filter-scoped "select all matching" bulk action. */
   listAllIds(filters: LeadListFilters): Promise<string[]>;

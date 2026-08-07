@@ -128,4 +128,38 @@ export const cloudinaryStorageProvider: StorageProvider = {
       "private/authenticated delivery is not implemented for this provider — see this file's own doc comment. Use AWS S3 or the local provider for private files.",
     );
   },
+
+  async listAllKeys(): Promise<string[]> {
+    assertConfigured();
+    const auth = Buffer.from(`${CLOUDINARY_CONFIG.apiKey}:${CLOUDINARY_CONFIG.apiSecret}`).toString("base64");
+    const keys: string[] = [];
+    // Cloudinary's Admin API partitions resources by resource_type
+    // (image/video/raw) — there is no single "list everything" call,
+    // same reason delete() above tries all three.
+    for (const resourceType of ["image", "video", "raw"] as const) {
+      let nextCursor: string | undefined;
+      do {
+        const url = new URL(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CONFIG.cloudName}/resources/${resourceType}`);
+        url.searchParams.set("max_results", "500");
+        if (nextCursor) url.searchParams.set("next_cursor", nextCursor);
+        const response = await fetch(url, {
+          headers: { Authorization: `Basic ${auth}` },
+          signal: AbortSignal.timeout(STORAGE_PROVIDER_TIMEOUT_MS),
+        });
+        if (!response.ok) throw new StorageProviderError("cloudinary", `list resources (${resourceType}) failed (${response.status})`);
+        const body = (await response.json()) as {
+          resources?: { public_id: string; format?: string }[];
+          next_cursor?: string;
+        };
+        for (const resource of body.resources ?? []) {
+          // Reconstruct the original storageKey: publicIdFor() strips the
+          // extension on upload, Cloudinary returns it back separately as
+          // `format` — inverse of that same transform.
+          keys.push(resource.format ? `${resource.public_id}.${resource.format}` : resource.public_id);
+        }
+        nextCursor = body.next_cursor;
+      } while (nextCursor);
+    }
+    return keys;
+  },
 };

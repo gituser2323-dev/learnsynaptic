@@ -19,6 +19,11 @@ export interface UserDocument extends Document {
   mfaEnabled: boolean;
   mfaSecretEncrypted?: string;
   passwordChangedAt?: Date;
+  /** RC-6 — Platform Super Admin & SaaS Operations Console. See
+   *  lib/services/auth/types.ts's PlatformRole doc comment — a
+   *  separate authorization dimension from `role` above, never
+   *  compared against it. */
+  platformRole?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -37,6 +42,7 @@ const userSchema = new Schema<UserDocument>(
     mfaEnabled: { type: Boolean, default: false },
     mfaSecretEncrypted: { type: String },
     passwordChangedAt: { type: Date },
+    platformRole: { type: String, enum: ["super_admin"] },
   },
   { timestamps: true },
 );
@@ -60,6 +66,7 @@ export function toUser(doc: UserDocument): User {
     mfaEnabled: doc.mfaEnabled ?? false,
     mfaSecretEncrypted: doc.mfaSecretEncrypted,
     passwordChangedAt: doc.passwordChangedAt?.toISOString(),
+    platformRole: doc.platformRole as User["platformRole"],
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };

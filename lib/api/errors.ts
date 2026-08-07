@@ -114,3 +114,17 @@ export class PayloadTooLargeApiError extends ApiError {
     this.name = "PayloadTooLargeApiError";
   }
 }
+
+/** RC-5 — Backup, Restore & Disaster Recovery: the read-only kill
+ *  switch (`MAINTENANCE_READ_ONLY_MODE`, checked in withApiRoute.ts
+ *  before any handler runs). 503, the standard status for "the server
+ *  is deliberately not able to handle this right now" — distinct from
+ *  ForbiddenApiError (403, a permissions decision about THIS caller):
+ *  every write from every caller is refused identically while this
+ *  mode is on. */
+export class ServiceUnavailableApiError extends ApiError {
+  constructor(message = "The platform is temporarily in read-only mode. Please try again shortly.") {
+    super(message, 503, [{ field: "root", message }]);
+    this.name = "ServiceUnavailableApiError";
+  }
+}

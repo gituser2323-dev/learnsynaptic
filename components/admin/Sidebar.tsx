@@ -8,6 +8,7 @@ import { useAdminShellState } from "./AdminShellState";
 import { useAdminAuth } from "./AdminAuthContext";
 import { useAdminBranding } from "./AdminBrandingContext";
 import { NAV_SEARCH_INDEX, NAV_GROUPS, navItemVisible } from "./navIndex";
+import { Skeleton } from "./Skeleton";
 
 function NavLink({
   href,
@@ -54,9 +55,33 @@ function NavLink({
   );
 }
 
+/** Placeholder shown in place of the real nav while `user.role` is still
+ *  loading — `navItemVisible()` fails closed with no role known yet
+ *  (correctly: it must never briefly show a link to a page the user's
+ *  real role can't reach), which otherwise renders a real but much
+ *  SHORTER nav list for one visible frame before widening to the full
+ *  one the instant the role resolves. Matches the real nav's own group
+ *  count/shape closely enough that the swap-in doesn't reflow the page
+ *  around it, without ever showing incorrect (too-wide or too-narrow)
+ *  content for the signed-in user's actual role. */
+function SidebarSkeleton({ collapsed }: { collapsed: boolean }) {
+  return (
+    <div role="status" aria-label="Loading navigation" className="flex-1 space-y-5">
+      {[3, 5, 4, 2].map((rows, groupIndex) => (
+        <div key={groupIndex} aria-hidden="true" className="space-y-2">
+          {!collapsed && <Skeleton className="mb-2 h-2.5 w-16" />}
+          {Array.from({ length: rows }).map((_, i) => (
+            <Skeleton key={i} className="h-9 w-full" />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavigate?: () => void }) {
   const pathname = usePathname();
-  const { user } = useAdminAuth();
+  const { user, loading } = useAdminAuth();
   const { branding } = useAdminBranding();
 
   return (
@@ -97,38 +122,42 @@ function SidebarContent({ collapsed, onNavigate }: { collapsed: boolean; onNavig
       </Link>
 
       <nav aria-label="Dashboard navigation" className="flex-1 space-y-5 overflow-y-auto pr-0.5">
-        {NAV_GROUPS.map((group) => {
-          const items = NAV_SEARCH_INDEX.filter((item) => item.group === group && navItemVisible(item.minRole, user?.role));
-          if (items.length === 0) return null;
-          return (
-            <div key={group}>
-              {!collapsed && (
-                <p
-                  className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.09em]"
-                  style={{ color: "var(--adm-text-muted)" }}
-                >
-                  {group}
-                </p>
-              )}
-              <div className="space-y-0.5">
-                {items.map(({ href, label, icon: Icon }) => {
-                  const isActive = href === "/admin" ? pathname === "/admin" : pathname?.startsWith(href);
-                  return (
-                    <NavLink
-                      key={href}
-                      href={href}
-                      label={label}
-                      Icon={Icon}
-                      isActive={!!isActive}
-                      collapsed={collapsed}
-                      onNavigate={onNavigate}
-                    />
-                  );
-                })}
+        {loading ? (
+          <SidebarSkeleton collapsed={collapsed} />
+        ) : (
+          NAV_GROUPS.map((group) => {
+            const items = NAV_SEARCH_INDEX.filter((item) => item.group === group && navItemVisible(item.minRole, user?.role));
+            if (items.length === 0) return null;
+            return (
+              <div key={group}>
+                {!collapsed && (
+                  <p
+                    className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.09em]"
+                    style={{ color: "var(--adm-text-muted)" }}
+                  >
+                    {group}
+                  </p>
+                )}
+                <div className="space-y-0.5">
+                  {items.map(({ href, label, icon: Icon }) => {
+                    const isActive = href === "/admin" ? pathname === "/admin" : pathname?.startsWith(href);
+                    return (
+                      <NavLink
+                        key={href}
+                        href={href}
+                        label={label}
+                        Icon={Icon}
+                        isActive={!!isActive}
+                        collapsed={collapsed}
+                        onNavigate={onNavigate}
+                      />
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </nav>
     </>
   );

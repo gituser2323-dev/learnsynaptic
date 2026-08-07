@@ -1,6 +1,6 @@
 import { Schema, model, models, type Document, type Model } from "mongoose";
 import { tenantScopePlugin } from "@/lib/db/tenantScopePlugin";
-import type { Subscription, SubscriptionStatus, SubscriptionProviderRef } from "@/lib/services/billing/types";
+import type { Subscription, SubscriptionStatus, SubscriptionProviderRef, PlanCapability, UsageMetric } from "@/lib/services/billing/types";
 
 /**
  * Business OS Phase 8, Module 8.3 — one Subscription row per
@@ -24,6 +24,9 @@ export interface SubscriptionDocument extends Document {
   cancelledAt?: Date;
   providerRef?: SubscriptionProviderRef;
   metadata?: Record<string, string>;
+  /** RC-6 — see Subscription's own doc comment (lib/services/billing/types.ts). */
+  capabilityOverrides?: Partial<Record<PlanCapability, boolean>>;
+  limitOverrides?: Partial<Record<UsageMetric, number | null>>;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -45,6 +48,8 @@ const subscriptionSchema = new Schema<SubscriptionDocument>(
     cancelledAt: { type: Date },
     providerRef: { type: Schema.Types.Mixed },
     metadata: { type: Schema.Types.Mixed },
+    capabilityOverrides: { type: Schema.Types.Mixed },
+    limitOverrides: { type: Schema.Types.Mixed },
   },
   { timestamps: true },
 );
@@ -67,6 +72,8 @@ export function toSubscription(doc: SubscriptionDocument): Subscription {
     cancelledAt: doc.cancelledAt?.toISOString(),
     providerRef: doc.providerRef,
     metadata: doc.metadata,
+    capabilityOverrides: doc.capabilityOverrides,
+    limitOverrides: doc.limitOverrides,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };

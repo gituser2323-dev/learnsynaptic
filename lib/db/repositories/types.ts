@@ -203,7 +203,13 @@ export type AuditEntityType =
   | "Subscription"
   | "FeatureFlag"
   // White Label & Branding (Phase 8), Module 8.4
-  | "BrandConfiguration";
+  | "BrandConfiguration"
+  // RC-5 — Backup, Restore & Disaster Recovery
+  | "DataExportRequest"
+  // RC-6 — Platform Super Admin & SaaS Operations Console
+  | "Organization"
+  // RC-7 — Customer Onboarding & SaaS Activation
+  | "TeamInvitation";
 
 export type AuditCategory = "business" | "security";
 

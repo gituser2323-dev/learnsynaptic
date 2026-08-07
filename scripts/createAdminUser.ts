@@ -1,11 +1,21 @@
 import { authService } from "@/lib/services/auth";
 
 /**
- * One-time bootstrap for the first staff account (usually "admin") —
- * there is no public self-registration endpoint by design; see
- * authService.createUser()'s doc comment. Only meaningfully durable once
- * MONGODB_URI is configured — against the in-memory dev repository, the
- * created user disappears the moment this process exits.
+ * CLI bootstrap for a staff account, bypassing email verification.
+ *
+ * RC-7 added real public self-service registration (`/admin/register`,
+ * `authService.registerUser()`) as the normal way a NEW organization's
+ * first user signs up — this script predates that and is no longer the
+ * only way in. It stays useful for what self-registration doesn't
+ * cover: seeding a test/dev account without going through email
+ * verification, or creating an additional user directly inside an
+ * *existing* organization from a shell (self-registration always
+ * creates a brand-new, org-less account — see authService.registerUser()'s
+ * own doc comment — the normal way to add a user to an existing
+ * organization is a team invitation, not this script or
+ * self-registration). Only meaningfully durable once MONGODB_URI is
+ * configured — against the in-memory dev repository, the created user
+ * disappears the moment this process exits.
  *
  * Usage:
  *   npx tsx scripts/createAdminUser.ts <email> <password> [role] [name]

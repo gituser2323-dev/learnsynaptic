@@ -14,6 +14,7 @@ export {
   PlanEntitlementRequiredApiError,
   UsageLimitExceededApiError,
   PayloadTooLargeApiError,
+  ServiceUnavailableApiError,
 } from "./errors";
 export type { ApiFieldError } from "./errors";
 export { createRequestLogger } from "./logger";

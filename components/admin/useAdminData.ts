@@ -15,6 +15,15 @@ export interface UseAdminDataResult<T> {
    *  Kept distinct from `error` so a page can render a dedicated "you
    *  don't have permission" state instead of a generic failure banner. */
   forbidden: boolean;
+  /** RC-9 — the 403's own message, preserved alongside `forbidden`
+   *  (most callers only need the boolean, but withApiRoute.ts's
+   *  pre-organization gate throws a specific, distinguishable message —
+   *  "Complete your organization setup to continue." — for a genuinely
+   *  brand-new, mid-onboarding user, as opposed to an ordinary
+   *  role-based 403. A page that needs to tell those two cases apart
+   *  (redirect to onboarding vs. show a real "no permission" state)
+   *  reads this; every other page can keep ignoring it. */
+  forbiddenMessage: string | null;
   reload: () => void;
 }
 
@@ -48,6 +57,7 @@ export function useAdminData<T>(fetcher: () => Promise<ApiClientResult<T>>, deps
   const [data, setData] = useState<T | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [forbidden, setForbidden] = useState(false);
+  const [forbiddenMessage, setForbiddenMessage] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -68,8 +78,10 @@ export function useAdminData<T>(fetcher: () => Promise<ApiClientResult<T>>, deps
         setData(result.data);
         setError(null);
         setForbidden(false);
+        setForbiddenMessage(null);
       } else if (result.status === 403) {
         setForbidden(true);
+        setForbiddenMessage(result.errors[0]?.message ?? null);
       } else {
         setError(result.errors[0]?.message ?? "Something went wrong.");
       }
@@ -89,6 +101,7 @@ export function useAdminData<T>(fetcher: () => Promise<ApiClientResult<T>>, deps
     // the current one is still in flight.
     error: loading ? null : error,
     forbidden: loading ? false : forbidden,
+    forbiddenMessage: loading ? null : forbiddenMessage,
     reload: () => setReloadToken((t) => t + 1),
   };
 }

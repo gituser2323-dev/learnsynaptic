@@ -1,4 +1,4 @@
-import { getScheduledJobRepository } from "@/lib/db";
+import { getScheduledJobRepository, getOrganizationRepository } from "@/lib/db";
 import { createLogger } from "@/lib/logger";
 import { errorTrackingService } from "@/lib/services/errorTracking";
 import { ensureSchedulerBootstrapped } from "./bootstrap";
@@ -13,6 +13,13 @@ const logger = createLogger({ service: "scheduler" });
  *  size (CAMPAIGN_ARCHITECTURE.md §12), the same reasoning as the
  *  Marketing Dashboard module's MAX_CAMPAIGNS_FOR_OVERALL_METRICS cap. */
 const DEFAULT_BATCH_SIZE = 20;
+
+/** RC-6 — how long a job for a currently-suspended organization waits
+ *  before this poller checks its status again. An hour is cheap (no
+ *  meaningful queue-depth cost) and plenty responsive — reactivation is
+ *  an infrequent, deliberate operator action, not a race against a
+ *  tight SLA. */
+const SUSPENDED_ORG_RECHECK_MINUTES = 60;
 
 /**
  * RC-4 — Deployment & Production Infrastructure: Serverless Limits.
@@ -85,6 +92,36 @@ async function processJob(job: ScheduledJob): Promise<void> {
   if (!claimed) {
     logger.info("scheduler.job_claim_lost", { jobId: job.id, jobType: job.jobType });
     return;
+  }
+
+  // RC-6 — Platform Super Admin & SaaS Operations Console: "Background
+  // workers must respect tenant suspension" (the mission's own explicit
+  // instruction). Checked here, independently of withApiRoute.ts's own
+  // suspension gate (that one only ever covers HTTP requests — a
+  // scheduled job has no request to gate). Global/system jobs (no
+  // organizationId — payments.reconcile, billing.period_check, etc.)
+  // are never affected; only per-tenant work (WhatsApp sends, campaign
+  // promotion, automation steps, webhook deliveries) is deferred.
+  // Deliberately a RESCHEDULE, not a failure/completion: the job hasn't
+  // failed and shouldn't be treated as done — it simply resumes
+  // automatically once the organization is reactivated, with zero side
+  // effects having occurred in the meantime (the handler is never
+  // invoked at all for a suspended org's job).
+  if (claimed.organizationId) {
+    const organizationRepository = await getOrganizationRepository();
+    const organization = await organizationRepository.findById(claimed.organizationId);
+    if (organization?.status === "suspended") {
+      logger.info("scheduler.job_deferred_suspended_org", {
+        jobId: claimed.id,
+        jobType: claimed.jobType,
+        organizationId: claimed.organizationId,
+      });
+      await repository.update(claimed.id, {
+        status: "pending",
+        runAt: addMinutes(new Date(), SUSPENDED_ORG_RECHECK_MINUTES).toISOString(),
+      });
+      return;
+    }
   }
 
   const handler = getJobHandler(job.jobType);

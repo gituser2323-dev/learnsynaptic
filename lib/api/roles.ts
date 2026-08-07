@@ -1,6 +1,7 @@
-import type { UserRole } from "@/lib/services/auth";
+import type { UserRole, PlatformRole } from "@/lib/services/auth";
 
 export type AdminRole = UserRole;
+export type { PlatformRole };
 
 const ROLE_RANK: Record<AdminRole, number> = { counsellor: 1, manager: 2, admin: 3 };
 
@@ -22,6 +23,12 @@ export interface AuthContext {
    *  a token minted before this field existed — see tokens.ts's own
    *  verifyAccessToken() doc comment. */
   sessionId?: string;
+  /** RC-6 — Platform Super Admin & SaaS Operations Console. A SEPARATE
+   *  dimension from `role` above, never compared against it or folded
+   *  into ROLE_RANK — see PlatformRole's own doc comment
+   *  (lib/services/auth/types.ts) for why. Absent for every ordinary
+   *  tenant user, forever. */
+  platformRole?: PlatformRole;
 }
 
 /**
@@ -49,9 +56,18 @@ export const AUTH_HEADER_ROLE = "x-auth-role";
 export const AUTH_HEADER_ORG_ID = "x-auth-org-id";
 /** RC-1 — same trusted provenance as the other four headers. */
 export const AUTH_HEADER_SESSION_ID = "x-auth-session-id";
+/** RC-6 — same trusted provenance as the rest: middleware.ts strips any
+ *  client-sent copy before setting its own, from the verified JWT's own
+ *  `platformRole` claim (tokens.ts). Absent whenever the claim is
+ *  absent — never defaulted to a value. */
+export const AUTH_HEADER_PLATFORM_ROLE = "x-auth-platform-role";
 
 function isAdminRole(value: string | null): value is AdminRole {
   return value === "counsellor" || value === "manager" || value === "admin";
+}
+
+function isPlatformRoleHeader(value: string | null): value is PlatformRole {
+  return value === "super_admin";
 }
 
 export function getAuthContext(headers: Headers): AuthContext {
@@ -64,7 +80,9 @@ export function getAuthContext(headers: Headers): AuthContext {
   // no org/session claim is NOT the same as no session at all.
   const organizationId = headers.get(AUTH_HEADER_ORG_ID) ?? undefined;
   const sessionId = headers.get(AUTH_HEADER_SESSION_ID) ?? undefined;
-  return { userId, email, role, organizationId, sessionId };
+  const platformRoleHeader = headers.get(AUTH_HEADER_PLATFORM_ROLE);
+  const platformRole = isPlatformRoleHeader(platformRoleHeader) ? platformRoleHeader : undefined;
+  return { userId, email, role, organizationId, sessionId, platformRole };
 }
 
 /**
@@ -82,4 +100,21 @@ export function getAuthContext(headers: Headers): AuthContext {
 export function hasRequiredRole(context: AuthContext, required: AdminRole): boolean {
   if (!context.role) return false;
   return ROLE_RANK[context.role] >= ROLE_RANK[required];
+}
+
+/**
+ * RC-6 — deliberately NOT rank-based (there is only one platform role
+ * today, but written as an exact-match check rather than a rank
+ * comparison so introducing a lower "support"/"operations" tier later
+ * doesn't silently grant it every route today's single tier can reach —
+ * a future route would opt in explicitly). Critically: this NEVER reads
+ * `context.role` — a tenant `admin` (`role: "admin"`, `platformRole:
+ * undefined`) always fails this check, exactly the mission's own "a
+ * tenant Admin must NEVER gain Platform Super Admin privileges"
+ * requirement, enforced by construction (the two fields are read by
+ * two entirely separate functions) rather than by remembering not to
+ * conflate them.
+ */
+export function hasPlatformRole(context: AuthContext, required: PlatformRole): boolean {
+  return context.platformRole === required;
 }

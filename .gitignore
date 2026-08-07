@@ -50,6 +50,10 @@ yarn-error.log*
 # uploaded bytes, never committed, never served as a static asset.
 /.storage-uploads/
 
+# Database backups (RC-5) — real production data (including encrypted
+# tenant credentials and PII); a backup archive must never be committed.
+/backups/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
