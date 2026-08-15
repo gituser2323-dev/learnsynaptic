@@ -462,7 +462,7 @@ export default function InternshipPage() {
               </h2>
               <p style={{ color: 'var(--ls-muted)', fontSize: '1.0625rem', lineHeight: 1.7, marginBottom: 24 }}>
                 Applications are reviewed by Pratik personally. There is no automated filter —
-                what you write in the "what you want to build" field determines the project brief
+                what you write in the &quot;what you want to build&quot; field determines the project brief
                 you get matched to. Be specific about the problem you want to solve.
               </p>
 

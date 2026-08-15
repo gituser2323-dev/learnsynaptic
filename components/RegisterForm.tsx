@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import emailjs from '@emailjs/browser';
 import {
@@ -349,9 +350,9 @@ export function RegisterForm() {
               className="mt-8 pt-6 flex flex-col sm:flex-row items-center justify-center gap-3"
               style={{ borderTop: '1px solid var(--ls-border)' }}
             >
-              <a href="/" className="ls-btn-outline" style={{ fontSize: '0.875rem' }}>
+              <Link href="/" className="ls-btn-outline" style={{ fontSize: '0.875rem' }}>
                 Back to home
-              </a>
+              </Link>
               <a
                 href="https://instagram.com/learnsynaptic"
                 target="_blank"

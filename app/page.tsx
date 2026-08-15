@@ -894,7 +894,7 @@ to-[#0D47D9]
 
           <span className="mt-2 bg-gradient-to-r from-[#165DFC] via-blue-500 to-cyan-500 bg-clip-text text-transparent">
 
-            You'll Thank Yourself.
+            You&apos;ll Thank Yourself.
 
           </span>
 

@@ -27,9 +27,9 @@ function useCountUp(value: number | null, durationMs = 700): number {
     const target: number = value;
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (prefersReduced) {
-      setDisplay(target);
       prevRef.current = target;
-      return;
+      const id = requestAnimationFrame(() => setDisplay(target));
+      return () => cancelAnimationFrame(id);
     }
     const from = prevRef.current;
     const delta = target - from;

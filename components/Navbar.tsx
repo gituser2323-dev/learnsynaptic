@@ -108,8 +108,17 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [announcementVisible, setAnnouncementVisible] = useState(true);
   const pathname = usePathname();
+  const [navPathname, setNavPathname] = useState(pathname);
 
-  // --- existing scroll/pathname effects, preserved exactly ---
+  // Close menus when the route changes — adjust during render (React-
+  // recommended) rather than setState inside an effect.
+  if (pathname !== navPathname) {
+    setNavPathname(pathname);
+    setMobileOpen(false);
+    setProgramsOpen(false);
+  }
+
+  // --- existing scroll effect, preserved exactly ---
   useEffect(() => {
     const onScroll = () => {
       setScrolled(window.scrollY > 8);
@@ -121,11 +130,6 @@ export default function Navbar() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  useEffect(() => {
-    setMobileOpen(false);
-    setProgramsOpen(false);
-  }, [pathname]);
 
   return (
     <>

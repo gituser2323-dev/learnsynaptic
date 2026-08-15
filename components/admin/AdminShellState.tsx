@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 
 interface AdminShellStateValue {
   /** Desktop rail: full width vs. icon-only. Persisted — a deliberate,
@@ -17,23 +17,37 @@ const STORAGE_KEY = "ls-admin-sidebar-collapsed";
 
 const AdminShellStateContext = createContext<AdminShellStateValue | undefined>(undefined);
 
-export function AdminShellStateProvider({ children }: { children: ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+function subscribeCollapsed(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  return () => window.removeEventListener("storage", onStoreChange);
+}
 
-  useEffect(() => {
-    setCollapsed(window.localStorage.getItem(STORAGE_KEY) === "1");
-  }, []);
+function getCollapsedSnapshot() {
+  return window.localStorage.getItem(STORAGE_KEY) === "1";
+}
+
+function getCollapsedServerSnapshot() {
+  return false;
+}
+
+export function AdminShellStateProvider({ children }: { children: ReactNode }) {
+  const storedCollapsed = useSyncExternalStore(
+    subscribeCollapsed,
+    getCollapsedSnapshot,
+    getCollapsedServerSnapshot,
+  );
+  const [collapsedOverride, setCollapsedOverride] = useState<boolean | null>(null);
+  const collapsed = collapsedOverride ?? storedCollapsed;
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const value = useMemo<AdminShellStateValue>(
     () => ({
       collapsed,
-      toggleCollapsed: () =>
-        setCollapsed((prev) => {
-          const next = !prev;
-          window.localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
-          return next;
-        }),
+      toggleCollapsed: () => {
+        const next = !collapsed;
+        window.localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
+        setCollapsedOverride(next);
+      },
       mobileOpen,
       setMobileOpen,
     }),

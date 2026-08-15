@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 
 export type AdminTheme = "dark" | "light";
 
@@ -13,6 +13,20 @@ interface AdminThemeContextValue {
 
 const AdminThemeContext = createContext<AdminThemeContextValue | undefined>(undefined);
 
+function readStoredTheme(): AdminTheme {
+  const stored = window.localStorage.getItem(STORAGE_KEY);
+  return stored === "light" || stored === "dark" ? stored : "dark";
+}
+
+function subscribeTheme(onStoreChange: () => void) {
+  window.addEventListener("storage", onStoreChange);
+  return () => window.removeEventListener("storage", onStoreChange);
+}
+
+function getThemeServerSnapshot(): AdminTheme {
+  return "dark";
+}
+
 /**
  * Dark-first by design (see the redesign brief) — falls back to dark
  * whenever nothing's been saved yet, rather than reading the OS
@@ -22,21 +36,18 @@ const AdminThemeContext = createContext<AdminThemeContextValue | undefined>(unde
  * public site's own light-only design system.
  */
 export function AdminThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<AdminTheme>("dark");
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY);
-    if (stored === "light" || stored === "dark") setTheme(stored);
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, theme);
-  }, [theme]);
+  const storedTheme = useSyncExternalStore(subscribeTheme, readStoredTheme, getThemeServerSnapshot);
+  const [themeOverride, setThemeOverride] = useState<AdminTheme | null>(null);
+  const theme = themeOverride ?? storedTheme;
 
   const value = useMemo<AdminThemeContextValue>(
     () => ({
       theme,
-      toggleTheme: () => setTheme((t) => (t === "dark" ? "light" : "dark")),
+      toggleTheme: () => {
+        const next: AdminTheme = theme === "dark" ? "light" : "dark";
+        window.localStorage.setItem(STORAGE_KEY, next);
+        setThemeOverride(next);
+      },
     }),
     [theme],
   );

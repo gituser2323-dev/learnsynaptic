@@ -50,13 +50,20 @@ function formatRelativeTime(iso: string): string {
 
 function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
+  const [wasOpen, setWasOpen] = useState(open);
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const { user } = useAdminAuth();
 
+  // Reset search when the palette opens — adjust during render rather than
+  // setState inside an effect (react-hooks/set-state-in-effect).
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setQuery("");
+  }
+
   useEffect(() => {
     if (open) {
-      setQuery("");
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [open]);

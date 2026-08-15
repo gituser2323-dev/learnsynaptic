@@ -60,7 +60,7 @@ export default function SuccessScreen({ onClose }: Props) {
         </h2>
 
         <p className="mx-auto mt-3 max-w-md text-sm leading-4 text-slate-500">
-          You're one step closer to becoming
+          You&apos;re one step closer to becoming
           industry ready.
         </p>
 

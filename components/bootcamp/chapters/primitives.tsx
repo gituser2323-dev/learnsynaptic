@@ -123,22 +123,26 @@ export function FloatingParticles({ count = 14 }: { count?: number }) {
   // Particles are randomized, so they're generated client-side only (after
   // mount) rather than in a useState initializer — server and client would
   // otherwise compute different random values and React would flag a
-  // hydration mismatch on every render.
+  // hydration mismatch on every render. Defer setState via rAF so the update
+  // isn't synchronous inside the effect body.
   const [particles, setParticles] = useState<Particle[] | null>(null);
 
   useEffect(() => {
-    setParticles(
-      Array.from({ length: count }, (_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        size: 2 + Math.random() * 3,
-        duration: 8 + Math.random() * 10,
-        delay: Math.random() * 6,
-        drift: 14 + Math.random() * 22,
-        opacity: 0.15 + Math.random() * 0.35,
-      })),
-    );
+    const id = requestAnimationFrame(() => {
+      setParticles(
+        Array.from({ length: count }, (_, i) => ({
+          id: i,
+          left: Math.random() * 100,
+          top: Math.random() * 100,
+          size: 2 + Math.random() * 3,
+          duration: 8 + Math.random() * 10,
+          delay: Math.random() * 6,
+          drift: 14 + Math.random() * 22,
+          opacity: 0.15 + Math.random() * 0.35,
+        })),
+      );
+    });
+    return () => cancelAnimationFrame(id);
   }, [count]);
 
   if (shouldReduce || !particles) return null;

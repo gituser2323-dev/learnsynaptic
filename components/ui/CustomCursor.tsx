@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from "next/navigation";
 
-
-
 export function CustomCursor() {
   const [active, setActive] = useState(false)
   // Outer wrappers — rAF moves these (translate only)
@@ -16,16 +14,13 @@ export function CustomCursor() {
 
   const pathname = usePathname();
 
-  
-  
-
-
   useEffect(() => {
     const hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (!hasMouse || prefersReduced) return
 
-    setActive(true)
+    // Defer activation so setState isn't synchronous in the effect body.
+    const activateId = requestAnimationFrame(() => setActive(true))
     document.documentElement.classList.add('custom-cursor-active')
 
     let targetX = 0
@@ -50,53 +45,38 @@ export function CustomCursor() {
 
     function tick() {
       // Lerp: 0.12 gives a ~120ms settling feel — premium, not laggy
-     const speed = 0.30
+      const speed = 0.30
 
-curX += (targetX - curX) * speed;
-curY += (targetY - curY) * speed;
+      curX += (targetX - curX) * speed;
+      curY += (targetY - curY) * speed;
 
-const t = `translate3d(${curX}px, ${curY}px,0)`;    
-  if (dotWrapRef.current) dotWrapRef.current.style.transform = t
+      const t = `translate3d(${curX}px, ${curY}px,0)`;
+      if (dotWrapRef.current) dotWrapRef.current.style.transform = t
       if (ringWrapRef.current) ringWrapRef.current.style.transform = t
 
       rafId = requestAnimationFrame(tick)
     }
-function onMouseMove(e: PointerEvent) {
-  targetX = e.clientX;
-  targetY = e.clientY;
-}
 
-    function onPointerOver(e: PointerEvent) {
-      const el = e.target as Element | null
-      const interactive = !!el?.closest(
-        'a, button, [role="button"], [tabindex]:not([tabindex="-1"]), input, select, textarea, label, summary'
-      )
-      setHovered(interactive)
+    function onMouseMove(e: PointerEvent) {
+      targetX = e.clientX;
+      targetY = e.clientY;
     }
 
-window.addEventListener("pointermove", onMouseMove, {
-  passive: true,
-});  
+    function onMouseDown() {
+      if (dotRef.current) dotRef.current.style.transform = "scale(.7)";
+    }
 
-window.addEventListener("mousedown", () => {
-  dotRef.current!.style.transform = "scale(.7)";
-});
+    function onMouseUp() {
+      if (dotRef.current) {
+        dotRef.current.style.transform = currentlyHovered ? "scale(0)" : "scale(1)";
+      }
+    }
 
-window.addEventListener("mouseup", () => {
-  dotRef.current!.style.transform = currentlyHovered
-    ? "scale(0)"
-    : "scale(1)";
-});
-document.addEventListener("pointermove", handleHover);    rafId = requestAnimationFrame(tick)
+    function handleHover(e: PointerEvent) {
+      const el = document.elementFromPoint(e.clientX, e.clientY);
 
-function handleHover(e: PointerEvent) {
-  const el = document.elementFromPoint(
-    e.clientX,
-    e.clientY
-  );
-
-  const interactive = !!el?.closest(
-    `
+      const interactive = !!el?.closest(
+        `
       a,
       button,
       input,
@@ -108,32 +88,43 @@ function handleHover(e: PointerEvent) {
       .cursor-pointer,
       [data-cursor]
     `
-  );
+      );
 
-  setHovered(interactive);
-}
+      setHovered(interactive);
+    }
+
+    window.addEventListener("pointermove", onMouseMove, { passive: true });
+    window.addEventListener("mousedown", onMouseDown);
+    window.addEventListener("mouseup", onMouseUp);
+    document.addEventListener("pointermove", handleHover);
+    rafId = requestAnimationFrame(tick)
+
     return () => {
+      cancelAnimationFrame(activateId)
       document.documentElement.classList.remove('custom-cursor-active')
-let onMouseMove: ((e: MouseEvent) => void) | null = null;
-      document.removeEventListener('pointerover', onPointerOver)
+      window.removeEventListener("pointermove", onMouseMove)
+      window.removeEventListener("mousedown", onMouseDown)
+      window.removeEventListener("mouseup", onMouseUp)
+      document.removeEventListener("pointermove", handleHover)
       cancelAnimationFrame(rafId)
     }
   }, [])
 
 
   useEffect(() => {
-  if (!active) return;
+    if (!active) return;
 
-  if (dotRef.current) {
-    dotRef.current.style.transform = "scale(1)";
-    dotRef.current.style.opacity = "0.65";
-  }
+    if (dotRef.current) {
+      dotRef.current.style.transform = "scale(1)";
+      dotRef.current.style.opacity = "0.65";
+    }
 
-  if (ringRef.current) {
-    ringRef.current.style.transform = "scale(0)";
-    ringRef.current.style.opacity = "0";
-  }
-}, [pathname, active]);
+    if (ringRef.current) {
+      ringRef.current.style.transform = "scale(0)";
+      ringRef.current.style.opacity = "0";
+    }
+  }, [pathname, active]);
+
   if (!active) return null
 
   return (

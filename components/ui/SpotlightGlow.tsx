@@ -13,7 +13,8 @@ export function SpotlightGlow() {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (!hasMouse || prefersReduced) return
 
-    setActive(true)
+    // Defer activation so setState isn't synchronous in the effect body.
+    const activateId = requestAnimationFrame(() => setActive(true))
 
     let targetX = 0
     let targetY = 0
@@ -66,6 +67,7 @@ export function SpotlightGlow() {
     rafId = requestAnimationFrame(tick)
 
     return () => {
+      cancelAnimationFrame(activateId)
       window.removeEventListener('mousemove', onMouseMove)
       cancelAnimationFrame(rafId)
       if (inactivityTimer !== null) clearTimeout(inactivityTimer)
