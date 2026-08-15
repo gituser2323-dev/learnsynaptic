@@ -103,10 +103,15 @@ export default function ContactPage() {
                       <p className="text-sm font-semibold mb-0.5" style={{ color: 'var(--ls-text)' }}>
                         Office
                       </p>
-                      <p className="text-sm" style={{ color: 'var(--ls-muted)', lineHeight: 1.6 }}>
+                      {/* <p className="text-sm" style={{ color: 'var(--ls-muted)', lineHeight: 1.6 }}>
                         Office No. 201, Success Square<br />
                         Karve Rd, near Karve Statue<br />
                         Kothrud, Pune, Maharashtra 411038
+                      </p> */}
+
+                           <p className="text-sm" style={{ color: 'var(--ls-muted)', lineHeight: 1.6 }}>
+                    
+                        Saras Nagar,Ahilyanagar, Maharashtra 411001
                       </p>
                     </div>
                   </li>
@@ -127,7 +132,7 @@ export default function ContactPage() {
                         className="text-sm"
                         style={{ color: 'var(--ls-blue-primary)', fontWeight: 500 }}
                       >
-                        +91 9763969449
+                      +91 9119421273
                       </a>
                     </div>
                   </li>

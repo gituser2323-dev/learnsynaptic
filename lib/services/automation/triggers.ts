@@ -32,8 +32,25 @@ const logger = createLogger({ service: "automation.triggers" });
  * leadId for. A payment with no leadId yet is silently skipped by
  * handleTriggerEvent's own missing-entity-id guard below, the same
  * graceful degradation every other trigger already has.
+ *
+ * "appointment.booked"/"appointment.confirmed"/"appointment.completed"/
+ * "appointment.cancelled"/"appointment.no_show" (Appointment Booking, the
+ * Growth-track module after Lead Capture) — every one of these is
+ * published with a `leadId` (an Appointment always references a real
+ * CRM Lead, see publicBookingService.book/appointmentService.updateStatus),
+ * so they slot into this same generic Lead-scoped lookup with zero
+ * engine changes, identically to how "payment.success" was added on top
+ * of "lead.created" one phase earlier.
  */
-const SUPPORTED_TRIGGER_EVENT_TYPES = ["lead.created", "payment.success"];
+const SUPPORTED_TRIGGER_EVENT_TYPES = [
+  "lead.created",
+  "payment.success",
+  "appointment.booked",
+  "appointment.confirmed",
+  "appointment.completed",
+  "appointment.cancelled",
+  "appointment.no_show",
+];
 
 let registered = false;
 

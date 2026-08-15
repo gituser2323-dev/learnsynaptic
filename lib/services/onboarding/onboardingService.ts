@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { getOrganizationRepository, getUserRepository } from "@/lib/db";
 import { runInTransaction } from "@/lib/db/transaction";
 import { DuplicateKeyError } from "@/lib/db/types";
@@ -6,6 +5,7 @@ import { auditLogService, AUDIT_ACTIONS } from "@/lib/services/auditLog";
 import type { AuditContext } from "@/lib/services/auditLog";
 import { planService, ensureTrialPlanSeeded } from "@/lib/services/billing";
 import type { Plan } from "@/lib/services/billing";
+import { slugify, randomSlugSuffix } from "@/lib/utils/slugify";
 import { validateCreateOrganizationInput } from "./validation";
 import type { OnboardingValidationError } from "./validation";
 import type { Organization, OnboardingStepId, OnboardingStepStatus, OnboardingState } from "@/lib/services/organizations";
@@ -77,20 +77,6 @@ export interface SelectablePlan {
 }
 
 const MAX_SLUG_ATTEMPTS = 5;
-
-function slugify(name: string): string {
-  const base = name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-  return base || "organization";
-}
-
-function randomSlugSuffix(): string {
-  return randomUUID().slice(0, 6);
-}
 
 /** India is this business's own home market — a reasonable SPECIFIC
  *  default for it. Every other country (or no country given at all)
@@ -182,7 +168,10 @@ export const onboardingService = {
     let organization: Organization | undefined;
     let lastError: unknown;
     for (let attempt = 0; attempt < MAX_SLUG_ATTEMPTS; attempt += 1) {
-      const slug = attempt === 0 ? slugify(data.name) : `${slugify(data.name)}-${randomSlugSuffix()}`;
+      const slug =
+        attempt === 0
+          ? slugify(data.name, "organization")
+          : `${slugify(data.name, "organization")}-${randomSlugSuffix()}`;
       try {
         // A slug-collision retry loop is inherently sequential (each
         // attempt needs to know the previous one failed before trying

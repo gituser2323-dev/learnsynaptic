@@ -57,6 +57,8 @@ import type { AdminSettingsSnapshot } from "@/lib/services/settings";
 import type { Activity, ActivityEntityType, ActivityType } from "@/lib/services/crm/activities";
 import type { Task, TaskListFilters, TaskPriority, TaskRecurrence } from "@/lib/services/crm/tasks";
 import type { Tag } from "@/lib/services/crm/tags";
+import type { LeadCaptureForm, LeadCaptureFormFields } from "@/lib/services/crm/leadCaptureForms";
+import type { AppointmentType, WeeklyAvailabilitySlot, Appointment, AppointmentStatus } from "@/lib/services/crm/appointments";
 import type { CustomFieldDefinition, CustomFieldType } from "@/lib/services/crm/customFields";
 import type { AssignmentRule, AssignmentStrategy } from "@/lib/services/crm/assignment";
 import type { Opportunity, OpportunityListFilters, Pipeline } from "@/lib/services/crm/pipelines";
@@ -1223,6 +1225,86 @@ export function createTag(label: string, color: string): Promise<ApiClientResult
 
 export function deleteTag(id: string): Promise<ApiClientResult<{ deleted: boolean }>> {
   return apiFetch(`/api/admin/crm/tags/${id}`, { method: "DELETE" });
+}
+
+// ─── Lead Capture Forms ─────────────────────────────────────────────────────
+
+export function listLeadCaptureForms(): Promise<ApiClientResult<{ forms: LeadCaptureForm[] }>> {
+  return apiFetch("/api/admin/crm/lead-capture-forms");
+}
+
+export interface CreateLeadCaptureFormRequest {
+  name: string;
+  fields?: LeadCaptureFormFields;
+  successMessage?: string;
+}
+
+export function createLeadCaptureForm(input: CreateLeadCaptureFormRequest): Promise<ApiClientResult<{ form: LeadCaptureForm }>> {
+  return apiFetch("/api/admin/crm/lead-capture-forms", { method: "POST", body: JSON.stringify(input) });
+}
+
+export interface UpdateLeadCaptureFormRequest {
+  name?: string;
+  active?: boolean;
+  fields?: LeadCaptureFormFields;
+  successMessage?: string;
+}
+
+export function updateLeadCaptureForm(
+  id: string,
+  input: UpdateLeadCaptureFormRequest,
+): Promise<ApiClientResult<{ form: LeadCaptureForm }>> {
+  return apiFetch(`/api/admin/crm/lead-capture-forms/${id}`, { method: "PATCH", body: JSON.stringify(input) });
+}
+
+export function deleteLeadCaptureForm(id: string): Promise<ApiClientResult<{ deleted: boolean }>> {
+  return apiFetch(`/api/admin/crm/lead-capture-forms/${id}`, { method: "DELETE" });
+}
+
+// ─── Appointment Booking (the Growth-track module after Lead Capture) ──────
+
+export function listAppointmentTypes(): Promise<ApiClientResult<{ appointmentTypes: AppointmentType[] }>> {
+  return apiFetch("/api/admin/crm/appointment-types");
+}
+
+export interface CreateAppointmentTypeRequest {
+  name: string;
+  description?: string;
+  durationMinutes: number;
+  bufferMinutes: number;
+  timezone: string;
+  weeklyAvailability: WeeklyAvailabilitySlot[];
+  assignedCounsellorId: string;
+}
+
+export function createAppointmentType(input: CreateAppointmentTypeRequest): Promise<ApiClientResult<{ appointmentType: AppointmentType }>> {
+  return apiFetch("/api/admin/crm/appointment-types", { method: "POST", body: JSON.stringify(input) });
+}
+
+export function updateAppointmentType(
+  id: string,
+  input: Partial<CreateAppointmentTypeRequest> & { active?: boolean },
+): Promise<ApiClientResult<{ appointmentType: AppointmentType }>> {
+  return apiFetch(`/api/admin/crm/appointment-types/${id}`, { method: "PATCH", body: JSON.stringify(input) });
+}
+
+export function deleteAppointmentType(id: string): Promise<ApiClientResult<{ deleted: boolean }>> {
+  return apiFetch(`/api/admin/crm/appointment-types/${id}`, { method: "DELETE" });
+}
+
+export function listAppointments(
+  filters: { leadId?: string; appointmentTypeId?: string; status?: AppointmentStatus },
+  page = 1,
+  limit = 20,
+): Promise<ApiClientResult<PaginatedResult<Appointment>>> {
+  return apiFetch(`/api/admin/crm/appointments?${buildQuery({ ...filters, page, limit })}`);
+}
+
+export function updateAppointmentStatus(
+  id: string,
+  input: { status?: AppointmentStatus; notes?: string },
+): Promise<ApiClientResult<{ appointment: Appointment }>> {
+  return apiFetch(`/api/admin/crm/appointments/${id}`, { method: "PATCH", body: JSON.stringify(input) });
 }
 
 // ─── Custom Fields ────────────────────────────────────────────────────────

@@ -316,6 +316,30 @@ export function outboundWebhookDeliveryOutcomeTone(outcome: string): BadgeTone {
   }
 }
 
+/** Appointment Booking (the Growth-track module after Lead Capture) —
+ *  used by both the admin Appointments page's Bookings tab and the Lead
+ *  Detail page's LeadAppointmentsSection, so it lives here (not local to
+ *  either page) the same way every other tone used in more than one
+ *  place already does. Distinct tone map from MeetingStatus's own local
+ *  meetingStatusTone() in leads/[id]/page.tsx: Appointment's status set
+ *  adds "no_show", which Meeting has no equivalent for. */
+export function appointmentStatusTone(status: string): BadgeTone {
+  switch (status) {
+    case "scheduled":
+      return "info";
+    case "confirmed":
+      return "success";
+    case "completed":
+      return "neutral";
+    case "cancelled":
+      return "danger";
+    case "no_show":
+      return "warning";
+    default:
+      return "neutral";
+  }
+}
+
 /** RC-3 — Reliability panel's ScheduledJob status. "dead_lettered" gets
  *  its own danger tone distinct from "failed"'s warning: a dead-lettered
  *  job is retry-eligible and actionable right now (see

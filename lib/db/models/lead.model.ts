@@ -31,6 +31,9 @@ export interface LeadDocument extends Document {
    *  set only by an admin bulk-delete action, and is what makes that
    *  action recoverable instead of a permanent `deleteMany`. */
   deletedAt?: Date;
+  /** Lead Capture (tenant public forms) — see Lead.capturedVia's own doc
+   *  comment (lib/services/leads/types.ts). */
+  capturedVia?: { formId: string; formName: string };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -63,6 +66,10 @@ const leadSchema = new Schema<LeadDocument>(
     assignedCounsellorId: { type: Schema.Types.ObjectId, ref: "User" },
     archived: { type: Boolean, default: false },
     deletedAt: { type: Date },
+    capturedVia: {
+      formId: { type: String },
+      formName: { type: String },
+    },
   },
   { timestamps: true },
 );
@@ -111,6 +118,7 @@ export function toLead(doc: LeadDocument): Lead {
     assignedCounsellorId: doc.assignedCounsellorId?.toString(),
     archived: doc.archived,
     deletedAt: doc.deletedAt?.toISOString(),
+    capturedVia: doc.capturedVia?.formId ? { formId: doc.capturedVia.formId, formName: doc.capturedVia.formName ?? "" } : undefined,
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };

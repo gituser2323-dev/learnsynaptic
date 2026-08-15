@@ -11,6 +11,18 @@ function normalizePhone(value: string): string {
   return `+91${digits}`;
 }
 
+/** Lead Capture (tenant public forms) — pass-through only, same shape as
+ *  parseUtm below. Never derived from client input directly: the only
+ *  caller is publicSubmissionService, which constructs this from the
+ *  LeadCaptureForm record it already resolved server-side, not from the
+ *  anonymous request body. */
+function parseCapturedVia(raw: unknown): { formId: string; formName: string } | undefined {
+  if (typeof raw !== "object" || raw === null) return undefined;
+  const record = raw as Record<string, unknown>;
+  if (typeof record.formId !== "string" || !record.formId) return undefined;
+  return { formId: record.formId, formName: typeof record.formName === "string" ? record.formName : "" };
+}
+
 function parseUtm(raw: unknown): LeadUtmParams | undefined {
   if (typeof raw !== "object" || raw === null) return undefined;
   const record = raw as Record<string, unknown>;
@@ -77,6 +89,7 @@ export function validateCreateLeadInput(input: unknown): ValidateCreateLeadInput
       source,
       message,
       utm: parseUtm(record.utm),
+      capturedVia: parseCapturedVia(record.capturedVia),
     },
   };
 }

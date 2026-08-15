@@ -25,10 +25,13 @@ import {
   scheduleMeeting,
   listMeetings,
   cancelMeeting,
+  listAppointments,
+  updateAppointmentStatus,
+  listAppointmentTypes,
 } from "@/components/admin/apiClient";
 import { useAdminData } from "@/components/admin/useAdminData";
 import { useAdminAuth } from "@/components/admin/AdminAuthContext";
-import { Badge, leadStatusTone, leadHealthTone, buyingIntentTone, taskPriorityTone } from "@/components/admin/Badge";
+import { Badge, leadStatusTone, leadHealthTone, buyingIntentTone, taskPriorityTone, appointmentStatusTone } from "@/components/admin/Badge";
 import { FormField } from "@/components/admin/FormField";
 import { FilterSelect } from "@/components/admin/FilterControls";
 import { ForbiddenState, ErrorState, EmptyState, LoadingState } from "@/components/admin/DataStates";
@@ -37,6 +40,7 @@ import type { LeadStatus } from "@/lib/services/leads";
 import type { ActivityType } from "@/lib/services/crm/activities";
 import type { TaskPriority } from "@/lib/services/crm/tasks";
 import type { CalendarProviderId, MeetingStatus } from "@/lib/services/calendar";
+import type { Appointment, AppointmentStatus } from "@/lib/services/crm/appointments";
 
 const STATUS_OPTIONS: LeadStatus[] = ["new", "contacted", "nurture", "registered", "closed"];
 const ACTIVITY_TYPES: ActivityType[] = ["note", "call", "meeting", "email"];
@@ -332,6 +336,63 @@ function LeadMeetingsSection({ leadId, leadEmail, leadName }: { leadId: string; 
                 )}
                 {meeting.status !== "cancelled" && meeting.status !== "completed" && (
                   <button type="button" onClick={() => handleCancel(meeting.id)} className="adm-focus-ring adm-icon-btn" aria-label="Cancel meeting">
+                    <XCircle size={13} />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+      </div>
+    </SectionCard>
+  );
+}
+
+/** Appointment Booking (the Growth-track module after Lead Capture) —
+ *  read/act-only from this page, mirroring LeadMeetingsSection's own
+ *  display shape immediately above. No "create appointment from Lead
+ *  Detail" button here: staff already have LeadMeetingsSection for
+ *  ad-hoc scheduling; Appointment creation is the public booking flow's
+ *  own job (see app/book/[slug]/page.tsx), not a parallel staff-facing
+ *  scheduling surface. */
+function LeadAppointmentsSection({ leadId }: { leadId: string }) {
+  const { data, loading, reload } = useAdminData(() => listAppointments({ leadId }, 1, 20), [leadId]);
+  const { data: typesData } = useAdminData(() => listAppointmentTypes(), []);
+  const typeNameById = new Map((typesData?.appointmentTypes ?? []).map((t) => [t.id, t.name]));
+
+  async function setStatus(appointment: Appointment, status: AppointmentStatus) {
+    await updateAppointmentStatus(appointment.id, { status });
+    reload();
+  }
+
+  return (
+    <SectionCard title="Appointments">
+      <div className="space-y-3">
+        {loading && (
+          <p className="text-xs" style={{ color: "var(--adm-text-muted)" }}>
+            Loading appointments…
+          </p>
+        )}
+        {!loading && data && data.items.length === 0 && (
+          <p className="text-xs" style={{ color: "var(--adm-text-muted)" }}>
+            No appointments yet.
+          </p>
+        )}
+        {!loading &&
+          data &&
+          data.items.map((appointment) => (
+            <div key={appointment.id} className="flex items-start justify-between gap-2 border-t pt-2 first:border-t-0 first:pt-0" style={{ borderColor: "var(--adm-border)" }}>
+              <div className="min-w-0">
+                <p className="truncate text-sm" style={{ color: "var(--adm-text)" }}>
+                  {typeNameById.get(appointment.appointmentTypeId) ?? "Appointment"}
+                </p>
+                <p className="text-xs" style={{ color: "var(--adm-text-muted)" }}>
+                  {new Date(appointment.startAt).toLocaleString("en-IN", { timeZone: appointment.timezone })}
+                </p>
+              </div>
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-1.5">
+                <Badge tone={appointmentStatusTone(appointment.status)}>{appointment.status.replace("_", " ")}</Badge>
+                {(appointment.status === "scheduled" || appointment.status === "confirmed") && (
+                  <button type="button" onClick={() => setStatus(appointment, "cancelled")} className="adm-focus-ring adm-icon-btn" aria-label="Cancel appointment">
                     <XCircle size={13} />
                   </button>
                 )}
@@ -843,6 +904,7 @@ export default function LeadDetailPage() {
       <LeadAttachmentsSection leadId={leadId} />
 
       <LeadMeetingsSection leadId={leadId} leadEmail={lead.email} leadName={lead.name} />
+      <LeadAppointmentsSection leadId={leadId} />
 
       <AiInsightsSection leadId={leadId} />
 

@@ -23,14 +23,25 @@ import { LeadCapturePopup } from '@/components/LeadCapturePopup';
  * WhatsApp bubble/lead popup/cursor effects). It renders bare children
  * here; its own layout provides `id="main-content"` for the skip link
  * instead of this component doing it.
+ *
+ * /book (Appointment Booking's own hosted public page,
+ * app/book/[slug]/page.tsx) is a fourth category, the same reasoning as
+ * /admin applies to for a different reason: a real customer mid-booking
+ * must never have the page's own submit button fought over by an
+ * UNRELATED competing lead-capture popup — confirmed live in this
+ * module's own E2E suite, where LeadCapturePopup's overlay genuinely
+ * intercepted the real "Book appointment" button's click. Bare
+ * treatment, matching the "hosted page, not a marketing page" intent
+ * the approved plan already established for this route.
  */
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdminDashboard = pathname?.startsWith('/admin');
+  const isBookingPage = pathname?.startsWith('/book');
   const isAiBootcamp = pathname?.startsWith('/ai-bootcamp') || pathname?.startsWith('/ai-generalist');
   const isIsolatedMicrosite = pathname?.startsWith('/bootcamp') || isAiBootcamp;
 
-  if (isAdminDashboard) {
+  if (isAdminDashboard || isBookingPage) {
     return <>{children}</>;
   }
 

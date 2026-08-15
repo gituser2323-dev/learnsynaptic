@@ -21,6 +21,11 @@ export {
   getAssignmentRuleRepository,
   getPipelineRepository,
   getOpportunityRepository,
+  // Lead Capture — public entry point into the existing CRM
+  getLeadCaptureFormRepository,
+  // Appointment Booking — the Growth-track module after Lead Capture
+  getAppointmentTypeRepository,
+  getAppointmentRepository,
   // WhatsApp Platform (Phase 2)
   getConversationRepository,
   // Automation Platform (Phase 3)

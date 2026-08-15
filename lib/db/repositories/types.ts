@@ -209,7 +209,12 @@ export type AuditEntityType =
   // RC-6 — Platform Super Admin & SaaS Operations Console
   | "Organization"
   // RC-7 — Customer Onboarding & SaaS Activation
-  | "TeamInvitation";
+  | "TeamInvitation"
+  // Lead Capture — public entry point into the existing CRM
+  | "LeadCaptureForm"
+  // Appointment Booking — the Growth-track module after Lead Capture
+  | "AppointmentType"
+  | "Appointment";
 
 export type AuditCategory = "business" | "security";
 

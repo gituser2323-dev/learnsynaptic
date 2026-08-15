@@ -45,6 +45,16 @@ export interface CreateLeadInput {
    *  doc comment), never accepted directly from request input. Optional
    *  here only so pre-8.1 call sites/tests keep compiling. */
   organizationId?: string;
+  /** Lead Capture (tenant public forms) — set only by
+   *  publicSubmissionService when a lead originates from a tenant's own
+   *  LeadCaptureForm; `undefined` for every other creation path (manual
+   *  entry, CSV import, /api/leads). A pointer only (formId), same
+   *  "denormalized reference, not a join" shape utm already established —
+   *  distinct from `source` (which stays the constant "lead_capture" so
+   *  every existing exact-match filter/CSV-export/analytics screen keeps
+   *  working with zero changes); this is what lets a future "by form"
+   *  breakdown distinguish which specific form a lead came from. */
+  capturedVia?: { formId: string; formName: string };
 }
 
 export interface Lead extends CreateLeadInput {

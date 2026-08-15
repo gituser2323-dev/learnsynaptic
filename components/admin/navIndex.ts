@@ -18,6 +18,8 @@ import {
   Gauge,
   ShieldCheck,
   Activity,
+  FormInput,
+  CalendarClock,
   type LucideIcon,
 } from "lucide-react";
 
@@ -64,6 +66,22 @@ export const NAV_SEARCH_INDEX: NavSearchEntry[] = [
   { href: "/admin/executive", label: "Executive Dashboard", icon: Gauge, keywords: ["command center", "owner", "revenue", "kpi", "business performance"], group: "Overview", minRole: "admin" },
   { href: "/admin/analytics", label: "Analytics", icon: TrendingUp, keywords: ["charts", "funnel", "utm"], group: "Overview", minRole: "manager" },
   { href: "/admin/leads", label: "Leads", icon: Users, keywords: ["contacts", "prospects"], group: "Growth" },
+  {
+    href: "/admin/lead-capture",
+    label: "Lead Capture",
+    icon: FormInput,
+    keywords: ["forms", "public form", "landing", "capture", "widget", "embed"],
+    group: "Growth",
+    minRole: "manager",
+  },
+  {
+    href: "/admin/appointments",
+    label: "Appointments",
+    icon: CalendarClock,
+    keywords: ["booking", "scheduling", "slots", "counsellor", "meeting"],
+    group: "Growth",
+    minRole: "manager",
+  },
   { href: "/admin/pipeline", label: "Pipeline", icon: Kanban, keywords: ["opportunities", "kanban", "deals"], group: "Growth", minRole: "manager" },
   { href: "/admin/tasks", label: "Tasks", icon: CheckSquare, keywords: ["reminders", "follow-up", "todo"], group: "Growth" },
   { href: "/admin/campaigns", label: "Campaigns", icon: Megaphone, keywords: ["marketing", "ads"], group: "Growth", minRole: "admin" },

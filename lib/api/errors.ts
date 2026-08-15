@@ -115,6 +115,22 @@ export class PayloadTooLargeApiError extends ApiError {
   }
 }
 
+/** Appointment Booking — thrown when a slot a client believes is free
+ *  was just taken by a concurrent booking (the double-booking guard's
+ *  own DuplicateKeyError, caught by publicBookingService.book and
+ *  mapped here). 409 (Conflict), the standard status for "the request
+ *  was well-formed, but the current state of the resource means it
+ *  can't be applied as asked" — distinct from ValidationApiError (400,
+ *  the client's own input was malformed) since the exact same request
+ *  would have succeeded moments earlier; the client's real remedy is
+ *  to pick a different slot, not to fix its input shape. */
+export class ConflictApiError extends ApiError {
+  constructor(message: string) {
+    super(message, 409, [{ field: "root", message }]);
+    this.name = "ConflictApiError";
+  }
+}
+
 /** RC-5 — Backup, Restore & Disaster Recovery: the read-only kill
  *  switch (`MAINTENANCE_READ_ONLY_MODE`, checked in withApiRoute.ts
  *  before any handler runs). 503, the standard status for "the server

@@ -15,6 +15,7 @@ export {
   UsageLimitExceededApiError,
   PayloadTooLargeApiError,
   ServiceUnavailableApiError,
+  ConflictApiError,
 } from "./errors";
 export type { ApiFieldError } from "./errors";
 export { createRequestLogger } from "./logger";

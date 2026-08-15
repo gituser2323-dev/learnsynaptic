@@ -50,16 +50,19 @@ export default function Footer() {
               <div className="flex items-start gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>
                 <MapPin size={14} className="mt-0.5 shrink-0" style={{ color: 'var(--ls-blue-primary)' }} />
                 <span>
-                  Office No. 201, Success Square, Karve Rd<br />
+                  {/* Office No. 201, Success Square, Karve Rd<br />
                   Kothrud, Pune, Maharashtra 411038
                   <br />
-                  <span className="text-xs">Based in Pune. Training pan-India.</span>
+                  <span className="text-xs">Based in Pune. Training pan-India.</span> */}
+                    
+                    Saras Nagar,Ahilyanagar, Maharashtra 411001
+                   
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>
                 <Phone size={14} style={{ color: 'var(--ls-blue-primary)' }} />
                 <a href="tel:+919763969449" className="hover:text-ls-text transition-colors">
-                  +91 9763969449
+                +91 9119421273
                 </a>
               </div>
               <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>

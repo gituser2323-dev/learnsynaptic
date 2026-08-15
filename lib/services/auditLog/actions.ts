@@ -277,6 +277,33 @@ export const AUDIT_ACTIONS = {
    *  naming to existing architecture"). */
   ONBOARDING_STEP_COMPLETED: "onboarding.step_completed",
   ONBOARDING_ACTIVATED: "onboarding.activated",
+
+  /** Lead Capture — a tenant admin defining/editing/removing a public
+   *  lead-capture form is the same "deliberate state change a person
+   *  initiated" threshold as TAG_CREATED/CUSTOM_FIELD_DEFINED above —
+   *  it changes what an anonymous visitor can write into this org's CRM.
+   *  Individual public submissions are NOT audited here (same threshold
+   *  as lead.duplicate_touched — high volume, and the created Lead's own
+   *  audit trail plus its Activity timeline entry already is the durable
+   *  record of that specific event). */
+  LEAD_CAPTURE_FORM_CREATED: "lead_capture_form.created",
+  LEAD_CAPTURE_FORM_UPDATED: "lead_capture_form.updated",
+  LEAD_CAPTURE_FORM_DELETED: "lead_capture_form.deleted",
+
+  /** Appointment Booking — config changes to an AppointmentType sit at
+   *  the same threshold as LEAD_CAPTURE_FORM_CREATED/TAG_CREATED above. Unlike
+   *  Lead Capture's own individual public submissions (deliberately NOT
+   *  audited — high volume, Lead's own audit trail already covers it),
+   *  an individual booking IS audited here: it occupies a real
+   *  counsellor calendar slot via the double-booking-protected unique
+   *  index, a more consequential single event than a duplicate lead
+   *  touch, and the audit trail is what makes "who booked/occupied this
+   *  slot" traceable independent of the Lead's own timeline. */
+  APPOINTMENT_TYPE_CREATED: "appointment_type.created",
+  APPOINTMENT_TYPE_UPDATED: "appointment_type.updated",
+  APPOINTMENT_TYPE_DELETED: "appointment_type.deleted",
+  APPOINTMENT_BOOKED: "appointment.booked",
+  APPOINTMENT_STATUS_CHANGED: "appointment.status_changed",
 } as const;
 
 /**

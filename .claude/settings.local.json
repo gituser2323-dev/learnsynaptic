@@ -95,7 +95,24 @@
       "Bash(echo \"TSC_EXIT:$?\")",
       "Bash(xargs -I{} echo {})",
       "Bash(pkill -f \"next start\")",
-      "Bash(ps -p 87914 -o pid,command)"
+      "Bash(ps -p 87914 -o pid,command)",
+      "Bash(npx tsx *)",
+      "Bash(mkdir -p /Users/pratikparshuramsabale/Desktop/learnsynaptic-main/.mongo-data)",
+      "Bash(nohup mongod --port 27117 --dbpath /Users/pratikparshuramsabale/Desktop/learnsynaptic-main/.mongo-data --replSet rs-learnsynaptic --bind_ip 127.0.0.1)",
+      "Bash(mongosh *)",
+      "Bash(xargs -I{} basename {})",
+      "Bash(grep -riE \"review.{0,15}\\(management|request|widget|google\\)\" --include=\"*.ts\" --include=\"*.tsx\" -l . --exclude-dir=node_modules --exclude-dir=.git)",
+      "WebFetch(domain:claude.ai)",
+      "Bash(sort -t: -k2)",
+      "Bash(awk NR==640{print length\\($0\\)} NR==641{print length\\($0\\)} NR==703{print length\\($0\\)} *)",
+      "Bash(awk NR>=640 && NR<=704{print NR\": \"length\\($0\\)} *)",
+      "Bash(npx vitest *)",
+      "Bash(wc -l /tmp_lint_out.txt)",
+      "Bash(grep -c \"^/Users\" /tmp_lint_out.txt)",
+      "Bash(grep \"^/Users\" /tmp_lint_out.txt)",
+      "Bash(awk 'NR==1{print length\\($0\\)}' /private/tmp/claude-501/-Users-pratikparshuramsabale-Desktop-learnsynaptic-main/c80714c0-a5b6-4b4b-a8e4-55f10f873933/scratchpad/implementation-audit.html)",
+      "Artifact",
+      "Bash(grep -iv \"duplicates\\\\|page.tsx$\")"
     ]
   }
 }

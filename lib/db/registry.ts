@@ -20,6 +20,9 @@ import { inMemoryTaskRepository } from "./repositories/task.inMemory.repository"
 import { inMemoryNotificationRepository } from "./repositories/notification.inMemory.repository";
 import { inMemoryAssignmentRuleRepository } from "./repositories/assignmentRule.inMemory.repository";
 import { inMemoryPipelineRepository } from "./repositories/pipeline.inMemory.repository";
+import { inMemoryLeadCaptureFormRepository } from "./repositories/leadCaptureForm.inMemory.repository";
+import { inMemoryAppointmentTypeRepository } from "./repositories/appointmentType.inMemory.repository";
+import { inMemoryAppointmentRepository } from "./repositories/appointment.inMemory.repository";
 import { inMemoryOpportunityRepository } from "./repositories/opportunity.inMemory.repository";
 import { inMemoryConversationRepository } from "./repositories/conversation.inMemory.repository";
 import { inMemoryWorkflowDefinitionRepository } from "./repositories/workflowDefinition.inMemory.repository";
@@ -60,6 +63,8 @@ import type { TaskRepository } from "@/lib/services/crm/tasks/types";
 import type { NotificationRepository } from "@/lib/services/crm/notifications/types";
 import type { AssignmentRuleRepository } from "@/lib/services/crm/assignment/types";
 import type { PipelineRepository, OpportunityRepository } from "@/lib/services/crm/pipelines/types";
+import type { LeadCaptureFormRepository } from "@/lib/services/crm/leadCaptureForms/types";
+import type { AppointmentTypeRepository, AppointmentRepository } from "@/lib/services/crm/appointments/types";
 import type { ConversationRepository } from "@/lib/services/conversations/types";
 import type { WorkflowRunRepository, WorkflowDefinitionRepository } from "@/lib/services/automation/types";
 import type { AutoReplyRuleRepository } from "@/lib/services/automation/autoReply/types";
@@ -404,6 +409,38 @@ export async function getOpportunityRepository(): Promise<OpportunityRepository>
     return mongodbOpportunityRepository;
   });
   return opportunityRepo;
+}
+
+// Lead Capture — public entry point into the existing CRM Lead lifecycle.
+let leadCaptureFormRepo: LeadCaptureFormRepository | null = null;
+export async function getLeadCaptureFormRepository(): Promise<LeadCaptureFormRepository> {
+  if (leadCaptureFormRepo) return leadCaptureFormRepo;
+  leadCaptureFormRepo = await selectRepository(inMemoryLeadCaptureFormRepository, async () => {
+    const { mongodbLeadCaptureFormRepository } = await import("./repositories/leadCaptureForm.mongodb.repository");
+    return mongodbLeadCaptureFormRepository;
+  });
+  return leadCaptureFormRepo;
+}
+
+// Appointment Booking — the Growth-track module after Lead Capture.
+let appointmentTypeRepo: AppointmentTypeRepository | null = null;
+export async function getAppointmentTypeRepository(): Promise<AppointmentTypeRepository> {
+  if (appointmentTypeRepo) return appointmentTypeRepo;
+  appointmentTypeRepo = await selectRepository(inMemoryAppointmentTypeRepository, async () => {
+    const { mongodbAppointmentTypeRepository } = await import("./repositories/appointmentType.mongodb.repository");
+    return mongodbAppointmentTypeRepository;
+  });
+  return appointmentTypeRepo;
+}
+
+let appointmentRepo: AppointmentRepository | null = null;
+export async function getAppointmentRepository(): Promise<AppointmentRepository> {
+  if (appointmentRepo) return appointmentRepo;
+  appointmentRepo = await selectRepository(inMemoryAppointmentRepository, async () => {
+    const { mongodbAppointmentRepository } = await import("./repositories/appointment.mongodb.repository");
+    return mongodbAppointmentRepository;
+  });
+  return appointmentRepo;
 }
 
 let conversationRepo: ConversationRepository | null = null;
