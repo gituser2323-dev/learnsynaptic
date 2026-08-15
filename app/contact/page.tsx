@@ -103,15 +103,10 @@ export default function ContactPage() {
                       <p className="text-sm font-semibold mb-0.5" style={{ color: 'var(--ls-text)' }}>
                         Office
                       </p>
-                      {/* <p className="text-sm" style={{ color: 'var(--ls-muted)', lineHeight: 1.6 }}>
-                        Office No. 201, Success Square<br />
-                        Karve Rd, near Karve Statue<br />
-                        Kothrud, Pune, Maharashtra 411038
-                      </p> */}
-
-                           <p className="text-sm" style={{ color: 'var(--ls-muted)', lineHeight: 1.6 }}>
-                    
-                        Saras Nagar,Ahilyanagar, Maharashtra 411001
+                      <p className="text-sm" style={{ color: 'var(--ls-muted)', lineHeight: 1.6 }}>
+                        LearnSynaptic, Success Square, A-201<br />
+                        Karve Rd, Paschimanagri, Kothrud<br />
+                        Pune, Maharashtra 411038
                       </p>
                     </div>
                   </li>
@@ -192,13 +187,13 @@ export default function ContactPage() {
                 </ul>
               </div>
 
-              {/* Google Maps — Success Square, Karve Rd, Kothrud, Pune */}
+              {/* Google Maps — Success Square, A-201, Karve Rd, Kothrud, Pune */}
               <div
                 className="rounded-2xl border overflow-hidden"
                 style={{ borderColor: 'var(--ls-border)' }}
               >
                 <iframe
-                  src="https://maps.google.com/maps?q=Success+Square,+Karve+Rd,+near+Karve+Statue,+Kothrud,+Pune,+Maharashtra+411038&t=m&z=16&ie=UTF8&iwloc=B&output=embed"
+                  src="https://maps.google.com/maps?q=Success+Square,+A-201,+Karve+Rd,+Paschimanagri,+Kothrud,+Pune,+Maharashtra+411038&t=m&z=16&ie=UTF8&iwloc=B&output=embed"
                   width="100%"
                   height="220"
                   style={{ border: 0, display: 'block' }}

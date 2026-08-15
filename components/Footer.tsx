@@ -50,13 +50,9 @@ export default function Footer() {
               <div className="flex items-start gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>
                 <MapPin size={14} className="mt-0.5 shrink-0" style={{ color: 'var(--ls-blue-primary)' }} />
                 <span>
-                  {/* Office No. 201, Success Square, Karve Rd<br />
-                  Kothrud, Pune, Maharashtra 411038
-                  <br />
-                  <span className="text-xs">Based in Pune. Training pan-India.</span> */}
-                    
-                    Saras Nagar,Ahilyanagar, Maharashtra 411001
-                   
+                  LearnSynaptic, Success Square, A-201<br />
+                  Karve Rd, Paschimanagri, Kothrud<br />
+                  Pune, Maharashtra 411038
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>
