@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/programs/data-science' },
   title: 'Data Science AI/ML Specialisation — 5 Months | LearnSynaptic',
   description:
-    'Master Python, machine learning, deep learning, NLP, and Power BI in 5 months. Pune-based Data Science program with 85% placement rate across India.',
-  keywords: ['data science course India', 'machine learning training Pune', 'AI ML course India', 'data analyst course'],
+    'Master Python, machine learning, deep learning, NLP, and Power BI in 5 months. Ahilyanagar-based Data Science program with 85% placement rate across India.',
+  keywords: ['data science course India', 'machine learning training Ahilyanagar', 'AI ML course India', 'data analyst course'],
 };
 
 const curriculum = [

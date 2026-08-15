@@ -12,8 +12,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/programs/full-stack-devops' },
   title: 'AI Powered Full Stack Dev + DevOps Course — 6 Months | LearnSynaptic',
   description:
-    'Master React, Node.js, Docker, AWS, and AI integration in 6 months. Build production-grade AI web apps and CI/CD pipelines. 85% placement rate. Pune-based, pan-India batches.',
-  keywords: ['full stack developer course India', 'AI full stack devops training', 'React Node.js course Pune', 'devops training India'],
+    'Master React, Node.js, Docker, AWS, and AI integration in 6 months. Build production-grade AI web apps and CI/CD pipelines. 85% placement rate. Ahilyanagar-based, pan-India batches.',
+  keywords: ['full stack developer course India', 'AI full stack devops training', 'React Node.js course Ahilyanagar', 'devops training India'],
 };
 
 const curriculum = [

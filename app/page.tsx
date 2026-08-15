@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   title: 'LearnSynaptic — AI, Full Stack & Data Science Training in India',
   description:
-    'Build your tech career with LearnSynaptic. Industry-led AI, Full Stack Dev, GenAI, and Data Science programs. Pune-based, training students across India. 85% placement rate.',
+    'Build your tech career with LearnSynaptic. Industry-led AI, Full Stack Dev, GenAI, and Data Science programs. Ahilyanagar-based, training students across India. 85% placement rate.',
   openGraph: {
     title: 'LearnSynaptic — AI & Tech Training for India',
     description:
@@ -611,7 +611,7 @@ to-[#0D47D9]
                     Pratik Sabale
                   </p>
                   <p className="text-sm" style={{ color: 'var(--ls-muted)' }}>
-                   Co-Founder &amp; Lead Trainer, LearnSynaptic · Pune, Maharashtra
+                   Co-Founder &amp; Lead Trainer, LearnSynaptic · Ahilyanagar, Maharashtra
                   </p>
                 </div>
               </div>

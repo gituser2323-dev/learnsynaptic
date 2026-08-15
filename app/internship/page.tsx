@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     'LearnSynaptic internship',
     'student internship India',
     'AI internship program',
-    'full stack internship Pune',
+    'full stack internship Ahilyanagar',
   ],
 }
 

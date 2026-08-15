@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: 'Student Testimonials — Real Outcomes from LearnSynaptic',
   description:
     'Read what LearnSynaptic graduates say about their career transitions. Before and after role outcomes from students across AI Full Stack, GenAI Builder, Data Science, and Bootcamp programs.',
-  keywords: ['LearnSynaptic reviews', 'student testimonials India', 'tech course reviews Pune', 'AI training outcomes'],
+  keywords: ['LearnSynaptic reviews', 'student testimonials India', 'tech course reviews Ahilyanagar', 'AI training outcomes'],
 };
 
 /*
