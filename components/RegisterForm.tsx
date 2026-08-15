@@ -541,7 +541,7 @@ export function RegisterForm() {
                 <p style={{ color: '#b91c1c', fontSize: '0.8125rem', marginTop: 3 }}>
                   Or{' '}
                   <a
-                    href="https://wa.me/919763969449"
+                    href="https://wa.me/919119421273"
                     target="_blank" rel="noopener noreferrer"
                     style={{ fontWeight: 600, textDecoration: 'underline' }}
                   >

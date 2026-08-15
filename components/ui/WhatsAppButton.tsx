@@ -3,7 +3,7 @@
 import { analytics } from '@/lib/services/analytics'
 
 export function WhatsAppButton() {
-  const phone = '919763969449'
+  const phone = '919119421273'
   const message = encodeURIComponent("Hi! I'm interested in LearnSynaptic programs.")
   const href = `https://wa.me/${phone}?text=${message}`
 

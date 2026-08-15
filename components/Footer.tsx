@@ -57,7 +57,7 @@ export default function Footer() {
               </div>
               <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>
                 <Phone size={14} style={{ color: 'var(--ls-blue-primary)' }} />
-                <a href="tel:+919763969449" className="hover:text-ls-text transition-colors">
+                <a href="tel:+919119421273" className="hover:text-ls-text transition-colors">
                 +91 9119421273
                 </a>
               </div>

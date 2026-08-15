@@ -1,10 +1,39 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
 import { usePathname } from "next/navigation";
 
+function subscribePointerCapability(onStoreChange: () => void) {
+  const hoverMq = window.matchMedia('(hover: hover) and (pointer: fine)')
+  const motionMq = window.matchMedia('(prefers-reduced-motion: reduce)')
+  hoverMq.addEventListener('change', onStoreChange)
+  motionMq.addEventListener('change', onStoreChange)
+  return () => {
+    hoverMq.removeEventListener('change', onStoreChange)
+    motionMq.removeEventListener('change', onStoreChange)
+  }
+}
+
+function getPointerCapabilitySnapshot() {
+  return (
+    window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+
+function getPointerCapabilityServerSnapshot() {
+  return false
+}
+
 export function CustomCursor() {
-  const [active, setActive] = useState(false)
+  // Capability is derived from matchMedia via an external store — no
+  // setState-in-effect, and active is true in the same commit that mounts
+  // the custom cursor DOM (after hydration).
+  const active = useSyncExternalStore(
+    subscribePointerCapability,
+    getPointerCapabilitySnapshot,
+    getPointerCapabilityServerSnapshot,
+  )
   // Outer wrappers — rAF moves these (translate only)
   const dotWrapRef = useRef<HTMLDivElement>(null)
   const ringWrapRef = useRef<HTMLDivElement>(null)
@@ -14,14 +43,19 @@ export function CustomCursor() {
 
   const pathname = usePathname();
 
+  // Hide the native cursor only after the custom cursor is mounted.
+  // Adding `custom-cursor-active` before `active` is true left a frame
+  // with cursor:none and no custom cursor DOM.
   useEffect(() => {
-    const hasMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!hasMouse || prefersReduced) return
-
-    // Defer activation so setState isn't synchronous in the effect body.
-    const activateId = requestAnimationFrame(() => setActive(true))
+    if (!active) return
     document.documentElement.classList.add('custom-cursor-active')
+    return () => {
+      document.documentElement.classList.remove('custom-cursor-active')
+    }
+  }, [active])
+
+  useEffect(() => {
+    if (!active) return
 
     let targetX = 0
     let targetY = 0
@@ -100,15 +134,13 @@ export function CustomCursor() {
     rafId = requestAnimationFrame(tick)
 
     return () => {
-      cancelAnimationFrame(activateId)
-      document.documentElement.classList.remove('custom-cursor-active')
       window.removeEventListener("pointermove", onMouseMove)
       window.removeEventListener("mousedown", onMouseDown)
       window.removeEventListener("mouseup", onMouseUp)
       document.removeEventListener("pointermove", handleHover)
       cancelAnimationFrame(rafId)
     }
-  }, [])
+  }, [active])
 
 
   useEffect(() => {
