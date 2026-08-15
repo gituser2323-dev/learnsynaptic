@@ -43,16 +43,15 @@ export default function Footer() {
               />
             </Link>
             <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--ls-muted)' }}>
-              India&apos;s emerging tech training platform. From Pune, training students and
+              India&apos;s emerging tech training platform. From Ahilyanagar, training students and
               professionals across India in AI, Full Stack, and Data Science.
             </p>
             <div className="space-y-2">
               <div className="flex items-start gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>
                 <MapPin size={14} className="mt-0.5 shrink-0" style={{ color: 'var(--ls-blue-primary)' }} />
                 <span>
-                  LearnSynaptic, Success Square, A-201<br />
-                  Karve Rd, Paschimanagri, Kothrud<br />
-                  Pune, Maharashtra 411038
+                  LearnSynaptic, Saras Nagar<br />
+                  Ahilyanagar, Maharashtra 414001
                 </span>
               </div>
               <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--ls-muted)' }}>
@@ -225,7 +224,7 @@ export default function Footer() {
           className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs"
           style={{ borderTop: '1px solid var(--ls-border)', color: 'var(--ls-muted)' }}
         >
-          <p>© {new Date().getFullYear()} LearnSynaptic. All rights reserved. Based in Pune, India.</p>
+          <p>© {new Date().getFullYear()} LearnSynaptic. All rights reserved. Based in Ahilyanagar, India.</p>
           <div className="flex items-center gap-4">
             <Link href="/privacy" className="hover:text-ls-text transition-colors">
               Privacy Policy

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/contact' },
   title: 'Contact Us — LearnSynaptic',
   description:
-    'Get in touch with the LearnSynaptic team. Ask about programs, book a free counselling session, or request a callback. Pune-based, available pan-India.',
+    'Get in touch with the LearnSynaptic team. Ask about programs, book a free counselling session, or request a callback. Ahilyanagar-based, available pan-India.',
   openGraph: {
     title: 'Contact LearnSynaptic',
     description:
@@ -49,7 +49,7 @@ export default function ContactPage() {
           <AnimateOnScroll>
             <span className="ls-badge mb-5 inline-flex">
               <Phone size={12} />
-              Pune-based · Pan-India
+              Ahilyanagar-based · Pan-India
             </span>
             <h1 className="mb-5" style={{ maxWidth: 680 }}>
               Talk to us directly.
@@ -104,9 +104,8 @@ export default function ContactPage() {
                         Office
                       </p>
                       <p className="text-sm" style={{ color: 'var(--ls-muted)', lineHeight: 1.6 }}>
-                        LearnSynaptic, Success Square, A-201<br />
-                        Karve Rd, Paschimanagri, Kothrud<br />
-                        Pune, Maharashtra 411038
+                        LearnSynaptic, Saras Nagar<br />
+                        Ahilyanagar, Maharashtra 414001
                       </p>
                     </div>
                   </li>
@@ -187,13 +186,13 @@ export default function ContactPage() {
                 </ul>
               </div>
 
-              {/* Google Maps — Success Square, A-201, Karve Rd, Kothrud, Pune */}
+              {/* Google Maps — Saras Nagar, Ahilyanagar */}
               <div
                 className="rounded-2xl border overflow-hidden"
                 style={{ borderColor: 'var(--ls-border)' }}
               >
                 <iframe
-                  src="https://maps.google.com/maps?q=Success+Square,+A-201,+Karve+Rd,+Paschimanagri,+Kothrud,+Pune,+Maharashtra+411038&t=m&z=16&ie=UTF8&iwloc=B&output=embed"
+                  src="https://maps.google.com/maps?q=Saras+Nagar,+Ahilyanagar,+Maharashtra+414001&t=m&z=16&ie=UTF8&iwloc=B&output=embed"
                   width="100%"
                   height="220"
                   style={{ border: 0, display: 'block' }}
