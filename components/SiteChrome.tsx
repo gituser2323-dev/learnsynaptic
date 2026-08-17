@@ -9,13 +9,15 @@ import { SpotlightGlow } from '@/components/ui/SpotlightGlow';
 import { LeadCapturePopup } from '@/components/LeadCapturePopup';
 
 /**
- * /bootcamp, /ai-bootcamp and /ai-generalist are standalone campaign
- * microsites, not pages inside the main site — they must not inherit the
- * global Navbar/Footer/WhatsApp bubble/lead popup. /ai-bootcamp and
- * /ai-generalist additionally ship their own, completely separate design
- * systems (an imported Claude Design) so they also skip the ambient cursor
- * glow / custom cursor micro-interactions that belong to the existing
- * site's visual identity, keeping the designs from ever blending.
+ * /bootcamp, /ai-bootcamp, /ai-generalist and /ai-full-stack-engineering
+ * (a clone of /ai-bootcamp's design system for a different audience) are
+ * standalone campaign microsites, not pages inside the main site — they
+ * must not inherit the global Navbar/Footer/WhatsApp bubble/lead popup.
+ * /ai-bootcamp, /ai-generalist and /ai-full-stack-engineering additionally
+ * ship their own, completely separate design systems (an imported Claude
+ * Design) so they also skip the ambient cursor glow / custom cursor
+ * micro-interactions that belong to the existing site's visual identity,
+ * keeping the designs from ever blending.
  *
  * /admin (Module 11 — CRM Dashboard UI) is a third category: not a
  * marketing microsite at all, an internal tool with its own shell
@@ -38,7 +40,12 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdminDashboard = pathname?.startsWith('/admin');
   const isBookingPage = pathname?.startsWith('/book');
-  const isAiBootcamp = pathname?.startsWith('/ai-bootcamp') || pathname?.startsWith('/ai-generalist');
+  const isAiBootcamp =
+    pathname?.startsWith('/ai-bootcamp') ||
+    pathname?.startsWith('/ai-generalist') ||
+    pathname?.startsWith('/ai-full-stack-engineering') ||
+    pathname?.startsWith('/data-analytics-bi') ||
+    pathname?.startsWith('/genai');
   const isIsolatedMicrosite = pathname?.startsWith('/bootcamp') || isAiBootcamp;
 
   if (isAdminDashboard || isBookingPage) {

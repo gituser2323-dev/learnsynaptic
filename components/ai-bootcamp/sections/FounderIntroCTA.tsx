@@ -25,11 +25,10 @@ export function FounderIntroCTA() {
               letterSpacing: "-0.01em",
             }}
           >
-            The 7-Day AI Engineering Bootcamp
+            The 2-Hour Live AI Masterclass
           </h2>
           <p style={{ color: "var(--ink-600)", fontSize: 16, lineHeight: 1.7, maxWidth: 560, margin: "0 auto 40px" }}>
-            Not just how to use AI—but how to choose the right tools, build practical applications, and solve
-            real-world problems.
+            Not just how to use AI — but how to build real work, live, using the tools professionals actually use.
           </p>
           <div
             style={{
@@ -112,7 +111,7 @@ export function FounderIntroCTA() {
               className="aib-btn"
               style={{ background: "var(--ls-primary)", color: "#fff", padding: "16px 32px", fontSize: 13.5 }}
             >
-              Explore the AI Bootcamp →
+              Explore the Live Masterclass →
             </button>
             <a href="#curriculum" style={{ color: "var(--ink-black)", fontSize: 14.5, fontWeight: 700, textDecoration: "underline" }}>
               See Complete AI Ecosystem

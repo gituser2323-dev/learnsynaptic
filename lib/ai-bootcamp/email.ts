@@ -18,7 +18,7 @@ export async function sendAiBootcampRegistration(data: AiBootcampRegistration) {
     {
       whatsapp_number: normalizeIndianMobile(data.whatsappNumber),
       full_name: data.fullName.trim() || "Not provided",
-      program: "7-Day AI Engineering Bootcamp",
+      program: "2-Hour Live AI Masterclass",
       submittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
     },
     AI_BOOTCAMP_EMAILJS_PUBLIC_KEY,

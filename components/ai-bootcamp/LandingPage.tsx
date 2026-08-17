@@ -7,6 +7,7 @@ import { AwarenessCards } from "./sections/AwarenessCards";
 import { ProblemAwareness } from "./sections/ProblemAwareness";
 import { FounderIntroCTA } from "./sections/FounderIntroCTA";
 import { AudienceComparison } from "./sections/AudienceComparison";
+import { Testimonials } from "./sections/Testimonials";
 import { ProjectsCurriculum } from "./sections/ProjectsCurriculum";
 import { MentorBonuses } from "./sections/MentorBonuses";
 import { FaqClosing } from "./sections/FaqClosing";
@@ -30,6 +31,7 @@ export function AiBootcampLandingPage() {
           <ProblemAwareness />
           <FounderIntroCTA />
           <AudienceComparison />
+          <Testimonials />
           <ProjectsCurriculum />
           <MentorBonuses />
           <FaqClosing />

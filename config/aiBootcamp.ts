@@ -14,3 +14,7 @@ export const AI_BOOTCAMP_EMAILJS_TEMPLATE_ID =
 // Real invite link confirmed by the client (2026-07-22).
 export const AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL =
   "https://chat.whatsapp.com/GYCiEA1Ld5A1h0n71QPFhG";
+
+// The next live session date/time is computed live (alternating Thursday
+// 8:00 PM / Sunday 11:00 AM IST) by lib/masterclassSchedule.ts — nothing
+// to configure here.

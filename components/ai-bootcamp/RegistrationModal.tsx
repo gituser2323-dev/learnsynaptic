@@ -50,7 +50,7 @@ export function RegistrationModal() {
         name: fullName || "Not provided",
         email: syntheticEmailFromPhone(normalizedPhone),
         phone: normalizedPhone,
-        program: "7-Day AI Engineering Bootcamp",
+        program: "2-Hour Live AI Masterclass",
         source: "ai-bootcamp-modal",
       },
       analyticsEvent: "CompleteRegistration",
@@ -79,7 +79,7 @@ export function RegistrationModal() {
         }}
       >
         <span className="aib-live-dot" style={{ backgroundColor: "rgb(0, 213, 27)" }} />
-        FREE · 7-DAY AI LIVE BOOTCAMP
+        FREE · 2-HOUR LIVE AI MASTERCLASS
       </span>
 
       <h2
@@ -95,7 +95,7 @@ export function RegistrationModal() {
         Claim My <span style={{ color: "var(--ls-primary-light)" }}>Free Seat</span>
       </h2>
       <p style={{ color: "var(--ink-200)", fontSize: 14.5, lineHeight: 1.6, margin: "0 0 28px" }}>
-        Enter your WhatsApp number and we&apos;ll send you everything you need for Day 1.
+        Enter your WhatsApp number and we&apos;ll send you everything you need for the session.
       </p>
 
       <form onSubmit={handleSubmit} noValidate style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -189,7 +189,7 @@ export function RegistrationModal() {
         )}
 
         <p style={{ textAlign: "center", fontSize: 11.5, color: "var(--ink-400)", lineHeight: 1.5, margin: 0 }}>
-          By continuing, you agree to receive bootcamp updates via WhatsApp.
+          By continuing, you agree to receive masterclass updates via WhatsApp.
         </p>
       </form>
 

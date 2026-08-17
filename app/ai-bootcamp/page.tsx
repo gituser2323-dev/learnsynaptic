@@ -18,13 +18,13 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   alternates: { canonical: '/ai-bootcamp' },
-  title: "FREE 7-Day AI Engineering Bootcamp — LearnSynaptic",
+  title: "FREE 2-Hour Live AI Masterclass — LearnSynaptic",
   description:
-    "The Next Big Opportunity Starts With AI. Join LearnSynaptic's free 7-day live AI Engineering Bootcamp — 7 real projects shipped, 1:1 mentorship, zero cost.",
+    "The next big opportunity starts with the right skill. Join LearnSynaptic's free 2-hour live masterclass — built live, zero cost, zero fluff.",
   openGraph: {
-    title: "FREE 7-Day AI Engineering Bootcamp — LearnSynaptic",
+    title: "FREE 2-Hour Live AI Masterclass — LearnSynaptic",
     description:
-      "Most people consume AI content. Very few build AI products. This free 7-day live bootcamp helps you become one of them.",
+      "Most people consume AI content. Very few build AI products. This free 2-hour live masterclass helps you become one of them.",
     type: "website",
   },
   robots: { index: true, follow: true },

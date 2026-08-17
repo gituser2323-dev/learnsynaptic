@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRegisterModal } from "./RegisterModalContext";
-import { getNextCohortSaturday, getIstDateParts } from "@/lib/cohortDate";
+import { formatFloatingDate } from "@/lib/ai-bootcamp/schedule";
+import { getNextSessionDate } from "@/lib/masterclassSchedule";
 
 interface FloatingCTAProps {
   seatsReserved?: number;
@@ -11,16 +12,6 @@ interface FloatingCTAProps {
 }
 
 const MINUTE_MS = 60 * 1000;
-
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
-
-function formatCohortDate(d: Date): string {
-  const { day, month } = getIstDateParts(d);
-  return `Saturday, ${day} ${MONTHS[month]} • 8:30 PM Onwards`;
-}
 
 interface Remaining {
   days: number;
@@ -38,14 +29,16 @@ function getRemaining(target: number, now: number): Remaining {
   return { days, hours, minutes, totalMinutes };
 }
 
-/** Tracks the next upcoming cohort and the live countdown to it, rolling
- *  forward automatically once the current cohort's start time passes.
- *  Re-renders are gated on the minute actually changing, keeping this
- *  premium and quiet rather than ticking every second. */
-function useNextCohort() {
+/** Tracks the next upcoming live session and the countdown to it, re-reading
+ *  getNextSessionDate() on every tick so the moment one session's start time
+ *  passes, the target rolls forward to the next alternating slot on its own —
+ *  never a date that needs to be updated by hand. Re-renders are gated on the
+ *  minute actually changing, keeping this premium and quiet rather than
+ *  ticking every second. */
+function useNextSession() {
   const [state, setState] = useState(() => {
     const now = Date.now();
-    const target = getNextCohortSaturday(now);
+    const target = getNextSessionDate(now);
     return { target, ...getRemaining(target.getTime(), now) };
   });
 
@@ -53,12 +46,9 @@ function useNextCohort() {
     const tick = () => {
       setState((prev) => {
         const now = Date.now();
-        const target = getNextCohortSaturday(now);
+        const target = getNextSessionDate(now);
         const remaining = getRemaining(target.getTime(), now);
-        if (
-          target.getTime() === prev.target.getTime() &&
-          remaining.totalMinutes === prev.totalMinutes
-        ) {
+        if (target.getTime() === prev.target.getTime() && remaining.totalMinutes === prev.totalMinutes) {
           return prev;
         }
         return { target, ...remaining };
@@ -105,7 +95,7 @@ function CountdownUnit({ value, label, animate }: { value: number; label: string
 export function FloatingCTA({ seatsReserved = 27, seatsTotal =40 }: FloatingCTAProps) {
   const { openRegister, isRegisterOpen, isSuccessOpen } = useRegisterModal();
   const [scrolledPast, setScrolledPast] = useState(false);
-  const { target, days, hours, minutes } = useNextCohort();
+  const { days, hours, minutes } = useNextSession();
 
   useEffect(() => {
     let ticking = false;
@@ -148,11 +138,11 @@ export function FloatingCTA({ seatsReserved = 27, seatsTotal =40 }: FloatingCTAP
         >
           <div className="aib-floating-cta">
             <div className="aib-floating-cta-info">
-              <span className="aib-floating-cta-title">7-Day AI Engineering Bootcamp</span>
+              <span className="aib-floating-cta-title">2-Hour Live AI Masterclass</span>
               <div className="aib-floating-cta-meta">
                 <span className="aib-floating-cta-cohort">
-                  <span className="aib-floating-cta-cohort-label">Upcoming Live Cohort</span>
-                  <span className="aib-floating-cta-cohort-date">{formatCohortDate(target)}</span>
+                  <span className="aib-floating-cta-cohort-label">Upcoming Live Masterclass</span>
+                  <span className="aib-floating-cta-cohort-date">{formatFloatingDate()}</span>
                 </span>
                 <span className="aib-floating-cta-meta-divider" aria-hidden="true" />
                 <div

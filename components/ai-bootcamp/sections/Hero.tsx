@@ -1,16 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
 import Image from "next/image";
 import { useRegisterModal } from "../RegisterModalContext";
 import { WhatsAppIcon } from "../WhatsAppIcon";
-import { getNextCohortSaturday, getIstDateParts } from "@/lib/cohortDate";
 import { AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL } from "@/config/aiBootcamp";
-
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
+import { formatBadgeDate } from "@/lib/ai-bootcamp/schedule";
 
 function GlassBadge({ text, style }: { text: string; style: React.CSSProperties }) {
   return (
@@ -43,11 +37,6 @@ function GlassBadge({ text, style }: { text: string; style: React.CSSProperties 
 
 export function Hero() {
   const { openRegister } = useRegisterModal();
-
-  const nextCohortLabel = useMemo(() => {
-    const { day, month } = getIstDateParts(getNextCohortSaturday());
-    return `Saturday • ${day} ${MONTHS[month]}`;
-  }, []);
 
   return (
     <section style={{ background: "var(--ls-dark)", color: "#fff", padding: "72px 6% 96px", position: "relative", overflow: "hidden" }}>
@@ -92,7 +81,7 @@ export function Hero() {
           }}
         >
           <span className="aib-live-dot" style={{ backgroundColor: "rgb(0, 213, 27)" }} />
-          FREE · AI BOOTCAMP ·&nbsp; {nextCohortLabel.toUpperCase()}
+          FREE · 2-HOUR LIVE AI MASTERCLASS ·&nbsp; {formatBadgeDate()}
         </span>
         <div
           className="aib-hero-item"
@@ -106,7 +95,7 @@ export function Hero() {
             marginTop: 28,
           }}
         >
-          &nbsp;AI FIRST ACADEMY
+          &nbsp;AI-PROOF YOUR CAREER
         </div>
         <h1
           className="aib-hero-item"
@@ -123,14 +112,19 @@ export function Hero() {
           <br />
           <span style={{ color: "var(--ls-primary-light)" }}>Starts With AI.</span>
         </h1>
-        <p className="aib-hero-item" style={{ gridArea: "subhead", fontSize: 17, color: "var(--ink-200)", maxWidth: 520, margin: "22px 0 0", lineHeight: 1.6 }}>
-          Most people consume AI content. Very few build AI products. This free 7-day live bootcamp helps you become
-          one of them.
-        </p>
+        <div className="aib-hero-item" style={{ gridArea: "subhead", marginTop: 22 }}>
+          <p style={{ fontSize: 17, color: "var(--ink-200)", maxWidth: 520, margin: 0, lineHeight: 1.6 }}>
+            Most people consume AI content. Very few build AI products. This free 2-hour live masterclass helps you
+            become one of them.
+          </p>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ls-primary-light)", marginTop: 14, letterSpacing: "0.02em" }}>
+            Software Engineering | Data Analytics | AI Products | GenAI
+          </div>
+        </div>
         <div className="aib-hero-item" style={{ gridArea: "checklist", display: "flex", flexDirection: "column", gap: 12, marginTop: 28 }}>
           {[
-            "Worth ₹10,000+ • Free This Cohort",
-            "AI Skills Are Becoming the New Standard",
+            "Worth ₹10,000+ • Free This Session",
+            "The AI Skill That Gets You Hired in 2027",
             "5 Hands-On AI Projects | Applications",
           ].map((text) => (
             <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -183,7 +177,7 @@ export function Hero() {
           </a>
         </div>
         <p className="aib-hero-item" style={{ gridArea: "note", fontSize: 13, color: "var(--ink-400)", margin: "14px 0 0", lineHeight: 1.5 }}>
-          No spam. Only AI resources, event reminders and bootcamp updates.
+          No spam. Only AI resources, event reminders and masterclass updates.
         </p>
 
         <div

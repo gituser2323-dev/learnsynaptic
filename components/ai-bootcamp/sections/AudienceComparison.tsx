@@ -17,7 +17,7 @@ export function AudienceComparison() {
               }}
             >
               <span style={{ color: "var(--ink-black)" }}>Who is this </span>
-              <span style={{ color: "var(--ls-primary)" }}>Bootcamp&nbsp;</span>
+              <span style={{ color: "var(--ls-primary)" }}>Masterclass&nbsp;</span>
               <span style={{ color: "var(--ink-black)" }}>for?</span>
             </h3>
           </div>

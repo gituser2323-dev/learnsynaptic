@@ -1,25 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { faqList } from "../data";
 import { useRegisterModal } from "../RegisterModalContext";
 import { WhatsAppIcon } from "../WhatsAppIcon";
-import { getNextCohortSaturday, getIstDateParts } from "@/lib/cohortDate";
 import { AI_BOOTCAMP_WHATSAPP_COMMUNITY_URL } from "@/config/aiBootcamp";
-
-const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-];
+import { formatClosingDate } from "@/lib/ai-bootcamp/schedule";
 
 export function FaqClosing() {
   const [openIndex, setOpenIndex] = useState<Record<number, boolean>>({});
   const { openRegister } = useRegisterModal();
-
-  const nextCohortLabel = useMemo(() => {
-    const { day, month } = getIstDateParts(getNextCohortSaturday());
-    return `Saturday, ${day} ${MONTHS[month]}`;
-  }, []);
 
   return (
     <>
@@ -67,12 +57,12 @@ export function FaqClosing() {
       <section style={{ background: "var(--white)", padding: "80px 6%", textAlign: "center" }}>
         <div style={{ maxWidth: 640, margin: "0 auto" }}>
           <h2 style={{ fontFamily: "var(--font-heading-editorial)", fontWeight: 800, fontSize: 30, color: "var(--ink-black)", margin: "0 0 16px" }}>
-            Why We Cap Every Cohort
+            Why We Cap Every Session
           </h2>
           <p style={{ color: "var(--ink-600)", fontSize: 16, lineHeight: 1.6, margin: 0 }}>
             Every project gets reviewed live. Every question gets answered on the spot. That only works in a small
-            room — so registration closes once the cohort fills. No countdown gimmicks. Just a simple fact: the
-            sooner you join, the sooner Day 1 starts.
+            room — so registration closes once the session fills. No countdown gimmicks. Just a simple fact: the
+            sooner you join, the sooner it starts.
           </p>
         </div>
       </section>
@@ -84,7 +74,7 @@ export function FaqClosing() {
           <span style={{ color: "var(--ls-primary-light)" }}>The Next Best Time Is Today.</span>
         </h2>
         <p style={{ color: "var(--ink-200)", fontSize: 17, margin: "0 0 32px" }}>
-          Cohort starts {nextCohortLabel}. Seats close when it&apos;s full.
+          2-Hour Live AI Masterclass — {formatClosingDate()}. Seats close when it&apos;s full.
         </p>
         <div className="aib-cta-row" style={{ justifyContent: "center" }}>
           <button
@@ -112,7 +102,7 @@ export function FaqClosing() {
           </a>
         </div>
         <div style={{ marginTop: 44, color: "var(--ink-400)", fontSize: 14 }}>
-          learnsynaptic.com · #AISoftwareEngineeringCohort
+          learnsynaptic.com · #AILiveMasterclass2027
         </div>
       </section>
     </>

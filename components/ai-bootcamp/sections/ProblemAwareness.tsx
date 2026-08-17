@@ -229,7 +229,7 @@ export function ProblemAwareness() {
               Trying to learn every AI tool.
             </h3>
             <p style={{ color: "var(--ink-200)", fontSize: 15.5, maxWidth: 560, margin: "20px auto 0", lineHeight: 1.7 }}>
-              In our bootcamp, you won&apos;t memorize 120 platforms. You&apos;ll learn when to use them, why to use
+              In our masterclass, you won&apos;t memorize 120 platforms. You&apos;ll learn when to use them, why to use
               them, and how to combine them into real AI workflows.
             </p>
           </div>
