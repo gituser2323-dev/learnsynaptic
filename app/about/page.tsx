@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/about' },
   title: 'About Pratik Sabale — Founder, LearnSynaptic',
   description:
-    'MERN Stack Developer and EdTech founder based in Ahilyanagar. 3-4 years building real products and training developers. LearnSynaptic is already running — 5+ batches, 200+ students trained.',
-  keywords: ['Pratik Sabale', 'LearnSynaptic founder', 'MERN developer trainer Ahilyanagar', 'EdTech founder India'],
+    'MERN Stack Developer and EdTech founder based in Pune. 3-4 years building real products and training developers. LearnSynaptic is already running — 5+ batches, 200+ students trained.',
+  keywords: ['Pratik Sabale', 'LearnSynaptic founder', 'MERN developer trainer Pune', 'EdTech founder India'],
 };
 
 // Timeline dates are placeholders — [EDIT] markers for Pratik to fill exact dates
@@ -69,7 +69,7 @@ export default function AboutPage() {
           <AnimateOnScroll>
             <span className="ls-badge mb-5 inline-flex">
               <MapPin size={12} />
-              Ahilyanagar, Maharashtra · Pan-India
+              Pune, Maharashtra · Pan-India
             </span>
             <h1 className="mb-5" style={{ maxWidth: 820 }}>
               Built by someone who&apos;s actually doing it.
@@ -100,7 +100,7 @@ export default function AboutPage() {
 
               <div className="space-y-5 text-base" style={{ color: 'var(--ls-muted)', maxWidth: 620, lineHeight: 1.75 }}>
                 <p style={{ color: 'var(--ls-text)', fontWeight: 500, fontSize: '1.125rem' }}>
-                  I&apos;m Pratik Sabale — a full-stack developer based in Ahilyanagar with 3–4 years of experience
+                  I&apos;m Pratik Sabale — a full-stack developer based in Pune with 3–4 years of experience
                   building real products and training developers who wanted to build real products too.
                 </p>
                 <p>
@@ -174,7 +174,7 @@ export default function AboutPage() {
                 <div className="p-5" style={{ background: 'white' }}>
                   <div className="flex items-center gap-2 mb-3">
                     <MapPin size={13} style={{ color: 'var(--ls-blue-primary)' }} />
-                    <span className="text-sm" style={{ color: 'var(--ls-muted)' }}>Ahilyanagar, Maharashtra</span>
+                    <span className="text-sm" style={{ color: 'var(--ls-muted)' }}>Pune, Maharashtra</span>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {['MERN Stack', 'Python', 'GenAI', 'DevOps', 'EdTech'].map((tag) => (

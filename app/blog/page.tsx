@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     'AI engineering blog India',
     'full stack developer career',
     'GenAI tutorial',
-    'tech career advice Ahilyanagar',
+    'tech career advice Pune',
     'learn AI India',
   ],
 };

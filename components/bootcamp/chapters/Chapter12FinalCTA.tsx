@@ -41,7 +41,7 @@ export function ChapterFinalCTA({ batchDateLabel }: { batchDateLabel: string }) 
 
       <div className="relative b-container" style={{ borderTop: '1px solid var(--b-line-dark-soft)', paddingTop: 28 }}>
         <p className="text-center b-muted" style={{ fontSize: '0.75rem' }}>
-          © {new Date().getFullYear()} LearnSynaptic · Ahilyanagar, India
+          © {new Date().getFullYear()} LearnSynaptic · Pune, India
         </p>
       </div>
     </section>

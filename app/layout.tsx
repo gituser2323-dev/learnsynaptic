@@ -16,7 +16,7 @@ const inter = Inter({
 
 
 const DEFAULT_DESCRIPTION =
-  'LearnSynaptic offers industry-aligned AI, Full Stack, Data Science, and GenAI training programs for students and professionals across India. Based in Ahilyanagar.';
+  'LearnSynaptic offers industry-aligned AI, Full Stack, Data Science, and GenAI training programs for students and professionals across India. Based in Pune.';
 
 // metadataBase resolves every relative URL used in openGraph/twitter
 // metadata (here and on every page that sets its own) into an absolute
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   keywords: [
     'AI course India',
     'full stack developer course',
-    'data science course Ahilyanagar',
+    'data science course Pune',
     'GenAI training',
     'tech bootcamp India',
     'LearnSynaptic',
