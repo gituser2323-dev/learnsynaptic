@@ -1,7 +1,11 @@
 import type { NextResponse } from "next/server";
 import { withApiRoute, apiSuccess, parseJsonBody, ValidationApiError, NotFoundApiError, UpstreamServiceApiError } from "@/lib/api";
 import type { ApiRouteContext } from "@/lib/api";
-import { conversationService, ConversationSendFailedError } from "@/lib/services/conversations";
+import {
+  conversationService,
+  ConversationSendFailedError,
+  requireAccessibleConversation,
+} from "@/lib/services/conversations";
 import type { SendReplyInput } from "@/lib/services/conversations";
 import { WhatsAppProviderNotImplementedError } from "@/lib/services/whatsapp";
 import type { WhatsAppQuickReplyButton, WhatsAppListSection, WhatsAppMediaKind } from "@/lib/services/whatsapp";
@@ -109,10 +113,11 @@ function parseSendReplyInput(body: Record<string, unknown>): SendReplyInput {
  *  - ConversationSendFailedError → 502, the provider attempted the send
  *    and Meta (or whichever vendor) rejected/failed it.
  *
- * ⚠️ requiredRole: "admin".
+ * Phase 2A — requiredRole counsellor + ownership assert before send.
  */
 async function handleSendReply(request: Request, ctx: ApiRouteContext): Promise<NextResponse> {
   const { id } = ctx.params;
+  await requireAccessibleConversation(ctx, id);
   const body = (await parseJsonBody(request)) as Record<string, unknown>;
   const input = parseSendReplyInput(body);
 
@@ -132,6 +137,6 @@ async function handleSendReply(request: Request, ctx: ApiRouteContext): Promise<
 }
 
 export const POST = withApiRoute("admin.conversations.sendMessage", handleSendReply, {
-  requiredRole: "admin",
+  requiredRole: "counsellor",
   rateLimit: { limit: 30, windowMs: 60_000 },
 });

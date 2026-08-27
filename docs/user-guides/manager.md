@@ -59,9 +59,7 @@ actions remain Admin-only.
 
 Configure Team invitations, Automation, Webhooks, Integrations
 (connect/configure), Branding, Audit Logs, or Settings — all
-Admin-only. **Conversations remain unreachable to Manager too** — see
-[`counsellor.md`](counsellor.md#conversations--a-real-current-limitation-not-an-oversight-to-assume-away)
-for the same real, current gap (every conversation route requires
-Admin today, not Manager+). See
+Admin-only. Conversations are available org-wide for Managers (Phase
+2A); assign/labels on threads are Manager+. See
 [`docs/architecture/rbac.md`](../architecture/rbac.md) for the
 complete matrix.

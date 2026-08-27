@@ -110,7 +110,7 @@ differently on purpose:
 |---|---|---|
 | Tenant context | `lib/tenancy/context.ts` | `AsyncLocalStorage`-based; see [tenant.md](tenant.md) |
 | RBAC | `lib/api/roles.ts` | Rank-based tenant role check + a structurally separate platform-role check; see [rbac.md](rbac.md) |
-| Queue | `lib/services/scheduler/` | A real MongoDB-backed job queue, drained by Vercel Cron hitting `/api/cron/run-due-jobs` every 5 minutes — not Redis/BullMQ (see [ADR-0003](../development/adr/0003-queue-architecture.md)) |
+| Queue | `lib/services/scheduler/` | A real MongoDB-backed job queue, drained by Vercel Cron hitting `/api/cron/run-due-jobs`. Shipped `vercel.json` schedule is daily (`0 0 * * *`, Hobby-compatible); production should use Pro `*/5 * * * *` or an external 5-minute caller with `CRON_SECRET` — not Redis/BullMQ (see [ADR-0003](../development/adr/0003-queue-architecture.md)) |
 | Workers | none (serverless) | Job execution happens inside the same cron-triggered serverless invocation, with an internal 45s time budget so a batch never risks a mid-job kill; see [RUNBOOK.md](../../RUNBOOK.md) |
 | Cron | `vercel.json` | One cron entry, `/api/cron/run-due-jobs`, `CRON_SECRET`-authenticated |
 | Credential resolver | `lib/services/tenantCredentials/` | Per-organization encrypted provider credentials, resolved ahead of any deployment-wide env default; see [tenant.md](tenant.md) |

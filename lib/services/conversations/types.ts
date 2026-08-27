@@ -105,6 +105,12 @@ export interface ConversationListFilters {
    *  find this lead's conversation(s) to pull recent message context
    *  from. */
   leadId?: string;
+  /**
+   * Phase 2A — server-only counsellor ownership scope. Set by
+   * scopeConversationListFilters(); never taken from query params.
+   * Matches assignedTo === userId OR leadId ∈ leadIds.
+   */
+  ownershipScope?: { userId: string; leadIds: string[] };
 }
 
 /** Module 2.2 (Rich Messaging) — every shape a reply from the thread

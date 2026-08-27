@@ -38,7 +38,11 @@ async function handleImportCsv(request: Request, ctx: ApiRouteContext): Promise<
     throw new ValidationApiError(result.errors);
   }
 
-  return apiSuccess({ campaign: result.campaign, importResult: result.result });
+  return apiSuccess({
+    campaign: result.campaign,
+    importResult: result.result,
+    excludedCount: result.excludedCount,
+  });
 }
 
 // RC-4 — Serverless Limits: same reasoning as the general CRM CSV

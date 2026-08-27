@@ -40,27 +40,12 @@ Day-to-day pipeline work happens through Leads/Tasks/Activities above.
 pipeline/leaderboard analytics, or configure a pipeline — all
 Manager+.
 
-## Conversations — a real, current limitation, not an oversight to assume away
+## Conversations (Phase 2A)
 
-**Every conversation route currently requires the Admin tier** —
-`GET`/reply/assign/notes/labels/status/AI-reply/insights on a
-Conversation are all `requiredRole: "admin"` today, verified directly
-against every route's real registration (see
-[`docs/api/inventory.md`](../api/inventory.md#conversations)). A
-Counsellor account, despite being the role most naturally suited to
-day-to-day conversation handling, **cannot** open the Conversations
-inbox through the current admin API. This is stated here plainly
-because it's a real, surprising-if-undocumented gap between what a
-Counsellor's role conceptually implies and what the RBAC gate actually
-enforces — flagged as a real product gap for a future RC to evaluate
-(should Conversations open up to Counsellor/Manager?), not silently
-assumed to already work.
+You can open **Conversations** for WhatsApp/email threads tied to
+**leads assigned to you** (or conversations where you are the explicit
+`assignedTo` assignee). You can reply, add notes, open/close, and use
+AI reply/insights on those threads. You **cannot** assign conversations
+or edit labels (Manager+). Unassigned org-wide threads stay invisible
+to you until a Manager assigns the lead or the conversation.
 
-## What you cannot do, summarized
-
-Configure the CRM (pipelines, custom fields, assignment rules),
-reassign leads/tasks, run bulk operations, see Analytics/Automation/
-Billing/Integrations/Team/Webhooks/Audit Logs/Settings, or access
-Conversations (see above). All of these require Manager or Admin — see
-[`docs/architecture/rbac.md`](../architecture/rbac.md) for the full
-matrix.

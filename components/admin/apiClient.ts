@@ -601,7 +601,7 @@ export function resolveWhatsAppCampaignAudience(
 export async function importWhatsAppCampaignCsv(
   id: string,
   file: File,
-): Promise<ApiClientResult<{ campaign: WhatsAppCampaign; importResult: CsvImportResult }>> {
+): Promise<ApiClientResult<{ campaign: WhatsAppCampaign; importResult: CsvImportResult; excludedCount?: number }>> {
   const formData = new FormData();
   formData.append("file", file);
   const response = await fetch(`/api/admin/whatsapp-campaigns/${id}/import`, {
@@ -1490,7 +1490,10 @@ export function listConversations(
   page: number,
   limit: number,
 ): Promise<ApiClientResult<PaginatedResult<Conversation>>> {
-  return apiFetch(`/api/admin/conversations?${buildQuery({ ...filters, page, limit })}`);
+  // ownershipScope is server-only (Phase 2A counsellor force-scope) — never
+  // sent as a query param even if somehow present on a shared type.
+  const { ownershipScope: _ownershipScope, ...publicFilters } = filters;
+  return apiFetch(`/api/admin/conversations?${buildQuery({ ...publicFilters, page, limit })}`);
 }
 
 export function getConversationThread(

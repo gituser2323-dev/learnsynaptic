@@ -7,9 +7,9 @@ import type { RateLimitResult, RateLimiter } from "./types";
  * deployment each instance enforces the limit independently, meaning the
  * effective global limit is roughly (configured limit × instance count),
  * not the configured limit exactly. This is an honest trade-off, not a
- * bug — swapping in a Redis-backed RateLimiter (e.g. Upstash) later is a
- * one-file change because callers depend only on the RateLimiter
- * interface (types.ts), never on this implementation.
+ * bug — swapping in a Redis-backed RateLimiter (e.g. Upstash) is done
+ * via getRateLimiter() in index.ts when UPSTASH_REDIS_REST_* are set;
+ * callers depend only on the RateLimiter interface (types.ts).
  *
  * Bucket count is capped: once the map exceeds MAX_BUCKETS, expired
  * entries are swept before adding a new one, so long-running processes

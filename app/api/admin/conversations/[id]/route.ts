@@ -1,7 +1,7 @@
 import type { NextResponse } from "next/server";
 import { withApiRoute, apiSuccess, NotFoundApiError } from "@/lib/api";
 import type { ApiRouteContext } from "@/lib/api";
-import { conversationService } from "@/lib/services/conversations";
+import { conversationService, requireAccessibleConversation } from "@/lib/services/conversations";
 
 /**
  * GET /api/admin/conversations/[id]
@@ -12,16 +12,17 @@ import { conversationService } from "@/lib/services/conversations";
  * side effect of opening it — see conversationService.getThread()'s
  * own comment.
  *
- * ⚠️ requiredRole: "admin".
+ * Phase 2A — requiredRole counsellor + ownership assert.
  */
 async function handleGetThread(_request: Request, ctx: ApiRouteContext): Promise<NextResponse> {
   const { id } = ctx.params;
+  await requireAccessibleConversation(ctx, id);
   const thread = await conversationService.getThread(id);
   if (!thread) throw new NotFoundApiError("Conversation", id);
   return apiSuccess({ ...thread });
 }
 
 export const GET = withApiRoute("admin.conversations.get", handleGetThread, {
-  requiredRole: "admin",
+  requiredRole: "counsellor",
   rateLimit: { limit: 60, windowMs: 60_000 },
 });

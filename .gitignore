@@ -43,6 +43,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# Local staging MongoDB data directory (non-production)
+.data/
+
 # vercel
 .vercel
 
@@ -57,3 +60,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+.staging-admin.credentials
+
+
+.storage-uploads-staging/
+

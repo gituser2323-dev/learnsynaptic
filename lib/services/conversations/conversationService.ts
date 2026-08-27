@@ -4,6 +4,8 @@ import { activityService } from "@/lib/services/crm/activities";
 import { publish } from "@/lib/events";
 import { whatsappService } from "@/lib/services/whatsapp";
 import { emailService } from "@/lib/services/email";
+import { leadService } from "@/lib/services/leads";
+import { isWhatsAppStopKeyword } from "@/lib/services/whatsappCampaigns/marketingConsent";
 import type { AuditContext } from "@/lib/services/auditLog";
 import type { Activity } from "@/lib/services/crm/activities";
 import type { Message } from "@/lib/services/whatsappCampaigns";
@@ -236,6 +238,12 @@ export const conversationService = {
         const repository = await getConversationRepository();
         await repository.update(conversation.id, { leadId: lead.id });
       }
+    }
+
+    // Phase 2B — STOP / UNSUBSCRIBE / CANCEL / REMOVE ME → marketing opt-out.
+    // Conversation + message history are preserved; only consent flips.
+    if (input.messageType === "text" && isWhatsAppStopKeyword(input.body)) {
+      await leadService.recordWhatsAppMarketingOptOut(input.fromPhoneE164, "STOP keyword");
     }
 
     await publish("message.received", {

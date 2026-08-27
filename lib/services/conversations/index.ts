@@ -1,4 +1,10 @@
 export { conversationService, ConversationSendFailedError } from "./conversationService";
+export {
+  assertCanAccessConversation,
+  requireAccessibleConversation,
+  scopeConversationListFilters,
+  listCounsellorLeadIds,
+} from "./conversationAccess";
 export type {
   Conversation,
   ConversationChannel,

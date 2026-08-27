@@ -3,6 +3,7 @@ import {
   getMessageAttemptRepository,
   getCampaignTemplateRepository,
   getWhatsAppCampaignRepository,
+  getLeadRepository,
 } from "@/lib/db";
 import { whatsappService } from "@/lib/services/whatsapp";
 import { conversationService } from "@/lib/services/conversations";
@@ -10,6 +11,11 @@ import { registerJobHandler } from "@/lib/services/scheduler";
 import type { JobOutcome, ScheduledJob } from "@/lib/services/scheduler";
 import { enqueueMessagesForSending, checkCampaignCompletion } from "./whatsappCampaignService";
 import { SEND_MESSAGE_JOB_TYPE, PROMOTE_SCHEDULED_JOB_TYPE } from "./jobTypes";
+import {
+  isWhatsAppMarketingSendAllowed,
+  WHATSAPP_MARKETING_SUPPRESSION_REASON,
+  WHATSAPP_TEMPLATE_NOT_APPROVED_REASON,
+} from "./marketingConsent";
 
 /**
  * Bridges the WhatsApp Campaign Manager onto the shared scheduler
@@ -79,6 +85,34 @@ async function handleSendMessage(job: ScheduledJob): Promise<JobOutcome> {
     // Not retryable: a missing template is a data problem, not a
     // transient one — the same "retrying won't fix a malformed
     // request" reasoning the Meta adapter already applies to 4xx errors.
+    return { result: "failed", retryable: false, error: errorMessage };
+  }
+
+  // Phase 2B — fail closed if Meta has not approved this template.
+  if (template.approvalStatus !== "approved") {
+    const errorMessage = `${WHATSAPP_TEMPLATE_NOT_APPROVED_REASON} (currently "${template.approvalStatus}")`;
+    await messageAttemptRepository.create({ messageId, attemptNumber, status: "failure", errorMessage });
+    await messageRepository.update(messageId, { status: "failed", failureReason: errorMessage, attempts: attemptNumber });
+    if (message.campaignId) {
+      await incrementCampaignCount(message.campaignId, "failedCount");
+      await checkCampaignCompletion(message.campaignId);
+    }
+    return { result: "failed", retryable: false, error: errorMessage };
+  }
+
+  // Phase 2B — defense in depth: re-check marketing consent at send time.
+  const leadRepository = await getLeadRepository();
+  const lead = message.leadId
+    ? await leadRepository.findById(message.leadId)
+    : await leadRepository.findByPhoneOrEmail(message.recipientPhoneE164 as string, "");
+  if (!isWhatsAppMarketingSendAllowed(lead?.whatsappMarketingConsent)) {
+    const errorMessage = WHATSAPP_MARKETING_SUPPRESSION_REASON;
+    await messageAttemptRepository.create({ messageId, attemptNumber, status: "failure", errorMessage });
+    await messageRepository.update(messageId, { status: "failed", failureReason: errorMessage, attempts: attemptNumber });
+    if (message.campaignId) {
+      await incrementCampaignCount(message.campaignId, "failedCount");
+      await checkCampaignCompletion(message.campaignId);
+    }
     return { result: "failed", retryable: false, error: errorMessage };
   }
 

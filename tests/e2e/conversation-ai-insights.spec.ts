@@ -15,13 +15,13 @@ import { addSessionCookie } from "./helpers";
  * CHANGELOG entry).
  */
 test.describe("Conversational Analytics (5.3) — RBAC and error shape", () => {
-  test("a manager session is forbidden — same admin tier as every other Conversations route", async ({ browser, baseURL }) => {
+  test("a manager gets a 404 for a conversation id that doesn't exist (access is counsellor+)", async ({ browser, baseURL }) => {
     const context = await browser.newContext();
     await addSessionCookie(context, baseURL!, "manager");
     const getResponse = await context.request.get(`${baseURL}/api/admin/conversations/no-such-id/insights`);
-    expect(getResponse.status()).toBe(403);
+    expect(getResponse.status()).toBe(404);
     const postResponse = await context.request.post(`${baseURL}/api/admin/conversations/no-such-id/insights`);
-    expect(postResponse.status()).toBe(403);
+    expect(postResponse.status()).toBe(404);
     await context.close();
   });
 
@@ -33,13 +33,11 @@ test.describe("Conversational Analytics (5.3) — RBAC and error shape", () => {
     await context.close();
   });
 
-  test("an admin gets an empty history list for a conversation id that doesn't exist (list doesn't 404)", async ({ browser, baseURL }) => {
+  test("an admin gets a 404 listing insights for a conversation id that doesn't exist", async ({ browser, baseURL }) => {
     const context = await browser.newContext();
     await addSessionCookie(context, baseURL!, "admin");
     const response = await context.request.get(`${baseURL}/api/admin/conversations/no-such-id/insights`);
-    expect(response.ok()).toBeTruthy();
-    const body = await response.json();
-    expect(body.total).toBe(0);
+    expect(response.status()).toBe(404);
     await context.close();
   });
 });

@@ -57,7 +57,8 @@ by `requiredPlatformRole` instead — see the notes column):
 |---|:---:|:---:|:---:|---|
 | Leads (read/create/update) | ✅ | ✅ | ✅ | Bulk operations require Manager |
 | Tasks, Activities, Meetings | ✅ | ✅ | ✅ | Own day-to-day work |
-| Conversations (view, reply, notes) | — | — | ✅ | All 11 conversation routes require Admin today |
+| Conversations (view, reply, notes, AI) | ✅ scoped | ✅ | ✅ | Counsellor: own assignedTo or linked lead only; Manager/Admin: org-wide |
+| Conversations assign / labels | — | ✅ | ✅ | Manager+ (matches lead assignment) |
 | CRM configuration (pipelines, custom fields, assignment rules, tags, merge/duplicates) | — | ✅ | ✅ | Manager can configure; Counsellor cannot |
 | Files (upload/download own attachments) | ✅ | ✅ | ✅ | |
 | Analytics / Executive Dashboard | — | — | ✅ | |
@@ -96,8 +97,8 @@ request. See [`docs/user-guides/platform-admin.md`](../user-guides/platform-admi
 
 - **Counsellor** cannot configure the CRM (pipelines, assignment
   rules), cannot see Analytics/Automation/Billing/Integrations, cannot
-  invite team members, cannot manage conversations directly (today,
-  every conversation route requires Admin).
+  invite team members. Conversations are self-scoped (assigned lead or
+  conversation.assignedTo) — same ownership model as Leads.
 - **Manager** cannot manage Team invitations, Automation, Webhooks,
   Audit Logs, or Settings — these remain Admin-only even though Manager
   outranks Counsellor.

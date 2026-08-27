@@ -22,7 +22,7 @@ Database (MongoDB — Mongoose, one cached connection pool per instance)
 Queue (MongoDB-backed ScheduledJob collection — NOT Redis/BullMQ)
   │
   ▼
-Cron (Vercel Cron → GET /api/cron/run-due-jobs, every 5 minutes)
+Cron (Vercel Cron → GET /api/cron/run-due-jobs; vercel.json = daily on Hobby — use Pro */5 or external 5-min cron in production)
   │
   ▼
 External Providers (WhatsApp/Meta, Email/Postmark, AI, Payments,

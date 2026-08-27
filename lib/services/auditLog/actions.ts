@@ -50,6 +50,8 @@ export const AUDIT_ACTIONS = {
   TAG_CREATED: "tag.created",
   TAG_DELETED: "tag.deleted",
   LEAD_UPDATED: "lead.updated",
+  /** Phase 2B — WhatsApp marketing STOP / opt-out (recipient-initiated). */
+  LEAD_WHATSAPP_OPTED_OUT: "lead.whatsapp_opted_out",
   LEAD_TAGGED: "lead.tagged",
   LEAD_UNTAGGED: "lead.untagged",
   CUSTOM_FIELD_DEFINED: "custom_field.defined",

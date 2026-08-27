@@ -55,10 +55,10 @@ async function main(): Promise<void> {
     const res = await counsellorA.req("GET", "/api/admin/crm/pipelines");
     check("RBAC-01", res.status === 403, `Counsellor -> Manager route (crm.pipelines.list) -> ${res.status} (expect 403)`);
   }
-  // Counsellor -> Admin-tier route
+  // Counsellor -> Conversations list (Phase 2A — counsellor+ with self-scope)
   {
     const res = await counsellorA.req("GET", "/api/admin/conversations");
-    check("RBAC-02", res.status === 403, `Counsellor -> Admin route (conversations.list) -> ${res.status} (expect 403)`);
+    check("RBAC-02", res.status === 200, `Counsellor -> Conversations list (scoped) -> ${res.status} (expect 200)`);
   }
   {
     const res = await counsellorA.req("GET", "/api/admin/team/invitations");

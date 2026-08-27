@@ -973,13 +973,20 @@ function ConversationInsightsPanel({ conversationId }: { conversationId: string 
 
 function ThreadPane({ conversationId, onChanged }: { conversationId: string; onChanged: () => void }) {
   const { user } = useAdminAuth();
+  const canManageAssignment = user?.role === "manager" || user?.role === "admin";
   const [noteBody, setNoteBody] = useState("");
   const [submittingNote, setSubmittingNote] = useState(false);
   const [savingAssign, setSavingAssign] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
 
   const { data, loading, error, reload } = useAdminData(() => getConversationThread(conversationId), [conversationId]);
-  const { data: staffData } = useAdminData(() => listStaff(), []);
+  const { data: staffData } = useAdminData(
+    () =>
+      canManageAssignment
+        ? listStaff()
+        : Promise.resolve({ success: true as const, data: { users: [] as { id: string; name?: string; email: string }[] } }),
+    [canManageAssignment],
+  );
 
   // Fetching the thread marks it read server-side — refresh the list's
   // unread badge to match once that side effect has actually happened.
@@ -1062,27 +1069,36 @@ function ThreadPane({ conversationId, onChanged }: { conversationId: string; onC
            *  would need a matching <option> for the current assignee on
            *  every render; excluding that option to avoid a duplicate
            *  entry left the select with no matching option at all, which
-           *  silently mis-assigned to whatever the browser fell back to. */}
-          <FilterSelect
-            label="Assign to"
-            value=""
-            onChange={(e) => handleAssign(e.target.value)}
-            disabled={savingAssign}
-            className="w-full"
-          >
-            <option value="">{savingAssign ? "Assigning…" : "Assign / reassign…"}</option>
-            {staffData?.users.map((u) => (
-              <option key={u.id} value={u.id}>
-                {u.name || u.email}
-              </option>
-            ))}
-          </FilterSelect>
+           *  silently mis-assigned to whatever the browser fell back to.
+           *  Phase 2A — assign is manager+ (matches lead assignment). */}
+          {canManageAssignment && (
+            <FilterSelect
+              label="Assign to"
+              value=""
+              onChange={(e) => handleAssign(e.target.value)}
+              disabled={savingAssign}
+              className="w-full"
+            >
+              <option value="">{savingAssign ? "Assigning…" : "Assign / reassign…"}</option>
+              {staffData?.users.map((u) => (
+                <option key={u.id} value={u.id}>
+                  {u.name || u.email}
+                </option>
+              ))}
+            </FilterSelect>
+          )}
         </div>
         <div>
           <p className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide" style={{ color: "var(--adm-text-muted)" }}>
             <TagIcon size={13} /> Labels
           </p>
-          <LabelsEditor conversation={conversation} onSaved={reload} />
+          {canManageAssignment ? (
+            <LabelsEditor conversation={conversation} onSaved={reload} />
+          ) : (
+            <p className="text-sm" style={{ color: "var(--adm-text-muted)" }}>
+              {conversation.labels.length > 0 ? conversation.labels.join(", ") : "No labels"}
+            </p>
+          )}
         </div>
       </div>
 
@@ -1172,7 +1188,9 @@ export default function AdminConversationsPage() {
           Conversations
         </h1>
         <p className="mt-1 text-sm" style={{ color: "var(--adm-text-secondary)" }}>
-          A contact&apos;s whole WhatsApp or email history as one thread — assign, label, and reply from here.
+          {user?.role === "counsellor"
+            ? "WhatsApp and email threads for leads assigned to you — reply and add notes from here."
+            : "A contact's whole WhatsApp or email history as one thread — assign, label, and reply from here."}
         </p>
       </div>
 
@@ -1224,7 +1242,13 @@ export default function AdminConversationsPage() {
               {loading && <LoadingState label="Loading conversations…" />}
               {!loading && error && <ErrorState message={error} onRetry={reload} />}
               {!loading && !error && data && data.items.length === 0 && (
-                <EmptyState message="No conversations match these filters." />
+                <EmptyState
+                  message={
+                    user?.role === "counsellor"
+                      ? "No conversations for your assigned leads yet."
+                      : "No conversations match these filters."
+                  }
+                />
               )}
               {!loading &&
                 !error &&

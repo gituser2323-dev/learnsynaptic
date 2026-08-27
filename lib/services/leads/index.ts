@@ -12,6 +12,7 @@ export type {
   // Enterprise CRM (Phase 1)
   UpdateLeadInput,
   DuplicateLeadGroup,
+  WhatsAppMarketingConsent,
 } from "./types";
 
 // Deliberately NOT exported: getLeadRepository (registry.ts) and both

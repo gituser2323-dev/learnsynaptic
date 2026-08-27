@@ -68,6 +68,7 @@ export const inMemoryLeadRepository: LeadRepository = {
       score: 0,
       health: "cold",
       archived: false,
+      whatsappMarketingConsent: "unknown",
       createdAt: nowIso(),
       updatedAt: nowIso(),
     });

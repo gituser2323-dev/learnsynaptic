@@ -2,6 +2,7 @@ import {
   getWhatsAppCampaignRepository,
   getCampaignTemplateRepository,
   getMessageRepository,
+  getLeadRepository,
 } from "@/lib/db";
 import { leadService } from "@/lib/services/leads";
 import type { LeadListFilters } from "@/lib/services/leads";
@@ -9,10 +10,20 @@ import { auditLogService, AUDIT_ACTIONS } from "@/lib/services/auditLog";
 import type { AuditContext } from "@/lib/services/auditLog";
 import { enqueueJob } from "@/lib/services/scheduler";
 import type { PaginatedResult } from "@/lib/pagination";
-import { CSV_IMPORT_MAX_ROWS, MESSAGE_RETRY_POLICY } from "@/config/whatsappCampaigns";
+import {
+  AUDIENCE_FILTER_PAGE_SIZE,
+  CAMPAIGN_SEND_STAGGER_MS,
+  CSV_IMPORT_MAX_ROWS,
+  MESSAGE_RETRY_POLICY,
+} from "@/config/whatsappCampaigns";
 import { validateCreateCampaignInput, validateCreateCampaignTemplateInput } from "./validation";
 import { parseAndValidateCsv, type CsvImportResult } from "./csvImportService";
 import { SEND_MESSAGE_JOB_TYPE, PROMOTE_SCHEDULED_JOB_TYPE } from "./jobTypes";
+import {
+  isWhatsAppMarketingSendAllowed,
+  WHATSAPP_MARKETING_SUPPRESSION_REASON,
+  WHATSAPP_TEMPLATE_NOT_APPROVED_REASON,
+} from "./marketingConsent";
 import type {
   AudienceResolutionResult,
   CampaignTemplate,
@@ -88,23 +99,53 @@ async function finalizeAudience(
 /**
  * Creates a SEND_MESSAGE_JOB_TYPE job for every still-queued Message in
  * a campaign, with the approved 3-attempt/1-5-15-minute retry policy
- * (config/whatsappCampaigns.ts). Called by both sendNow() (immediate)
- * and jobHandlers.ts's promote-scheduled handler (once a scheduled
- * campaign's time arrives) — the one place this logic lives, not
- * duplicated between the two triggers.
+ * (config/whatsappCampaigns.ts). Phase 2B staggers runAt by
+ * CAMPAIGN_SEND_STAGGER_MS so sends are paced without Redis.
+ * Called by both sendNow() (immediate) and jobHandlers.ts's
+ * promote-scheduled handler.
  */
 export async function enqueueMessagesForSending(campaignId: string): Promise<number> {
   const messageRepository = await getMessageRepository();
   const { items } = await messageRepository.list({ campaignId, status: "queued" }, 1, CSV_IMPORT_MAX_ROWS);
-  for (const message of items) {
+  const baseMs = Date.now();
+  for (let i = 0; i < items.length; i++) {
+    const message = items[i];
     await enqueueJob({
       jobType: SEND_MESSAGE_JOB_TYPE,
       payload: { messageId: message.id },
-      runAt: new Date().toISOString(),
+      runAt: new Date(baseMs + i * CAMPAIGN_SEND_STAGGER_MS).toISOString(),
       retryPolicy: MESSAGE_RETRY_POLICY,
     });
   }
   return items.length;
+}
+
+/** Phase 2B — fail closed unless Meta approvalStatus === approved. */
+async function requireApprovedTemplate(
+  templateId: string,
+): Promise<{ ok: true } | { ok: false; errors: CampaignValidationError[] }> {
+  const template = await (await getCampaignTemplateRepository()).findById(templateId);
+  if (!template) {
+    return { ok: false, errors: [{ field: "templateId", message: "No template found for this campaign." }] };
+  }
+  if (template.approvalStatus !== "approved") {
+    return {
+      ok: false,
+      errors: [
+        {
+          field: "templateId",
+          message: `${WHATSAPP_TEMPLATE_NOT_APPROVED_REASON} (currently "${template.approvalStatus}").`,
+        },
+      ],
+    };
+  }
+  return { ok: true };
+}
+
+/** Phase 2B — marketing send requires an opted-in Lead for this phone. */
+async function phoneAllowsMarketingSend(phoneE164: string): Promise<boolean> {
+  const lead = await (await getLeadRepository()).findByPhoneOrEmail(phoneE164, "");
+  return isWhatsAppMarketingSendAllowed(lead?.whatsappMarketingConsent);
 }
 
 /**
@@ -224,22 +265,49 @@ export const whatsappCampaignService = {
     const { campaign } = check;
 
     if (input.source === "filter") {
-      const page = await leadService.listLeads(input.leadFilters as LeadListFilters, 1, CSV_IMPORT_MAX_ROWS);
-      const messageInputs: CreateMessageInput[] = page.items.map((lead) => ({
-        campaignId,
-        recipientPhoneE164: lead.phone,
-        recipientName: lead.name,
-        leadId: lead.id,
-        templateId: campaign.templateId,
-      }));
+      const messageInputs: CreateMessageInput[] = [];
+      let excludedCount = 0;
+      let page = 1;
+      const filters = input.leadFilters as LeadListFilters;
+
+      while (messageInputs.length < CSV_IMPORT_MAX_ROWS) {
+        const remaining = CSV_IMPORT_MAX_ROWS - messageInputs.length;
+        const limit = Math.min(AUDIENCE_FILTER_PAGE_SIZE, remaining);
+        const result = await leadService.listLeads(filters, page, limit);
+        if (result.items.length === 0) break;
+
+        for (const lead of result.items) {
+          if (messageInputs.length >= CSV_IMPORT_MAX_ROWS) break;
+          if (!isWhatsAppMarketingSendAllowed(lead.whatsappMarketingConsent)) {
+            excludedCount += 1;
+            continue;
+          }
+          messageInputs.push({
+            campaignId,
+            recipientPhoneE164: lead.phone,
+            recipientName: lead.name,
+            leadId: lead.id,
+            templateId: campaign.templateId,
+          });
+        }
+
+        if (page * limit >= result.total || result.items.length < limit) break;
+        page += 1;
+      }
+
       const updated = await finalizeAudience(campaign, "filter", messageInputs);
-      return { success: true, campaign: updated, data: { recipientCount: messageInputs.length, rejected: [] } };
+      return {
+        success: true,
+        campaign: updated,
+        data: { recipientCount: messageInputs.length, rejected: [], excludedCount },
+      };
     }
 
     // manual
     const seen = new Set<string>();
     const messageInputs: CreateMessageInput[] = [];
     const rejected: AudienceResolutionResult["rejected"] = [];
+    let excludedCount = 0;
     for (const recipient of input.recipients) {
       if (!recipient.phoneE164) {
         rejected.push({ rawPhone: "", reason: "Missing phone number" });
@@ -250,22 +318,33 @@ export const whatsappCampaignService = {
         continue;
       }
       seen.add(recipient.phoneE164);
+      if (!(await phoneAllowsMarketingSend(recipient.phoneE164))) {
+        excludedCount += 1;
+        rejected.push({ rawPhone: recipient.phoneE164, reason: WHATSAPP_MARKETING_SUPPRESSION_REASON });
+        continue;
+      }
+      const lead = await (await getLeadRepository()).findByPhoneOrEmail(recipient.phoneE164, "");
       messageInputs.push({
         campaignId,
         recipientPhoneE164: recipient.phoneE164,
         recipientName: recipient.name,
+        leadId: lead?.id,
         templateId: campaign.templateId,
       });
     }
     const updated = await finalizeAudience(campaign, "manual", messageInputs);
-    return { success: true, campaign: updated, data: { recipientCount: messageInputs.length, rejected } };
+    return {
+      success: true,
+      campaign: updated,
+      data: { recipientCount: messageInputs.length, rejected, excludedCount },
+    };
   },
 
   async resolveAudienceFromCsv(
     campaignId: string,
     csvText: string,
   ): Promise<
-    | { success: true; campaign: WhatsAppCampaign; result: CsvImportResult }
+    | { success: true; campaign: WhatsAppCampaign; result: CsvImportResult; excludedCount: number }
     | { success: false; errors: CampaignValidationError[] }
   > {
     const check = await requireDraftCampaign(campaignId);
@@ -277,14 +356,42 @@ export const whatsappCampaignService = {
       return { success: false, errors: [{ field: "file", message: parseResult.fileError }] };
     }
 
-    const messageInputs: CreateMessageInput[] = parseResult.recipients.map((recipient) => ({
-      campaignId,
-      recipientPhoneE164: recipient.phoneE164,
-      recipientName: recipient.name,
-      templateId: campaign.templateId,
-    }));
+    const messageInputs: CreateMessageInput[] = [];
+    let excludedCount = 0;
+    const consentRejected = [...parseResult.rejected];
+    for (const recipient of parseResult.recipients) {
+      if (!(await phoneAllowsMarketingSend(recipient.phoneE164))) {
+        excludedCount += 1;
+        consentRejected.push({
+          rowNumber: 0,
+          rawPhone: recipient.phoneE164,
+          reason: WHATSAPP_MARKETING_SUPPRESSION_REASON,
+        });
+        continue;
+      }
+      const lead = await (await getLeadRepository()).findByPhoneOrEmail(recipient.phoneE164, "");
+      messageInputs.push({
+        campaignId,
+        recipientPhoneE164: recipient.phoneE164,
+        recipientName: recipient.name,
+        leadId: lead?.id,
+        templateId: campaign.templateId,
+      });
+    }
     const updated = await finalizeAudience(campaign, "csv_import", messageInputs);
-    return { success: true, campaign: updated, result: parseResult };
+    return {
+      success: true,
+      campaign: updated,
+      excludedCount,
+      result: {
+        ...parseResult,
+        recipients: messageInputs.map((m) => ({
+          phoneE164: m.recipientPhoneE164 as string,
+          name: m.recipientName,
+        })),
+        rejected: consentRejected,
+      },
+    };
   },
 
   // ─── Send / schedule / cancel / retry ───────────────────────────────
@@ -302,6 +409,9 @@ export const whatsappCampaignService = {
         errors: [{ field: "status", message: `Campaign must be "ready" to send (currently "${campaign.status}").` }],
       };
     }
+
+    const templateGate = await requireApprovedTemplate(campaign.templateId);
+    if (!templateGate.ok) return { success: false, errors: templateGate.errors };
 
     await enqueueMessagesForSending(campaignId);
     const updated = await repository.update(campaignId, { status: "sending" });
@@ -333,6 +443,9 @@ export const whatsappCampaignService = {
         errors: [{ field: "status", message: `Campaign must be "ready" to schedule (currently "${campaign.status}").` }],
       };
     }
+
+    const templateGate = await requireApprovedTemplate(campaign.templateId);
+    if (!templateGate.ok) return { success: false, errors: templateGate.errors };
 
     const scheduledDate = new Date(scheduledFor);
     if (Number.isNaN(scheduledDate.getTime()) || scheduledDate.getTime() <= Date.now()) {

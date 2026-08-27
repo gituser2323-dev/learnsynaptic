@@ -30,6 +30,7 @@
     "@aws-sdk/s3-request-presigner": "^3.1100.0",
     "@emailjs/browser": "^4.4.1",
     "@scalar/nextjs-api-reference": "^0.11.12",
+    "@upstash/redis": "^1.38.3",
     "bcryptjs": "^3.0.3",
     "framer-motion": "^12.40.0",
     "jose": "^6.2.4",

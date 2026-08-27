@@ -10,7 +10,7 @@ import {
   ServiceUnavailableApiError,
   UnauthorizedApiError,
 } from "./errors";
-import { inMemoryRateLimiter } from "./rateLimit/inMemory";
+import { getRateLimiter } from "./rateLimit";
 import { getClientIp } from "./clientIp";
 import { getAuthContext, hasRequiredRole, hasPlatformRole } from "./roles";
 import { securityAuditLogService, SECURITY_AUDIT_ACTIONS } from "@/lib/services/auditLog";
@@ -205,7 +205,7 @@ export function withApiRoute(
 
       if (options.rateLimit) {
         const ip = getClientIp(request);
-        const result = await inMemoryRateLimiter.check(
+        const result = await getRateLimiter().check(
           `${routeName}:${ip}`,
           options.rateLimit.limit,
           options.rateLimit.windowMs,

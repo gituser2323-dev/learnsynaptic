@@ -80,7 +80,9 @@ function ResolveAudienceSection({ campaignId, onResolved }: { campaignId: string
       setError(result.errors[0]?.message ?? "Could not resolve audience.");
       return;
     }
-    setNotice(`Resolved ${result.data.resolution.recipientCount} recipients (${result.data.resolution.rejected.length} rejected).`);
+    setNotice(
+      `Resolved ${result.data.resolution.recipientCount} recipients (${result.data.resolution.rejected.length} rejected, ${result.data.resolution.excludedCount ?? 0} excluded for consent).`,
+    );
     onResolved();
   }
 
@@ -104,7 +106,9 @@ function ResolveAudienceSection({ campaignId, onResolved }: { campaignId: string
       setError(result.errors[0]?.message ?? "Could not resolve audience.");
       return;
     }
-    setNotice(`Resolved ${result.data.resolution.recipientCount} recipients (${result.data.resolution.rejected.length} rejected).`);
+    setNotice(
+      `Resolved ${result.data.resolution.recipientCount} recipients (${result.data.resolution.rejected.length} rejected, ${result.data.resolution.excludedCount ?? 0} excluded for consent).`,
+    );
     onResolved();
   }
 
@@ -125,7 +129,7 @@ function ResolveAudienceSection({ campaignId, onResolved }: { campaignId: string
       return;
     }
     setNotice(
-      `Imported ${result.data.importResult.recipients.length} recipients (${result.data.importResult.rejected.length} rejected)${result.data.importResult.truncated ? " — file was truncated to the row cap" : ""}.`,
+      `Imported ${result.data.importResult.recipients.length} recipients (${result.data.importResult.rejected.length} rejected, ${result.data.excludedCount ?? 0} excluded for consent)${result.data.importResult.truncated ? " — file was truncated to the row cap" : ""}.`,
     );
     onResolved();
   }

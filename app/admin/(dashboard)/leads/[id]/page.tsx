@@ -747,6 +747,11 @@ export default function LeadDetailPage() {
     reload();
   }
 
+  async function handleWhatsAppConsentChange(consent: "opted_in" | "opted_out" | "unknown") {
+    await updateLead(leadId, { whatsappMarketingConsent: consent });
+    reload();
+  }
+
   async function handleAssign(counsellorId: string) {
     if (!counsellorId) return;
     setSavingAssign(true);
@@ -806,6 +811,16 @@ export default function LeadDetailPage() {
                   {s}
                 </option>
               ))}
+            </FilterSelect>
+            <FilterSelect
+              label="WhatsApp marketing consent"
+              value={lead.whatsappMarketingConsent ?? "unknown"}
+              onChange={(e) => handleWhatsAppConsentChange(e.target.value as "opted_in" | "opted_out" | "unknown")}
+              className="w-full"
+            >
+              <option value="unknown">Unknown (not opted in)</option>
+              <option value="opted_in">Opted in</option>
+              <option value="opted_out">Opted out</option>
             </FilterSelect>
             <p className="text-xs" style={{ color: "var(--adm-text-muted)" }}>
               Program: <span style={{ color: "var(--adm-text)" }}>{lead.program ?? "—"}</span>

@@ -57,12 +57,20 @@ export interface CreateLeadInput {
   capturedVia?: { formId: string; formName: string };
 }
 
+/** Phase 2B — WhatsApp marketing consent. Campaign marketing sends
+ *  require `opted_in`. Missing/legacy values are treated as `unknown`
+ *  (not opted in). Recipient STOP keywords set `opted_out`. */
+export type WhatsAppMarketingConsent = "opted_in" | "opted_out" | "unknown";
+
 export interface Lead extends CreateLeadInput {
   id: string;
   status: LeadStatus;
   /** Business OS Phase 0 — tenant scaffolding, unset until multi-tenant
    *  activation (Phase 6). See lib/services/organizations/types.ts. */
   organizationId?: string;
+  /** Phase 2B — WhatsApp marketing consent. Missing/legacy → treat as unknown. */
+  whatsappMarketingConsent?: WhatsAppMarketingConsent;
+  whatsappMarketingConsentUpdatedAt?: string;
   /** Enterprise CRM (Phase 1) — Tag ids, not labels (see
    *  lib/services/crm/tags). Denormalized array on the owning record,
    *  same shape as `utm`. */
@@ -159,6 +167,8 @@ export interface UpdateLeadInput {
   health?: Lead["health"];
   assignedCounsellorId?: string;
   archived?: boolean;
+  whatsappMarketingConsent?: WhatsAppMarketingConsent;
+  whatsappMarketingConsentUpdatedAt?: string;
 }
 
 /** Enterprise CRM (Phase 1) — Duplicate Detection review queue. Every

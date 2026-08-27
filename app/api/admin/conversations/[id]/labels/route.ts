@@ -10,7 +10,7 @@ import { conversationService } from "@/lib/services/conversations";
  * wholesale (not a single add/remove) — the UI always sends the full
  * resulting array. Audit-logged (conversation.labeled).
  *
- * ⚠️ requiredRole: "admin".
+ * Phase 2A — requiredRole manager (triage control, not counsellor day-to-day).
  */
 async function handleSetLabels(request: Request, ctx: ApiRouteContext): Promise<NextResponse> {
   const { id } = ctx.params;
@@ -27,6 +27,6 @@ async function handleSetLabels(request: Request, ctx: ApiRouteContext): Promise<
 }
 
 export const PUT = withApiRoute("admin.conversations.labels", handleSetLabels, {
-  requiredRole: "admin",
+  requiredRole: "manager",
   rateLimit: { limit: 40, windowMs: 60_000 },
 });

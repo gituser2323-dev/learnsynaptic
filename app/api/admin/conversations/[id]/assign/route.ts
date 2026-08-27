@@ -10,7 +10,7 @@ import { conversationService } from "@/lib/services/conversations";
  * manager/admin. Audit-logged (conversation.assigned) and mirrored onto
  * the conversation's own Activity feed as a system event.
  *
- * ⚠️ requiredRole: "admin".
+ * Phase 2A — requiredRole manager (matches lead assignment tier).
  */
 async function handleAssign(request: Request, ctx: ApiRouteContext): Promise<NextResponse> {
   const { id } = ctx.params;
@@ -27,6 +27,6 @@ async function handleAssign(request: Request, ctx: ApiRouteContext): Promise<Nex
 }
 
 export const POST = withApiRoute("admin.conversations.assign", handleAssign, {
-  requiredRole: "admin",
+  requiredRole: "manager",
   rateLimit: { limit: 40, windowMs: 60_000 },
 });

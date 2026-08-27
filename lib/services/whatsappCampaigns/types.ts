@@ -476,4 +476,6 @@ export type ResolveAudienceInput =
 export interface AudienceResolutionResult {
   recipientCount: number;
   rejected: { rawPhone: string; reason: string }[];
+  /** Phase 2B — recipients skipped for marketing consent (not opted_in). */
+  excludedCount?: number;
 }

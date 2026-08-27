@@ -1,7 +1,7 @@
 import type { NextResponse } from "next/server";
 import { withApiRoute, apiSuccess, parseJsonBody, ValidationApiError } from "@/lib/api";
 import type { ApiRouteContext } from "@/lib/api";
-import { conversationService } from "@/lib/services/conversations";
+import { conversationService, requireAccessibleConversation } from "@/lib/services/conversations";
 
 /**
  * POST /api/admin/conversations/[id]/notes
@@ -10,10 +10,11 @@ import { conversationService } from "@/lib/services/conversations";
  * conversation's Activity feed (not visible to the contact, WhatsApp-
  * side — this only ever writes to our own Activity timeline).
  *
- * ⚠️ requiredRole: "admin".
+ * Phase 2A — requiredRole counsellor + ownership assert.
  */
 async function handleAddNote(request: Request, ctx: ApiRouteContext): Promise<NextResponse> {
   const { id } = ctx.params;
+  await requireAccessibleConversation(ctx, id);
   const body = (await parseJsonBody(request)) as { body?: string };
   if (!body.body || !body.body.trim()) {
     throw new ValidationApiError([{ field: "body", message: "body is required." }]);
@@ -24,6 +25,6 @@ async function handleAddNote(request: Request, ctx: ApiRouteContext): Promise<Ne
 }
 
 export const POST = withApiRoute("admin.conversations.notes", handleAddNote, {
-  requiredRole: "admin",
+  requiredRole: "counsellor",
   rateLimit: { limit: 40, windowMs: 60_000 },
 });

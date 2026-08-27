@@ -1,6 +1,7 @@
 import type { NextResponse } from "next/server";
 import { withApiRoute, apiSuccess, parsePaginationParams, NotFoundApiError } from "@/lib/api";
 import type { ApiRouteContext } from "@/lib/api";
+import { requireAccessibleConversation } from "@/lib/services/conversations";
 import { conversationInsightService } from "@/lib/services/conversations/insights";
 
 /**
@@ -14,11 +15,11 @@ import { conversationInsightService } from "@/lib/services/conversations/insight
  * 5.1/5.2's own routes established, never turning "no AI provider
  * configured" into an error response.
  *
- * ⚠️ requiredRole: "admin" — same tier as every other Conversations
- * route (see app/api/admin/conversations/[id]/messages/route.ts).
+ * Phase 2A — requiredRole counsellor + ownership assert.
  */
 async function handleListInsights(request: Request, ctx: ApiRouteContext): Promise<NextResponse> {
   const { id } = ctx.params;
+  await requireAccessibleConversation(ctx, id);
   const { searchParams } = new URL(request.url);
   const { page, limit } = parsePaginationParams(searchParams);
   const result = await conversationInsightService.listInsights(id, page, limit);
@@ -27,6 +28,7 @@ async function handleListInsights(request: Request, ctx: ApiRouteContext): Promi
 
 async function handleAnalyzeConversation(_request: Request, ctx: ApiRouteContext): Promise<NextResponse> {
   const { id } = ctx.params;
+  await requireAccessibleConversation(ctx, id);
   const insight = await conversationInsightService.analyzeConversation(id, {
     trigger: "manual",
     actorId: ctx.authContext.userId,
@@ -37,12 +39,12 @@ async function handleAnalyzeConversation(_request: Request, ctx: ApiRouteContext
 }
 
 export const GET = withApiRoute("admin.conversations.insights.list", handleListInsights, {
-  requiredRole: "admin",
+  requiredRole: "counsellor",
   rateLimit: { limit: 60, windowMs: 60_000 },
 });
 
 export const POST = withApiRoute("admin.conversations.insights.analyze", handleAnalyzeConversation, {
-  requiredRole: "admin",
+  requiredRole: "counsellor",
   // AI vendor calls are slow and costed per-call — same tighter limit
   // 5.1/5.2's own analyze routes use.
   rateLimit: { limit: 10, windowMs: 60_000 },

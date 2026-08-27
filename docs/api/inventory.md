@@ -150,17 +150,17 @@ control, the same shape a real S3 presigned URL already has.
 
 | Method | Route | Route name | Auth | Rate limit |
 |---|---|---|---|---|
-| GET | `/api/admin/conversations` | `admin.conversations.list` | Session, role ≥ `admin` | 60/60_000 |
-| GET | `/api/admin/conversations/media/{messageId}` | `admin.conversations.media` | Session, role ≥ `admin` | 60/60_000 |
-| GET | `/api/admin/conversations/{id}` | `admin.conversations.get` | Session, role ≥ `admin` | 60/60_000 |
-| POST | `/api/admin/conversations/{id}/ai-reply` | `admin.conversations.aiReply.generate` | Session, role ≥ `admin` | 15/60_000 |
-| POST | `/api/admin/conversations/{id}/assign` | `admin.conversations.assign` | Session, role ≥ `admin` | 40/60_000 |
-| GET | `/api/admin/conversations/{id}/insights` | `admin.conversations.insights.list` | Session, role ≥ `admin` | 60/60_000 |
-| POST | `/api/admin/conversations/{id}/insights` | `admin.conversations.insights.analyze` | Session, role ≥ `admin` | 10/60_000 |
-| PUT | `/api/admin/conversations/{id}/labels` | `admin.conversations.labels` | Session, role ≥ `admin` | 40/60_000 |
-| POST | `/api/admin/conversations/{id}/messages` | `admin.conversations.sendMessage` | Session, role ≥ `admin` | 30/60_000 |
-| POST | `/api/admin/conversations/{id}/notes` | `admin.conversations.notes` | Session, role ≥ `admin` | 40/60_000 |
-| PATCH | `/api/admin/conversations/{id}/status` | `admin.conversations.status` | Session, role ≥ `admin` | 40/60_000 |
+| GET | `/api/admin/conversations` | `admin.conversations.list` | Session, role ≥ `counsellor` (self-scoped) | 60/60_000 |
+| GET | `/api/admin/conversations/media/{messageId}` | `admin.conversations.media` | Session, role ≥ `counsellor` (ownership) | 60/60_000 |
+| GET | `/api/admin/conversations/{id}` | `admin.conversations.get` | Session, role ≥ `counsellor` (ownership) | 60/60_000 |
+| POST | `/api/admin/conversations/{id}/ai-reply` | `admin.conversations.aiReply.generate` | Session, role ≥ `counsellor` (ownership) | 15/60_000 |
+| POST | `/api/admin/conversations/{id}/assign` | `admin.conversations.assign` | Session, role ≥ `manager` | 40/60_000 |
+| GET | `/api/admin/conversations/{id}/insights` | `admin.conversations.insights.list` | Session, role ≥ `counsellor` (ownership) | 60/60_000 |
+| POST | `/api/admin/conversations/{id}/insights` | `admin.conversations.insights.analyze` | Session, role ≥ `counsellor` (ownership) | 10/60_000 |
+| PUT | `/api/admin/conversations/{id}/labels` | `admin.conversations.labels` | Session, role ≥ `manager` | 40/60_000 |
+| POST | `/api/admin/conversations/{id}/messages` | `admin.conversations.sendMessage` | Session, role ≥ `counsellor` (ownership) | 30/60_000 |
+| POST | `/api/admin/conversations/{id}/notes` | `admin.conversations.notes` | Session, role ≥ `counsellor` (ownership) | 40/60_000 |
+| PATCH | `/api/admin/conversations/{id}/status` | `admin.conversations.status` | Session, role ≥ `counsellor` (ownership) | 40/60_000 |
 
 ### Crm
 

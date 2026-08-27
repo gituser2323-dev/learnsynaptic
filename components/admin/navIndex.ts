@@ -88,7 +88,7 @@ export const NAV_SEARCH_INDEX: NavSearchEntry[] = [
   { href: "/admin/registrations", label: "Registrations", icon: ClipboardList, keywords: ["students", "cohort"], group: "Growth", minRole: "admin" },
   { href: "/admin/payments", label: "Payments", icon: CreditCard, keywords: ["transactions", "razorpay", "stripe", "cashfree", "refunds", "revenue"], group: "Growth", minRole: "manager" },
   { href: "/admin/attendance", label: "Attendance", icon: CalendarCheck, keywords: ["sessions", "present"], group: "Growth", minRole: "admin" },
-  { href: "/admin/conversations", label: "Conversations", icon: Inbox, keywords: ["inbox", "thread", "chat", "replies"], group: "Automation", minRole: "admin" },
+  { href: "/admin/conversations", label: "Conversations", icon: Inbox, keywords: ["inbox", "thread", "chat", "replies"], group: "Automation", minRole: "counsellor" },
   { href: "/admin/whatsapp", label: "WhatsApp", icon: MessageCircle, keywords: ["messages", "delivery"], group: "Automation", minRole: "admin" },
   { href: "/admin/automation", label: "Workflows", icon: Workflow, keywords: ["automation", "runs"], group: "Automation", minRole: "admin" },
   { href: "/admin/templates", label: "Templates", icon: FileText, keywords: ["whatsapp templates", "meta"], group: "Automation", minRole: "admin" },

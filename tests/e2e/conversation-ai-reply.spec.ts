@@ -15,13 +15,13 @@ import { addSessionCookie } from "./helpers";
  * CHANGELOG entry), the same split 2.1/2.2 already took.
  */
 test.describe("AI-Assisted Replies (5.2) — RBAC and error shape", () => {
-  test("a manager session is forbidden — same admin tier as every other Conversations route", async ({ browser, baseURL }) => {
+  test("a manager gets a 404 for a conversation id that doesn't exist (access is counsellor+)", async ({ browser, baseURL }) => {
     const context = await browser.newContext();
     await addSessionCookie(context, baseURL!, "manager");
     const response = await context.request.post(`${baseURL}/api/admin/conversations/no-such-id/ai-reply`, {
       data: { tone: "professional" },
     });
-    expect(response.status()).toBe(403);
+    expect(response.status()).toBe(404);
     await context.close();
   });
 

@@ -16,8 +16,13 @@ app's actual deployment target.
 
 Extend the existing MongoDB-backed `ScheduledJob` mechanism into a
 real, atomic-claim, retry-with-backoff queue, drained by Vercel Cron
-hitting a dedicated route (`GET /api/cron/run-due-jobs`) every 5
-minutes. Redis/BullMQ was evaluated and **not** adopted.
+hitting a dedicated route (`GET /api/cron/run-due-jobs`). Intended
+production cadence is every ~5 minutes (Vercel Pro `*/5 * * * *` or an
+external scheduler with `CRON_SECRET`). The checked-in `vercel.json`
+may remain daily (`0 0 * * *`) on Hobby-compatible deploys — operators
+must upgrade the schedule before treating async jobs as near-real-time.
+Redis/BullMQ was evaluated and **not** adopted (optional Upstash Redis
+for **API rate limiting only** is unrelated to this queue decision).
 
 ## Consequences
 

@@ -22,10 +22,31 @@ function buildQuery(filters: ConversationListFilters): Record<string, unknown> {
   if (filters.assignedTo) query.assignedTo = filters.assignedTo;
   if (filters.label) query.labels = filters.label;
   if (filters.leadId) query.leadId = filters.leadId;
+
+  const andClauses: Record<string, unknown>[] = [];
+
+  if (filters.ownershipScope) {
+    const { userId, leadIds } = filters.ownershipScope;
+    const ownershipOr: Record<string, unknown>[] = [{ assignedTo: userId }];
+    if (leadIds.length > 0) {
+      ownershipOr.push({ leadId: { $in: leadIds } });
+    }
+    andClauses.push({ $or: ownershipOr });
+  }
+
   if (filters.search) {
     const regex = new RegExp(escapeRegex(filters.search), "i");
-    query.$or = [{ contactName: regex }, { contactPhoneE164: regex }, { contactEmail: regex }];
+    andClauses.push({
+      $or: [{ contactName: regex }, { contactPhoneE164: regex }, { contactEmail: regex }],
+    });
   }
+
+  if (andClauses.length === 1) {
+    Object.assign(query, andClauses[0]);
+  } else if (andClauses.length > 1) {
+    query.$and = andClauses;
+  }
+
   return query;
 }
 

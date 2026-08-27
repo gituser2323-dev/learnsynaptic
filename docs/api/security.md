@@ -78,15 +78,23 @@ full mechanism and which entities are actually tenant-scoped.
 
 ## 5 · Rate limiting
 
-Per-route, per-client-IP (`lib/api/rateLimit/inMemory.ts`),
-`limit`/`windowMs` configured individually per route (see the "Rate
-limit" column in [`inventory.md`](inventory.md)) — most authentication-
+Per-route, per-client-IP via the `RateLimiter` interface
+(`lib/api/rateLimit/`), selected by `getRateLimiter()`:
+
+- **Default:** in-memory fixed window (`inMemory.ts`) — per serverless
+  instance only.
+- **Production (optional):** set `UPSTASH_REDIS_REST_URL` +
+  `UPSTASH_REDIS_REST_TOKEN` to use the Upstash Redis adapter
+  (`upstash.ts`) for distributed limits across isolates. Redis is used
+  **only** for rate limiting — not as a job queue (ADR-0003).
+
+`limit`/`windowMs` are configured per route (see the "Rate limit"
+column in [`inventory.md`](inventory.md)) — most authentication-
 adjacent routes (login, register, forgot-password) use a tighter
 window (5–10 requests/15min) than ordinary CRUD routes (30–60/min).
-**This limiter is in-memory, per serverless instance** — it bounds
-abuse from a single client hitting a single warm instance; it is not a
-distributed, cross-instance rate limit. A `429` response includes a
-computed `Retry-After` derived from the limiter's own reset time.
+A `429` response includes a computed `Retry-After` derived from the
+limiter's own reset time. Upstash errors fail open (allow + warn) so a
+Redis outage does not lock out all API traffic.
 
 ## 6 · Idempotency
 

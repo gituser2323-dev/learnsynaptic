@@ -209,18 +209,23 @@ export const leadService = {
       if (errors.length > 0) return { success: false, errors };
     }
 
+    const patch: UpdateLeadInput = { ...input };
+    if (patch.whatsappMarketingConsent !== undefined) {
+      patch.whatsappMarketingConsentUpdatedAt = new Date().toISOString();
+    }
+
     const repository = await getLeadRepository();
-    const updated = await repository.update(id, input);
+    const updated = await repository.update(id, patch);
     await auditLogService.record({
       action: AUDIT_ACTIONS.LEAD_UPDATED,
       entityType: "Lead",
       entityId: id,
       actorId: context.actorId,
       requestId: context.requestId,
-      metadata: { fields: Object.keys(input) },
+      metadata: { fields: Object.keys(patch) },
     });
 
-    const scoringRelevantChange = input.status !== undefined;
+    const scoringRelevantChange = patch.status !== undefined;
     if (scoringRelevantChange) await recomputeAndPersistScore(id);
 
     const final = scoringRelevantChange ? ((await repository.findById(id)) ?? updated) : updated;
@@ -230,9 +235,54 @@ export const leadService = {
     // Slack workspace) may care about any lead edit, not just status
     // changes; publishing every update keeps this event honest rather
     // than only firing for the subset this module happens to score on.
-    await publish("lead.updated", { leadId: id, name: final.name, email: final.email, status: final.status, fields: Object.keys(input) });
+    await publish("lead.updated", { leadId: id, name: final.name, email: final.email, status: final.status, fields: Object.keys(patch) });
 
     return { success: true, lead: final };
+  },
+
+  /**
+   * Phase 2B — recipient STOP / unsubscribe. Looks up Lead by phone
+   * (tenant-scoped), sets opted_out, timeline + audit. No-op if no Lead.
+   * Preserves conversation history.
+   */
+  async recordWhatsAppMarketingOptOut(
+    phoneE164: string,
+    reason = "STOP keyword",
+  ): Promise<Lead | null> {
+    const repository = await getLeadRepository();
+    const lead = await repository.findByPhoneOrEmail(phoneE164, "");
+    if (!lead) return null;
+    if (lead.whatsappMarketingConsent === "opted_out") return lead;
+
+    const updated = await repository.update(lead.id, {
+      whatsappMarketingConsent: "opted_out",
+      whatsappMarketingConsentUpdatedAt: new Date().toISOString(),
+    });
+
+    await activityService.logSystemEvent(
+      "Lead",
+      lead.id,
+      `WhatsApp marketing opt-out (${reason})`,
+      lead.organizationId,
+    );
+
+    await auditLogService.record({
+      action: AUDIT_ACTIONS.LEAD_WHATSAPP_OPTED_OUT,
+      entityType: "Lead",
+      entityId: lead.id,
+      actorType: "system",
+      metadata: { phoneE164, reason },
+    });
+
+    await publish("lead.updated", {
+      leadId: lead.id,
+      name: updated.name,
+      email: updated.email,
+      status: updated.status,
+      fields: ["whatsappMarketingConsent"],
+    });
+
+    return updated;
   },
 
   async tagLead(id: string, tagIds: string[], context: AuditContext = {}): Promise<Lead> {

@@ -72,6 +72,13 @@ export const inMemoryConversationRepository: ConversationRepository = {
     if (filters.leadId) items = items.filter((c) => c.leadId === filters.leadId);
     if (filters.assignedTo) items = items.filter((c) => c.assignedTo === filters.assignedTo);
     if (filters.label) items = items.filter((c) => c.labels.includes(filters.label as string));
+    if (filters.ownershipScope) {
+      const { userId, leadIds } = filters.ownershipScope;
+      const leadIdSet = new Set(leadIds);
+      items = items.filter(
+        (c) => c.assignedTo === userId || (c.leadId !== undefined && leadIdSet.has(c.leadId)),
+      );
+    }
     if (filters.search) {
       const q = filters.search.toLowerCase();
       items = items.filter(

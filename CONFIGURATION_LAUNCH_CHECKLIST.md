@@ -142,8 +142,11 @@ documented prerequisite for the feature next to it to do anything.
 | 1 | Production database | `MONGODB_URI` | Platform Console → Dashboard → Platform Health → "Database: ok" |
 | 2 | Auth secrets (unique to this deployment, never reused from local dev) | `JWT_ACCESS_TOKEN_SECRET`, `AUTH_OAUTH_STATE_SECRET` | Platform Health → "Authentication: ok" |
 | 3 | Encryption-at-rest secrets (4 separate keys) | `MFA_ENCRYPTION_SECRET`, `TENANT_CREDENTIAL_ENCRYPTION_SECRET`, `WEBHOOK_SECRET_ENCRYPTION_SECRET`, `CALENDAR_TOKEN_ENCRYPTION_SECRET` | Platform Health → "Encryption: ok" |
-| 4 | Cron (nothing async fires without this) | `CRON_SECRET` (must match `vercel.json`'s deploy config) | Platform Health → "Cron: ok" and "Queue: ok" |
+| 4 | Cron (nothing async fires without this) | `CRON_SECRET` + production schedule: Hobby `vercel.json` is daily (`0 0 * * *`); for ≤5‑min drain use **Vercel Pro** + `*/5 * * * *` **or** external cron → `GET /api/cron/run-due-jobs` with Bearer `CRON_SECRET` | Platform Health → "Cron: ok" and "Queue: ok"; confirm jobs leave `due` within your RTO |
 | 5 | Durable file storage (default `local` does not survive a serverless deploy) | `STORAGE_PROVIDER=aws_s3` (or `cloudinary`) + that vendor's keys below | Settings → Integrations → AWS S3 → Connect → **Test Connection** |
+| 5b | Atlas Cloud Backup (PITR) | Operator: MongoDB Atlas cluster **M10+**, enable Cloud Backup / Continuous PITR; retain per `DR_RUNBOOK.md` | Run `npm run db:verify-backup` / restore drill on a non-prod clone |
+| 5c | Legal pages (Footer destinations) | Counsel-approved copy on `/privacy`, `/terms`, `/refund-policy` (route shells ship; placeholder until legal signs off) | Open each URL — must 200, not 404 |
+| 5d | Distributed API rate limits (optional) | `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (rate limit only — not a queue) | Burst a rate-limited route across instances; expect shared 429 |
 
 ### Configure per real feature you intend to offer (each is independently optional)
 
@@ -152,7 +155,7 @@ documented prerequisite for the feature next to it to do anything.
 | 6 | Real WhatsApp sending | `WHATSAPP_PROVIDER=meta-cloud-api` + `WHATSAPP_META_*` (platform default), **or** an org self-connects via Settings → Integrations → WhatsApp → Embedded Signup (needs `WHATSAPP_META_APP_ID`/`_EMBEDDED_SIGNUP_CONFIG_ID` set first) | Settings → Integrations → WhatsApp → **Test Connection** |
 | 7 | Real email sending (Postmark) | `EMAIL_PROVIDER=postmark` + `EMAIL_POSTMARK_SERVER_TOKEN`/`_FROM_ADDRESS` | Settings → Integrations → Email → **Test Connection** |
 | 8 | AI features (Lead Insights, Reply Assistant, Conversational Analytics) | `AI_PROVIDER=openai\|anthropic\|gemini` + that vendor's `*_API_KEY` | Settings → Integrations → (OpenAI/Anthropic/Gemini) → **Test Connection** |
-| 9 | Payment collection | `RAZORPAY_KEY_ID`/`_SECRET` and/or `STRIPE_SECRET_KEY` and/or `CASHFREE_APP_ID`/`_SECRET_KEY` | Settings → Integrations → (provider) → Connect → **Test Connection** |
+| 9 | Payment collection (India) | `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` / `RAZORPAY_WEBHOOK_SECRET` (Test Mode for staging). Connect Razorpay in Settings → Integrations. Keep PhonePe/PayPal disabled. Stripe optional for international only. | Settings → Integrations → Razorpay → Connect → **Test Connection**; create INR payment → webhook |
 | 10 | Calendar scheduling / video links | `GOOGLE_OAUTH_*`, `MICROSOFT_OAUTH_*`, and/or `ZOOM_OAUTH_*` (each is its own OAuth app, separate from Social Login's `AUTH_GOOGLE_*`/`AUTH_MICROSOFT_*`) | Settings → Integrations → (provider) → Connect (redirects to real consent screen) → **Sync now** |
 | 11 | Team Slack/Teams/Discord alerts | Paste that channel's own Incoming Webhook URL directly in Settings → Integrations — no env var | Settings → Integrations → (provider) → **Test Notification** |
 | 12 | Outbound webhooks to a customer's own system | `WEBHOOK_SECRET_ENCRYPTION_SECRET` (platform, one-time — see #3) then an org registers its own endpoint in Settings → Integrations → Webhook Endpoints | Register an endpoint → trigger a real event → check its Deliveries tab |

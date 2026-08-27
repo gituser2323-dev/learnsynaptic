@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { withApiRoute, NotFoundApiError, UpstreamServiceApiError } from "@/lib/api";
 import type { ApiRouteContext } from "@/lib/api";
 import { getMessageRepository } from "@/lib/db";
+import { requireAccessibleConversation } from "@/lib/services/conversations";
 import { whatsappService } from "@/lib/services/whatsapp";
 import { createLogger } from "@/lib/logger";
 
@@ -26,7 +27,7 @@ const logger = createLogger({ service: "conversations.mediaProxy" });
  * sends never hit this route (they're sent by URL, and that URL is
  * already public — see WhatsAppMediaPayload's own doc comment).
  *
- * ⚠️ requiredRole: "admin" — this is not a public asset URL.
+ * Phase 2A — requiredRole counsellor + ownership via parent conversation.
  */
 async function handleGetMedia(_request: Request, ctx: ApiRouteContext): Promise<NextResponse> {
   const { messageId } = ctx.params;
@@ -36,6 +37,11 @@ async function handleGetMedia(_request: Request, ctx: ApiRouteContext): Promise<
   if (!message || !message.mediaId) {
     throw new NotFoundApiError("Media", messageId);
   }
+
+  if (!message.conversationId) {
+    throw new NotFoundApiError("Media", messageId);
+  }
+  await requireAccessibleConversation(ctx, message.conversationId);
 
   const resolved = await whatsappService.resolveInboundMediaUrl(message.mediaId);
   if (!resolved) {
@@ -61,6 +67,6 @@ async function handleGetMedia(_request: Request, ctx: ApiRouteContext): Promise<
 }
 
 export const GET = withApiRoute("admin.conversations.media", handleGetMedia, {
-  requiredRole: "admin",
+  requiredRole: "counsellor",
   rateLimit: { limit: 60, windowMs: 60_000 },
 });

@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { whatsappCampaignService, checkCampaignCompletion } from "./whatsappCampaignService";
-import { getMessageRepository, getWhatsAppCampaignRepository } from "@/lib/db";
+import { getMessageRepository, getWhatsAppCampaignRepository, getCampaignTemplateRepository } from "@/lib/db";
 import { validateCreateCampaignInput } from "./validation";
+import { leadService } from "@/lib/services/leads";
 
 /**
  * WhatsApp Platform (Phase 2), Module 2.5 — Campaign Enhancements.
@@ -20,7 +21,22 @@ async function createTestTemplate(): Promise<string> {
     variableLabels: [],
   });
   if (!result.success) throw new Error(`Failed to create test template: ${JSON.stringify(result.errors)}`);
+  await (await getCampaignTemplateRepository()).updateApprovalStatus(result.template.id, {
+    approvalStatus: "approved",
+    approvalStatusCheckedAt: new Date().toISOString(),
+  });
   return result.template.id;
+}
+
+async function createOptedInLead(phone: string, name: string): Promise<void> {
+  const created = await leadService.registerLead({
+    name,
+    email: `${phone.replace(/\+/g, "")}@example.com`,
+    phone,
+    source: "unit_test",
+  });
+  if (!created.success) throw new Error(JSON.stringify(created.errors));
+  await leadService.updateLead(created.lead.id, { whatsappMarketingConsent: "opted_in" });
 }
 
 async function createTestCampaign(overrides: Record<string, unknown> = {}): Promise<string> {
@@ -68,7 +84,9 @@ describe("whatsappCampaignService.cloneCampaign — the module's own Definition 
     const campaignId = await createTestCampaign();
 
     // Resolve a real audience — this is what actually creates Message
-    // rows against the source campaign.
+    // rows against the source campaign. Phase 2B requires opted_in Leads.
+    await createOptedInLead("+919876500001", "Recipient One");
+    await createOptedInLead("+919876500002", "Recipient Two");
     const resolveResult = await whatsappCampaignService.resolveAudience(campaignId, {
       source: "manual",
       recipients: [{ phoneE164: "+919876500001", name: "Recipient One" }, { phoneE164: "+919876500002" }],

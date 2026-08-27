@@ -11,6 +11,17 @@ import type { SchedulerRetryPolicy } from "@/lib/services/scheduler";
  *  cap being a simple in-memory buffer today. */
 export const CSV_IMPORT_MAX_ROWS = Number(process.env.CAMPAIGN_CSV_IMPORT_MAX_ROWS) || 5000;
 
+/** Phase 2B — stagger ScheduledJob.runAt when enqueueing campaign sends
+ *  (ms between recipients). Not a full Meta TPS controller; reduces
+ *  burst pressure under serverless without Redis. Default 750ms. */
+export const CAMPAIGN_SEND_STAGGER_MS = Math.max(
+  0,
+  Number(process.env.CAMPAIGN_SEND_STAGGER_MS) || 750,
+);
+
+/** Page size when paginating filter audiences up to CSV_IMPORT_MAX_ROWS. */
+export const AUDIENCE_FILTER_PAGE_SIZE = 500;
+
 /** Approved decision 4: max 3 attempts, exponential backoff at 1/5/15
  *  minutes, then permanently failed. Applied to every WhatsApp
  *  campaign message-send job via the shared scheduler

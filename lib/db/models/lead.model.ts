@@ -1,5 +1,5 @@
 import { Schema, model, models, Types, type Document, type Model } from "mongoose";
-import type { Lead, LeadStatus, LeadUtmParams } from "@/lib/services/leads/types";
+import type { Lead, LeadStatus, LeadUtmParams, WhatsAppMarketingConsent } from "@/lib/services/leads/types";
 import { tenantScopePlugin } from "@/lib/db/tenantScopePlugin";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,6 +34,9 @@ export interface LeadDocument extends Document {
   /** Lead Capture (tenant public forms) — see Lead.capturedVia's own doc
    *  comment (lib/services/leads/types.ts). */
   capturedVia?: { formId: string; formName: string };
+  /** Phase 2B — WhatsApp marketing consent. */
+  whatsappMarketingConsent: WhatsAppMarketingConsent;
+  whatsappMarketingConsentUpdatedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -70,6 +73,12 @@ const leadSchema = new Schema<LeadDocument>(
       formId: { type: String },
       formName: { type: String },
     },
+    whatsappMarketingConsent: {
+      type: String,
+      enum: ["opted_in", "opted_out", "unknown"],
+      default: "unknown",
+    },
+    whatsappMarketingConsentUpdatedAt: { type: Date },
   },
   { timestamps: true },
 );
@@ -119,6 +128,8 @@ export function toLead(doc: LeadDocument): Lead {
     archived: doc.archived,
     deletedAt: doc.deletedAt?.toISOString(),
     capturedVia: doc.capturedVia?.formId ? { formId: doc.capturedVia.formId, formName: doc.capturedVia.formName ?? "" } : undefined,
+    whatsappMarketingConsent: (doc.whatsappMarketingConsent as WhatsAppMarketingConsent) || "unknown",
+    whatsappMarketingConsentUpdatedAt: doc.whatsappMarketingConsentUpdatedAt?.toISOString(),
     createdAt: doc.createdAt.toISOString(),
     updatedAt: doc.updatedAt.toISOString(),
   };
