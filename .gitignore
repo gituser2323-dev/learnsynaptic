@@ -62,7 +62,7 @@ yarn-error.log*
 next-env.d.ts
 
 .staging-admin.credentials
-
+.staging-legal-counsel-brief.md
 
 .storage-uploads-staging/
 
