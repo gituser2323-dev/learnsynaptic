@@ -139,9 +139,9 @@ function OAuthMfaStep({ pendingToken, provider }: { pendingToken: string; provid
           {error}
         </p>
       )}
-      <button type="submit" disabled={loading} className="adm-focus-ring adm-btn adm-btn-primary h-11 w-full text-sm">
-        {loading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={16} />}
-        Verify
+      <button type="submit" disabled={loading} aria-busy={loading} className="adm-focus-ring adm-btn adm-btn-primary h-11 w-full text-sm">
+        {loading ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <ShieldCheck size={16} aria-hidden="true" />}
+        {loading ? "Verifying…" : "Verify"}
       </button>
     </form>
   );
@@ -349,9 +349,14 @@ function LoginForm() {
           </p>
         )}
 
-        <button type="submit" disabled={loading} className="adm-focus-ring adm-btn adm-btn-primary h-11 w-full text-sm">
-          {loading ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-          Sign in
+        <button
+          type="submit"
+          disabled={loading}
+          aria-busy={loading}
+          className="adm-focus-ring adm-btn adm-btn-primary h-11 w-full text-sm"
+        >
+          {loading ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <ArrowRight size={16} aria-hidden="true" />}
+          {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
       <OAuthButtons disabled={loading} />

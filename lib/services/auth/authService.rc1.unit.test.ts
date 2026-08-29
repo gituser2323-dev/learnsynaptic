@@ -227,26 +227,33 @@ describe("authService — self-service email verification", () => {
 });
 
 describe("authService.login — brute-force lockout", () => {
-  it(`pentest — Brute Force: locks the account after ${MAX_FAILED_LOGIN_ATTEMPTS} failed attempts, rejecting even a correct password until the lockout expires`, async () => {
-    const { email } = await createTestUser("lockout");
+  // bcrypt cost 12 × (MAX failed + 1 locked + 1 after unlock) is ~2–3s alone but
+  // regularly exceeds Vitest's default 5s when the full suite contends for CPU —
+  // production SALT_ROUNDS are unchanged; this is test-only timeout budget.
+  it(
+    `pentest — Brute Force: locks the account after ${MAX_FAILED_LOGIN_ATTEMPTS} failed attempts, rejecting even a correct password until the lockout expires`,
+    async () => {
+      const { email } = await createTestUser("lockout");
 
-    for (let i = 0; i < MAX_FAILED_LOGIN_ATTEMPTS; i++) {
-      const attempt = await authService.login({ email, password: "wrong-password" });
-      expect(attempt.success).toBe(false);
-    }
+      for (let i = 0; i < MAX_FAILED_LOGIN_ATTEMPTS; i++) {
+        const attempt = await authService.login({ email, password: "wrong-password" });
+        expect(attempt.success).toBe(false);
+      }
 
-    // Account is now locked — even the CORRECT password is rejected.
-    const correctButLocked = await authService.login({ email, password: STRONG_PASSWORD });
-    expect(correctButLocked.success).toBe(false);
-    expect("locked" in correctButLocked && correctButLocked.locked).toBe(true);
+      // Account is now locked — even the CORRECT password is rejected.
+      const correctButLocked = await authService.login({ email, password: STRONG_PASSWORD });
+      expect(correctButLocked.success).toBe(false);
+      expect("locked" in correctButLocked && correctButLocked.locked).toBe(true);
 
-    // After the lockout window elapses, login works again.
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date(Date.now() + (LOCKOUT_DURATION_SECONDS + 1) * 1000));
-    const afterWindow = await authService.login({ email, password: STRONG_PASSWORD });
-    vi.useRealTimers();
-    expect(afterWindow.success).toBe(true);
-  });
+      // After the lockout window elapses, login works again.
+      vi.useFakeTimers();
+      vi.setSystemTime(new Date(Date.now() + (LOCKOUT_DURATION_SECONDS + 1) * 1000));
+      const afterWindow = await authService.login({ email, password: STRONG_PASSWORD });
+      vi.useRealTimers();
+      expect(afterWindow.success).toBe(true);
+    },
+    20_000,
+  );
 });
 
 describe("authService.login — MFA gate", () => {

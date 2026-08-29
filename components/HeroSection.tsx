@@ -1,7 +1,6 @@
 "use client";
 
 import {
-  Calendar,
   Star,
   Users,
   Briefcase,
@@ -9,6 +8,7 @@ import {
   Download,
   User,
 } from "lucide-react";
+import Image from "next/image";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -282,14 +282,16 @@ const { openModal } = useLeadModal();
           {/* RIGHT */}
           <div className="mt-2 lg:mt-0">
             <div className="overflow-hidden rounded-2xl border bg-white shadow-2xl sm:rounded-3xl">
-              <div className="aspect-video">
-                <video
-                  controls
-                  poster="/student.jpg"
-                  className="h-full w-full rounded-2xl object-cover sm:rounded-3xl"
-                >
-                  <source src="/videos/testimonial.mp4" />
-                </video>
+              <div className="relative aspect-video">
+                {/* Testimonial video assets (/videos/testimonial.mp4, /student.jpg) are not in
+                    public/ — use the existing learn.jpeg still rather than 404 media URLs. */}
+                <Image
+                  src="/learn.jpeg"
+                  alt="LearnSynaptic learners"
+                  fill
+                  className="rounded-2xl object-cover sm:rounded-3xl"
+                  sizes="(max-width: 1024px) 100vw, 560px"
+                />
               </div>
             </div>
             <div className="mt-6">

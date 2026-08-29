@@ -19,7 +19,9 @@ const CSP_DIRECTIVES = [
   "img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://www.facebook.com",
   "font-src 'self' data:",
   "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://www.googletagmanager.com https://graph.facebook.com https://api.emailjs.com",
-  "frame-src 'self'",
+  // Contact page embeds Google Maps (app/contact/page.tsx) via maps.google.com
+  // and www.google.com embed URLs — allow only those origins, not a wildcard.
+  "frame-src 'self' https://maps.google.com https://www.google.com",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
