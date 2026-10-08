@@ -6,6 +6,10 @@ interface RegisterModalContextValue {
   isRegisterOpen: boolean;
   isSuccessOpen: boolean;
   registeredName: string;
+  leadProgram: string;
+  leadSource: string;
+  leadBadge: string;
+  seatWord: string;
   openRegister: () => void;
   closeRegister: () => void;
   openSuccess: (name: string) => void;
@@ -14,7 +18,19 @@ interface RegisterModalContextValue {
 
 const RegisterModalContext = createContext<RegisterModalContextValue | null>(null);
 
-export function RegisterModalProvider({ children }: { children: React.ReactNode }) {
+export function RegisterModalProvider({
+  children,
+  leadProgram = "2-Hour Live AI Masterclass",
+  leadSource = "ai-bootcamp-modal",
+  leadBadge = "FREE · 2-HOUR LIVE AI MASTERCLASS",
+  seatWord = "Free Seat",
+}: {
+  children: React.ReactNode;
+  leadProgram?: string;
+  leadSource?: string;
+  leadBadge?: string;
+  seatWord?: string;
+}) {
   const [isRegisterOpen, setRegisterOpen] = useState(false);
   const [isSuccessOpen, setSuccessOpen] = useState(false);
   const [registeredName, setRegisteredName] = useState("");
@@ -33,12 +49,16 @@ export function RegisterModalProvider({ children }: { children: React.ReactNode 
       isRegisterOpen,
       isSuccessOpen,
       registeredName,
+      leadProgram,
+      leadSource,
+      leadBadge,
+      seatWord,
       openRegister,
       closeRegister,
       openSuccess,
       closeSuccess,
     }),
-    [isRegisterOpen, isSuccessOpen, registeredName, openRegister, closeRegister, openSuccess, closeSuccess],
+    [isRegisterOpen, isSuccessOpen, registeredName, leadProgram, leadSource, leadBadge, seatWord, openRegister, closeRegister, openSuccess, closeSuccess],
   );
 
   return <RegisterModalContext.Provider value={value}>{children}</RegisterModalContext.Provider>;

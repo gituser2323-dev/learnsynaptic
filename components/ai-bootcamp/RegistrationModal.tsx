@@ -12,7 +12,7 @@ import { useLeadCapture } from "@/components/lead-capture/useLeadCapture";
 import { syntheticEmailFromPhone } from "@/lib/services/leads/phoneOnlyEmail";
 
 export function RegistrationModal() {
-  const { isRegisterOpen, closeRegister, openSuccess } = useRegisterModal();
+  const { isRegisterOpen, closeRegister, openSuccess, leadProgram, leadSource, leadBadge, seatWord } = useRegisterModal();
 
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [fullName, setFullName] = useState("");
@@ -50,12 +50,21 @@ export function RegistrationModal() {
         name: fullName || "Not provided",
         email: syntheticEmailFromPhone(normalizedPhone),
         phone: normalizedPhone,
-        program: "2-Hour Live AI Masterclass",
-        source: "ai-bootcamp-modal",
+        program: leadProgram,
+        source: leadSource,
       },
       analyticsEvent: "CompleteRegistration",
       analyticsParams: { formName: "AiBootcampRegistration" },
-      notify: () => sendAiBootcampRegistration({ whatsappNumber, fullName }),
+      notify: () =>
+        Promise.allSettled([
+          sendAiBootcampRegistration({ whatsappNumber, fullName, program: leadProgram }),
+          // Best-effort mirror of the registration into the Google Sheet (server-side).
+          fetch("/api/sheets/registrations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: fullName, phone: normalizedPhone, program: leadProgram, source: leadSource }),
+          }),
+        ]),
     });
 
     if (result.success) {
@@ -79,7 +88,7 @@ export function RegistrationModal() {
         }}
       >
         <span className="aib-live-dot" style={{ backgroundColor: "rgb(0, 213, 27)" }} />
-        FREE · 2-HOUR LIVE AI MASTERCLASS
+        {leadBadge}
       </span>
 
       <h2
@@ -92,7 +101,7 @@ export function RegistrationModal() {
           letterSpacing: "-0.01em",
         }}
       >
-        Claim My <span style={{ color: "var(--ls-primary-light)" }}>Free Seat</span>
+        Claim My <span style={{ color: "var(--ls-primary-light)" }}>{seatWord}</span>
       </h2>
       <p style={{ color: "var(--ink-200)", fontSize: 14.5, lineHeight: 1.6, margin: "0 0 28px" }}>
         Enter your WhatsApp number and we&apos;ll send you everything you need for the session.
@@ -176,7 +185,7 @@ export function RegistrationModal() {
             </>
           ) : (
             <>
-              Claim My Free Seat
+              Claim My {seatWord}
               <ArrowRight size={18} />
             </>
           )}
@@ -189,7 +198,7 @@ export function RegistrationModal() {
         )}
 
         <p style={{ textAlign: "center", fontSize: 11.5, color: "var(--ink-400)", lineHeight: 1.5, margin: 0 }}>
-          By continuing, you agree to receive masterclass updates via WhatsApp.
+          By continuing, you agree to receive updates about this session via WhatsApp.
         </p>
       </form>
 

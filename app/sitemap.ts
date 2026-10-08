@@ -27,6 +27,7 @@ const STATIC_ROUTES: { path: string; changeFrequency: ChangeFrequency; priority:
   { path: "/programs/genai-builder", changeFrequency: "monthly", priority: 0.8 },
   { path: "/bootcamp", changeFrequency: "weekly", priority: 0.9 },
   { path: "/ai-bootcamp", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/ai-mastermind", changeFrequency: "weekly", priority: 0.9 },
   { path: "/ai-generalist", changeFrequency: "weekly", priority: 0.9 },
   { path: "/pricing", changeFrequency: "monthly", priority: 0.7 },
   { path: "/placements", changeFrequency: "monthly", priority: 0.6 },

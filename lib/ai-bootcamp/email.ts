@@ -9,6 +9,8 @@ import { normalizeIndianMobile } from "./validation";
 export interface AiBootcampRegistration {
   whatsappNumber: string;
   fullName: string;
+  /** Which program this registration is for; defaults to the original masterclass. */
+  program?: string;
 }
 
 export async function sendAiBootcampRegistration(data: AiBootcampRegistration) {
@@ -18,7 +20,7 @@ export async function sendAiBootcampRegistration(data: AiBootcampRegistration) {
     {
       whatsapp_number: normalizeIndianMobile(data.whatsappNumber),
       full_name: data.fullName.trim() || "Not provided",
-      program: "2-Hour Live AI Masterclass",
+      program: data.program ?? "2-Hour Live AI Masterclass",
       submittedAt: new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }),
     },
     AI_BOOTCAMP_EMAILJS_PUBLIC_KEY,
