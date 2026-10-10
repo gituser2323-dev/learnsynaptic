@@ -26,7 +26,8 @@ const ease = [0.0, 0.0, 0.2, 1.0] as const
 
 export function LeadCapturePopup() {
   const pathname = usePathname()
-  const [visible, setVisible] = useState(false)
+  const [requested, setRequested] = useState(false)
+  const visible = requested && pathname !== '/register'
   const { status, submit } = useLeadCapture()
   const [form, setForm] = useState({ name: '', phone: '', program: '' })
   const firedRef = useRef(false)
@@ -37,10 +38,7 @@ export function LeadCapturePopup() {
   // Pathname is a dependency so a timer started on a marketing page is
   // cancelled if the visitor reaches /register before it fires.
   useEffect(() => {
-    if (pathname === '/register') {
-      setVisible(false)
-      return
-    }
+    if (pathname === '/register') return
     if (sessionStorage.getItem(STORAGE_KEY)) return
 
     function show() {
@@ -48,7 +46,7 @@ export function LeadCapturePopup() {
       firedRef.current = true
       clearTimeout(timer)
       window.removeEventListener('scroll', onScroll)
-      setVisible(true)
+      setRequested(true)
       sessionStorage.setItem(STORAGE_KEY, '1')
     }
 
@@ -86,7 +84,7 @@ export function LeadCapturePopup() {
 
     function onKey(event: KeyboardEvent) {
       if (event.key === 'Escape') {
-        setVisible(false)
+        setRequested(false)
         return
       }
       if (event.key !== 'Tab') return
@@ -114,7 +112,7 @@ export function LeadCapturePopup() {
   }, [visible])
 
   function handleClose() {
-    setVisible(false)
+    setRequested(false)
   }
 
   function onChange(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
