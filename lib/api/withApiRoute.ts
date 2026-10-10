@@ -73,9 +73,14 @@ export interface WithApiRouteOptions {
 
 type Handler = (request: Request, ctx: ApiRouteContext) => Promise<NextResponse>;
 
-/** What Next.js passes as a route handler's second argument on a
- *  dynamic route segment — undefined for a flat route. */
-type RouteSegmentArg = { params: Promise<Record<string, string>> } | undefined;
+/** Next.js always passes this as a route handler's second argument,
+ *  including on routes with no dynamic segment (`params` is `{}`).
+ *  The exported handler types that argument as optional `any` because
+ *  Next's generated route check rejects a second parameter whose type
+ *  includes `undefined` (`RouteSegmentArg | undefined` fails
+ *  `ParamCheck<RouteContext>`). An omitted argument stays valid for
+ *  unit tests and for callers that only have the request. */
+type RouteSegmentArg = { params: Promise<Record<string, string>> };
 
 /** RC-2 — one global request-size ceiling applied before ANY route
  *  handler reads the body, uniformly across every one of this app's
@@ -178,8 +183,8 @@ export function withApiRoute(
   routeName: string,
   handler: Handler,
   options: WithApiRouteOptions = {},
-): (request: Request, routeSegment?: RouteSegmentArg) => Promise<NextResponse> {
-  return async function wrapped(request: Request, routeSegment?: RouteSegmentArg): Promise<NextResponse> {
+): (request: Request, routeSegment?: any) => Promise<NextResponse> {
+  return async function wrapped(request: Request, routeSegment?: any): Promise<NextResponse> {
     const requestId = randomUUID();
     const logger = createRequestLogger(requestId, request);
     const startedAt = Date.now();
@@ -201,7 +206,8 @@ export function withApiRoute(
         throw new PayloadTooLargeApiError();
       }
 
-      const params = routeSegment ? await routeSegment.params : {};
+      const segment = routeSegment as RouteSegmentArg | undefined;
+      const params = segment ? await segment.params : {};
 
       if (options.rateLimit) {
         const ip = getClientIp(request);
