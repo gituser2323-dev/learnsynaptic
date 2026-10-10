@@ -444,15 +444,19 @@ function AssignmentRulePanel() {
   const [strategy, setStrategy] = useState<AssignmentStrategy>("manual");
   const [counsellorIds, setCounsellorIds] = useState<Set<string>>(new Set());
   const [initialized, setInitialized] = useState(false);
+  const [dirty, setDirty] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   if (!loading && !initialized && data) {
     setInitialized(true);
-    setStrategy(data.rule?.strategy ?? "manual");
-    setCounsellorIds(new Set(data.rule?.counsellorIds ?? []));
+    if (!dirty) {
+      setStrategy(data.rule?.strategy ?? "manual");
+      setCounsellorIds(new Set(data.rule?.counsellorIds ?? []));
+    }
   }
 
   function toggleCounsellor(id: string) {
+    setDirty(true);
     setCounsellorIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id);
@@ -471,7 +475,7 @@ function AssignmentRulePanel() {
   return (
     <SettingsCard title="Lead Assignment">
       <div className="mt-3 space-y-3">
-        <FilterSelect label="Assignment strategy" value={strategy} onChange={(e) => setStrategy(e.target.value as AssignmentStrategy)} className="w-full">
+        <FilterSelect label="Assignment strategy" value={strategy} onChange={(e) => { setDirty(true); setStrategy(e.target.value as AssignmentStrategy); }} className="w-full">
           <option value="manual">Manual</option>
           <option value="round_robin">Round robin</option>
         </FilterSelect>

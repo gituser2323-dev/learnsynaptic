@@ -214,7 +214,10 @@ export function withApiRoute(
       const segment = routeSegment as RouteSegmentArg | undefined;
       const params = segment ? await segment.params : {};
 
-      if (options.rateLimit) {
+      // Playwright sets this on its own server only. The smoke suite
+      // creates many leads from one IP, which would trip the public
+      // per-minute cap and fail unrelated tests. Production never sets it.
+      if (options.rateLimit && process.env.E2E_DISABLE_RATE_LIMIT !== "1") {
         const ip = getClientIp(request);
         const result = await getRateLimiter().check(
           `${routeName}:${ip}`,

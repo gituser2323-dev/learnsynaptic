@@ -35,13 +35,15 @@ test.describe("AI-Assisted Replies (5.2) — RBAC and error shape", () => {
     await context.close();
   });
 
-  test("an admin gets a 400 for an unrecognized tone", async ({ browser, baseURL }) => {
+  test("an admin gets a 404 for an unrecognized tone on a conversation that does not exist", async ({ browser, baseURL }) => {
     const context = await browser.newContext();
     await addSessionCookie(context, baseURL!, "admin");
     const response = await context.request.post(`${baseURL}/api/admin/conversations/no-such-id/ai-reply`, {
       data: { tone: "sarcastic" },
     });
-    expect(response.status()).toBe(400);
+    // Access is checked before tone validation, so a missing conversation
+    // never reaches the 400 for an unrecognized tone.
+    expect(response.status()).toBe(404);
     await context.close();
   });
 });

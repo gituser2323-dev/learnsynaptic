@@ -36,7 +36,7 @@ test.describe("CRM — Sales Pipeline", () => {
     await page.locator("#opp-lead-id").fill(lead.id);
     await page.getByRole("button", { name: "Create" }).click();
 
-    await expect(page.getByText(new RegExp(lead.id.slice(-6)))).toBeVisible();
+    await expect(page.getByText("Pipeline Spec Lead")).toBeVisible();
     await context.close();
   });
 });

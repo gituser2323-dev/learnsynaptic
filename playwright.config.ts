@@ -61,6 +61,7 @@ export default defineConfig({
       // platform-secret-gated route, the same "real secret, test-only
       // value" pattern JWT_ACCESS_TOKEN_SECRET above already uses.
       PLATFORM_ADMIN_SECRET: "playwright-test-platform-admin-secret",
+      E2E_DISABLE_RATE_LIMIT: "1",
     },
   },
 });

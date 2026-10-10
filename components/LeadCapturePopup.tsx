@@ -10,6 +10,10 @@ import { syntheticEmailFromPhone } from '@/lib/services/leads/phoneOnlyEmail'
 
 const STORAGE_KEY = 'ls_lead_popup_shown'
 
+// Pages that already are a lead form. Opening the dialog on top of them
+// covers the submit button.
+const POPUP_SUPPRESSED = new Set(['/register', '/contact'])
+
 const EJS_SERVICE = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!
 const EJS_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!
 const EJS_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
@@ -27,7 +31,7 @@ const ease = [0.0, 0.0, 0.2, 1.0] as const
 export function LeadCapturePopup() {
   const pathname = usePathname()
   const [requested, setRequested] = useState(false)
-  const visible = requested && pathname !== '/register'
+  const visible = requested && !POPUP_SUPPRESSED.has(pathname)
   const { status, submit } = useLeadCapture()
   const [form, setForm] = useState({ name: '', phone: '', program: '' })
   const firedRef = useRef(false)
@@ -36,9 +40,9 @@ export function LeadCapturePopup() {
 
   // Trigger: 15 s timer OR 50% scroll depth, whichever first; once per session.
   // Pathname is a dependency so a timer started on a marketing page is
-  // cancelled if the visitor reaches /register before it fires.
+  // cancelled if the visitor reaches a page that already has a lead form.
   useEffect(() => {
-    if (pathname === '/register') return
+    if (POPUP_SUPPRESSED.has(pathname)) return
     if (sessionStorage.getItem(STORAGE_KEY)) return
 
     function show() {
