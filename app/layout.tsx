@@ -1,18 +1,11 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { Inter } from 'next/font/google';
 import './globals.css';
+import { siteInter } from '@/app/fonts';
 import { SiteChrome } from '@/components/SiteChrome';
 import { LeadModalProvider } from "@/components/lead-modal";
 import { AnalyticsScripts, PageViewTracker, ScrollDepthTracker } from '@/components/analytics';
 import { SITE_URL } from '@/config/site';
-
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
 
 
 const DEFAULT_DESCRIPTION =
@@ -78,7 +71,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full`}>
+    <html lang="en" className={`${siteInter.variable} h-full`}>
       <body className="min-h-full flex flex-col" style={{ color: 'var(--ls-text)' }}>
         <script
           type="application/ld+json"

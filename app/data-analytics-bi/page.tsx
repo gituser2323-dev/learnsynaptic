@@ -1,20 +1,6 @@
 import type { Metadata } from "next";
-import { Poppins, Inter } from "next/font/google";
 import { DataAnalyticsLandingPage } from "@/components/data-analytics-bi/LandingPage";
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800", "900"],
-  variable: "--aib-poppins",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--aib-inter",
-  display: "swap",
-});
+import { aibInter, aibPoppins } from "@/app/fonts";
 
 export const metadata: Metadata = {
   alternates: { canonical: '/data-analytics-bi' },
@@ -32,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function DataAnalyticsBiPage() {
   return (
-    <div className={`${poppins.variable} ${inter.variable}`}>
+    <div className={`${aibPoppins.variable} ${aibInter.variable}`}>
       <DataAnalyticsLandingPage />
     </div>
   );

@@ -1,20 +1,6 @@
 import type { Metadata } from "next";
-import { Poppins, Inter } from "next/font/google";
 import { AiGeneralistLandingPage } from "@/components/ai-generalist/LandingPage";
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800", "900"],
-  variable: "--aig-poppins",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-  variable: "--aig-inter",
-  display: "swap",
-});
+import { aigInter, aigPoppins } from "@/app/fonts";
 
 export const metadata: Metadata = {
   alternates: { canonical: '/ai-generalist' },
@@ -32,7 +18,7 @@ export const metadata: Metadata = {
 
 export default function AiGeneralistPage() {
   return (
-    <div className={`${poppins.variable} ${inter.variable}`}>
+    <div className={`${aigPoppins.variable} ${aigInter.variable}`}>
       <AiGeneralistLandingPage />
     </div>
   );
