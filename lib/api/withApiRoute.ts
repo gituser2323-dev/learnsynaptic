@@ -183,7 +183,12 @@ export function withApiRoute(
   routeName: string,
   handler: Handler,
   options: WithApiRouteOptions = {},
+  // Optional `any` is the only second-argument type Next's generated
+  // ParamCheck accepts while still letting callers omit the context.
+  // A concrete type unioned with undefined fails that check.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): (request: Request, routeSegment?: any) => Promise<NextResponse> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return async function wrapped(request: Request, routeSegment?: any): Promise<NextResponse> {
     const requestId = randomUUID();
     const logger = createRequestLogger(requestId, request);
