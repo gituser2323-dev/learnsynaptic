@@ -30,10 +30,17 @@ export function LeadCapturePopup() {
   const { status, submit } = useLeadCapture()
   const [form, setForm] = useState({ name: '', phone: '', program: '' })
   const firedRef = useRef(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const restoreFocusRef = useRef<HTMLElement | null>(null)
 
-  // Trigger: 15 s timer OR 50% scroll depth, whichever first; once per session
+  // Trigger: 15 s timer OR 50% scroll depth, whichever first; once per session.
+  // Pathname is a dependency so a timer started on a marketing page is
+  // cancelled if the visitor reaches /register before it fires.
   useEffect(() => {
-    if (pathname === '/register') return
+    if (pathname === '/register') {
+      setVisible(false)
+      return
+    }
     if (sessionStorage.getItem(STORAGE_KEY)) return
 
     function show() {
@@ -58,17 +65,51 @@ export function LeadCapturePopup() {
       clearTimeout(timer)
       window.removeEventListener('scroll', onScroll)
     }
-  }, [])
+  }, [pathname])
 
-  // Close on Escape
   useEffect(() => {
     if (!visible) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') handleClose() }
+    restoreFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
+    const dialog = dialogRef.current
+
+    function focusable(): HTMLElement[] {
+      if (!dialog) return []
+      return Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])',
+        ),
+      )
+    }
+
+    const preferred = dialog?.querySelector<HTMLElement>('#lcp-name') ?? focusable()[0] ?? dialog
+    preferred?.focus()
+
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setVisible(false)
+        return
+      }
+      if (event.key !== 'Tab') return
+      const items = focusable()
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+
     document.addEventListener('keydown', onKey)
+    const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     return () => {
       document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
+      document.body.style.overflow = previousOverflow
+      restoreFocusRef.current?.focus()
     }
   }, [visible])
 
@@ -153,6 +194,12 @@ export function LeadCapturePopup() {
             }}
           >
             <div
+              ref={dialogRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="lcp-title"
+              aria-describedby="lcp-desc"
+              tabIndex={-1}
               onClick={e => e.stopPropagation()}
               style={{
                 pointerEvents: 'auto',
@@ -168,6 +215,7 @@ export function LeadCapturePopup() {
             >
               {/* Close button */}
               <button
+                type="button"
                 onClick={handleClose}
                 aria-label="Close"
                 style={{
@@ -219,10 +267,10 @@ export function LeadCapturePopup() {
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   </div>
-                  <h3 style={{ color: 'var(--ls-text)', marginBottom: 8, fontSize: '1.2rem' }}>
+                  <h3 id="lcp-title" style={{ color: 'var(--ls-text)', marginBottom: 8, fontSize: '1.2rem' }}>
                     Thanks! We&apos;ll be in touch within 24 hours.
                   </h3>
-                  <p style={{ color: 'var(--ls-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>
+                  <p id="lcp-desc" style={{ color: 'var(--ls-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>
                     Our team will reach out to schedule your free counselling call.
                   </p>
                   <button
@@ -254,6 +302,7 @@ export function LeadCapturePopup() {
                       Free offer
                     </span>
                     <h3
+                      id="lcp-title"
                       style={{
                         color: 'var(--ls-text)',
                         fontSize: 'clamp(1.15rem, 3vw, 1.35rem)',
@@ -265,7 +314,7 @@ export function LeadCapturePopup() {
                     >
                       Get program details + a free counselling call
                     </h3>
-                    <p style={{ color: 'var(--ls-muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                    <p id="lcp-desc" style={{ color: 'var(--ls-muted)', fontSize: '0.9rem', lineHeight: 1.6 }}>
                       Find the right program for your goals in under 30 minutes — no pressure, no sales pitch.
                     </p>
                   </div>

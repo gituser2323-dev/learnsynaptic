@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Mail, Phone } from 'lucide-react';
+import { LiveCohortLabel } from '@/components/LiveCohortLabel';
+import { COHORT_TIME_LABEL } from '@/lib/cohortDate';
 
 const programs = [
   { name: 'AI Full Stack Dev + DevOps', href: '/programs/full-stack-devops' },
@@ -203,10 +205,10 @@ export default function Footer() {
               style={{ background: 'var(--ls-blue-tint)' }}
             >
               <p className="text-sm font-semibold mb-1" style={{ color: 'var(--ls-text)' }}>
-                Next batch starting soon
+                Next cohort: <LiveCohortLabel long />
               </p>
               <p className="text-xs mb-3" style={{ color: 'var(--ls-muted)' }}>
-                Limited seats available. Don&apos;t miss the July cohort.
+                {COHORT_TIME_LABEL}. The date rolls forward every Saturday.
               </p>
               <Link
                 href="/programs"

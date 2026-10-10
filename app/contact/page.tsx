@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Mail, Phone, MapPin, Globe, ArrowRight } from 'lucide-react';
 import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll';
 import { ContactForm, CallbackForm } from '@/components/ContactForm';
+import { LiveCohortLabel } from '@/components/LiveCohortLabel';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/contact' },
@@ -235,7 +236,7 @@ export default function ContactPage() {
               className="mb-4"
               style={{ color: '#fff', maxWidth: 600, margin: '0 auto 1rem' }}
             >
-              The next cohort starts July 7. Seats are limited.
+              The next cohort starts <LiveCohortLabel long />.
             </h2>
             <p
               className="text-lg mb-8"

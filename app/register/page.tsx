@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { RegisterForm } from '@/components/RegisterForm';
+import { getLiveCohort } from '@/lib/cohortDate';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/register' },
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Apply to LearnSynaptic — Start Your AI Career',
     description:
-      "Tell us where you want to be. We'll show you the path. Apply for AI, Full Stack Dev, Data Science, or GenAI programs — next cohort July 2025.",
+      `Tell us where you want to be. We'll show you the path. Apply for AI, Full Stack Dev, Data Science, or GenAI programs — next cohort ${getLiveCohort().longLabel}.`,
     type: 'website',
   },
   robots: {
