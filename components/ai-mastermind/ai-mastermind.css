@@ -13,8 +13,13 @@
   min-height: 100vh;
   overflow-x: hidden;
 }
-.aim-root h1, .aim-root h2, .aim-root h3 { font-family: var(--aib-poppins), system-ui, sans-serif; margin: 0; }
-.aim-hero { padding: 48px 6%; }
+.aim-root h1, .aim-root h2, .aim-root h3 {
+  font-family: var(--aib-poppins), system-ui, sans-serif;
+  margin: 0;
+  color: var(--aim-text);
+}
+/* Clears the site's fixed announcement bar (36px) plus the floating nav (72px at top: 44px). */
+.aim-hero { padding: 140px 6% 48px; }
 .aim-hero-card {
   position: relative; overflow: hidden;
   max-width: 1100px; margin: 0 auto; padding: 72px 6vw; border: 1px solid var(--aim-border);
@@ -58,7 +63,7 @@
 .aim-faq details p { color: var(--aim-muted); line-height: 1.6; margin: 12px 0 0; }
 .aim-final { margin-top: 40px; text-align: center; }
 @media (max-width: 640px) {
-  .aim-hero { padding: 16px 16px 32px; }
+  .aim-hero { padding: 140px 16px 32px; }
   .aim-hero-card { padding: 40px 20px; }
   .aim-session { padding: 22px; }
   .aim-btn { width: 100%; }

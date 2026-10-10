@@ -12,7 +12,7 @@ const STORAGE_KEY = 'ls_lead_popup_shown'
 
 // Pages that already are a lead form. Opening the dialog on top of them
 // covers the submit button.
-const POPUP_SUPPRESSED = new Set(['/register', '/contact'])
+const POPUP_SUPPRESSED = new Set(['/register', '/contact', '/ai-mastermind'])
 
 const EJS_SERVICE = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!
 const EJS_TEMPLATE = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!
