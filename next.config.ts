@@ -12,9 +12,13 @@ import type { NextConfig } from "next";
  * scoped to the actual domains this app talks to (verified by grepping
  * every external URL referenced in the codebase), not left wide open.
  */
+// React's development build uses eval() to reconstruct call stacks, so `next dev` needs 'unsafe-eval'.
+// Production never evals, so the allowance is added in development only.
+const DEV_SCRIPT_EVAL = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
+
 const CSP_DIRECTIVES = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://connect.facebook.net",
+  `script-src 'self' 'unsafe-inline'${DEV_SCRIPT_EVAL} https://www.googletagmanager.com https://connect.facebook.net`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://www.facebook.com",
   "font-src 'self' data:",
@@ -81,7 +85,6 @@ const PERMISSIONS_POLICY = [
   "magnetometer=()",
   "gyroscope=()",
   "accelerometer=()",
-  "ambient-light-sensor=()",
   "autoplay=()",
   "encrypted-media=()",
   "fullscreen=(self)",

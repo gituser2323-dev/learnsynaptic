@@ -6,6 +6,8 @@ import {
 import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/AnimateOnScroll';
 import { CurriculumAccordion } from '@/components/CurriculumAccordion';
 import { ProgramFAQ } from '@/components/ProgramFAQ';
+import { LiveCohortLabel } from '@/components/LiveCohortLabel';
+import { UpcomingCohorts } from '@/components/UpcomingCohorts';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/programs/bootcamp' },
@@ -179,11 +181,6 @@ const faqs = [
   },
 ];
 
-const batches = [
-  { date: 'July 7, 2026', type: 'Weekday Batch', time: 'Mon–Fri, 7–9 PM IST', seats: 12 },
-  { date: 'August 18, 2026', type: 'Weekend Batch', time: 'Saturdays, 10 AM–6 PM IST', seats: 20 },
-  { date: 'September 29, 2026', type: 'Weekend Batch', time: 'Saturdays, 10 AM–6 PM IST', seats: 25 },
-];
 
 export default function BootcampPage() {
   return (
@@ -206,7 +203,7 @@ export default function BootcampPage() {
             <div className="flex flex-wrap gap-6 mb-8">
               {[
                 { label: 'Duration', value: '8 Weeks', Icon: Clock },
-                { label: 'Next Batch', value: 'Jul 7, 2026', Icon: Calendar },
+                { label: 'Next Batch', value: <LiveCohortLabel />, Icon: Calendar },
               ].map(({ label, value, Icon }) => (
                 <div key={label} className="flex items-center gap-2">
                   <Icon size={15} style={{ color: 'var(--ls-blue-primary)' }} />
@@ -356,19 +353,7 @@ export default function BootcampPage() {
       <section className="ls-section">
         <div className="ls-container">
           <AnimateOnScroll className="mb-8"><h2 className="mb-3">Upcoming Batches</h2></AnimateOnScroll>
-          <StaggerContainer className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {batches.map((b) => (
-              <StaggerItem key={b.date}>
-                <div className="rounded-2xl border p-5" style={{ borderColor: b.seats <= 15 ? 'var(--ls-blue-primary)' : 'var(--ls-border)', background: b.seats <= 15 ? 'var(--ls-blue-tint)' : 'white' }}>
-                  {b.seats <= 15 && <span className="text-xs font-semibold mb-2 inline-block" style={{ color: 'var(--ls-blue-primary)' }}>FILLING FAST</span>}
-                  <p className="font-bold text-lg mb-1" style={{ color: 'var(--ls-text)' }}>{b.date}</p>
-                  <p className="text-sm font-semibold mb-1" style={{ color: 'var(--ls-text)' }}>{b.type}</p>
-                  <p className="text-xs mb-3" style={{ color: 'var(--ls-muted)' }}>{b.time}</p>
-                  <p className="text-xs font-medium" style={{ color: b.seats <= 15 ? '#dc2626' : 'var(--ls-muted)' }}>{b.seats} seats remaining</p>
-                </div>
-              </StaggerItem>
-            ))}
-          </StaggerContainer>
+          <UpcomingCohorts />
         </div>
       </section>
 
@@ -462,14 +447,14 @@ export default function BootcampPage() {
         <div className="ls-container text-center">
           <AnimateOnScroll>
             <h2 className="mb-4" style={{ color: '#fff', maxWidth: 620, margin: '0 auto 1rem' }}>
-              July 7 batch. 8 weeks. Your first AI app goes live.
+              <LiveCohortLabel /> cohort. 8 weeks. Your first AI app goes live.
             </h2>
             <p className="text-lg mb-8" style={{ color: 'rgba(255,255,255,0.8)', maxWidth: 480, margin: '0 auto 2rem' }}>
               The most accessible way to start building in tech — 8 weeks to your first deployed AI app.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/contact" className="inline-flex items-center gap-2 bg-white font-semibold px-6 py-3 rounded-xl hover:-translate-y-0.5 transition-transform" style={{ color: 'var(--ls-blue-primary)', fontSize: '0.9375rem' }}>
-                Join the July 7 Batch <ArrowRight size={16} />
+                Join this cohort <ArrowRight size={16} />
               </Link>
               <Link href="/programs" className="inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-xl border-2 hover:-translate-y-0.5 transition-transform" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.4)', fontSize: '0.9375rem' }}>
                 Compare All Programs

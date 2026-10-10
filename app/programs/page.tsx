@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
-  ArrowRight, Clock, Users, TrendingUp, Code2, Brain, Layers, CheckCircle2,
+  ArrowRight, Clock, TrendingUp, Code2, Brain, Layers, CheckCircle2,
 } from 'lucide-react';
 import { AnimateOnScroll, StaggerContainer, StaggerItem, HoverCard } from '@/components/ui/AnimateOnScroll';
+import { LiveCohortLabel } from '@/components/LiveCohortLabel';
 
 export const metadata: Metadata = {
   alternates: { canonical: '/programs' },
@@ -20,8 +21,6 @@ const programs = [
     slug: 'full-stack-devops',
     level: 'Intermediate',
     duration: '6 Months',
-    nextBatch: 'Jul 14, 2026',
-    seats: 4,
     rating: 4.9,
     reviews: 128,
     description:
@@ -46,8 +45,6 @@ const programs = [
     slug: 'genai-builder',
     level: 'Beginner–Intermediate',
     duration: '3 Months',
-    nextBatch: 'Aug 5, 2026',
-    seats: 8,
     rating: 4.8,
     reviews: 96,
     description:
@@ -72,8 +69,6 @@ const programs = [
     slug: 'data-science',
     level: 'Intermediate',
     duration: '5 Months',
-    nextBatch: 'Jul 21, 2026',
-    seats: 6,
     rating: 4.8,
     reviews: 84,
     description:
@@ -98,8 +93,6 @@ const programs = [
     slug: 'bootcamp',
     level: 'Complete Beginner',
     duration: '8 Weeks',
-    nextBatch: 'Jul 7, 2026',
-    seats: 12,
     rating: 4.7,
     reviews: 156,
     description:
@@ -269,7 +262,7 @@ export default function ProgramsPage() {
                     >
                       <div className="mb-4 text-xs" style={{ color: 'var(--ls-muted)' }}>
                         <span>
-                          Next batch: <strong style={{ color: 'var(--ls-text)' }}>{p.nextBatch}</strong>
+                          Next batch: <strong style={{ color: 'var(--ls-text)' }}><LiveCohortLabel /></strong>
                         </span>
                       </div>
                       <div className="flex gap-2">

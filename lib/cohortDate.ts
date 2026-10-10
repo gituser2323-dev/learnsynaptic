@@ -36,3 +36,46 @@ export function getIstDateParts(date: Date): { day: number; month: number } {
   const month = Number(parts.find((p) => p.type === "month")?.value) - 1;
   return { day, month };
 }
+
+/** Shown everywhere a cohort time is named. One schedule, not per-program dates. */
+export const COHORT_TIME_LABEL = "Saturday, 8:30 PM IST";
+
+export type LiveCohort = {
+  startsAt: Date;
+  /** e.g. "11 Oct 2026" */
+  label: string;
+  /** e.g. "11 October 2026" */
+  longLabel: string;
+  timeLabel: string;
+};
+
+function formatInIst(date: Date, month: "short" | "long"): string {
+  return new Intl.DateTimeFormat("en-IN", {
+    timeZone: "Asia/Kolkata",
+    day: "numeric",
+    month,
+    year: "numeric",
+  }).format(date);
+}
+
+function toLiveCohort(startsAt: Date): LiveCohort {
+  return {
+    startsAt,
+    label: formatInIst(startsAt, "short"),
+    longLabel: formatInIst(startsAt, "long"),
+    timeLabel: COHORT_TIME_LABEL,
+  };
+}
+
+/** The single next cohort. Rolls forward every Saturday; no dates to edit. */
+export function getLiveCohort(nowMs: number = Date.now()): LiveCohort {
+  return toLiveCohort(getNextCohortSaturday(nowMs));
+}
+
+/** The next cohort plus the following Saturdays on the same cadence. */
+export function getUpcomingCohorts(count = 3, nowMs: number = Date.now()): LiveCohort[] {
+  const first = getNextCohortSaturday(nowMs);
+  return Array.from({ length: count }, (_, index) =>
+    toLiveCohort(new Date(first.getTime() + index * 7 * DAY_MS)),
+  );
+}

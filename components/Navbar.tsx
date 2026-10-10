@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTrackClick } from '@/lib/services/analytics/useTrackClick';
+import { getLiveCohort } from '@/lib/cohortDate';
 
 const programs = [
   {
@@ -46,52 +47,10 @@ const programs = [
   {
     name: 'AI Beginner Bootcamp',
     href: '/programs/bootcamp',
-    description: 'Excel • SQL • Power BI',
+    description: 'Python • Prompts • ChatGPT API',
     icon: BarChart3,
   },
 ];
-
-export function getBatchDates() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-
-  const getBatchMondays = (y: number, m: number) => {
-    const mondays: Date[] = [];
-    const date = new Date(y, m, 1);
-
-    while (date.getMonth() === m) {
-      if (date.getDay() === 1) {
-        mondays.push(new Date(date));
-      }
-      date.setDate(date.getDate() + 1);
-    }
-
-    return { first: mondays[0], third: mondays[2] };
-  };
-
-  const { first, third } = getBatchMondays(year, month);
-
-  let nextBatch: Date;
-
-  if (today <= first) {
-    nextBatch = first;
-  } else if (today <= third) {
-    nextBatch = third;
-  } else {
-    const nextMonth =
-      month === 11 ? getBatchMondays(year + 1, 0) : getBatchMondays(year, month + 1);
-    nextBatch = nextMonth.first;
-  }
-
-  return nextBatch.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-const nextBatch = getBatchDates();
 
 const navLinks = [
   { name: 'About', href: '/about', icon: Info },
@@ -103,8 +62,12 @@ const navLinks = [
 
 export default function Navbar() {
   const trackClick = useTrackClick();
+  const programsRef = useRef<HTMLDivElement>(null);
+  const programsButtonRef = useRef<HTMLButtonElement>(null);
+  const focusMenuOnOpen = useRef(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [programsOpen, setProgramsOpen] = useState(false);
+  const nextBatch = getLiveCohort().label;
   const [scrolled, setScrolled] = useState(false);
   const [announcementVisible, setAnnouncementVisible] = useState(true);
   const pathname = usePathname();
@@ -116,6 +79,66 @@ export default function Navbar() {
     setNavPathname(pathname);
     setMobileOpen(false);
     setProgramsOpen(false);
+  }
+
+  useEffect(() => {
+    if (!programsOpen || !focusMenuOnOpen.current) return;
+    focusMenuOnOpen.current = false;
+    programsRef.current?.querySelector<HTMLAnchorElement>('a')?.focus();
+  }, [programsOpen]);
+
+  useEffect(() => {
+    if (!programsOpen) return;
+
+    function closeIfOutside(event: MouseEvent) {
+      if (!programsRef.current?.contains(event.target as Node)) {
+        setProgramsOpen(false);
+      }
+    }
+
+    function onKey(event: KeyboardEvent) {
+      if (event.key !== 'Escape') return;
+      setProgramsOpen(false);
+      programsButtonRef.current?.focus();
+    }
+
+    document.addEventListener('mousedown', closeIfOutside);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', closeIfOutside);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [programsOpen]);
+
+  function closeProgramsIfUnfocused() {
+    if (programsRef.current?.contains(document.activeElement)) return;
+    setProgramsOpen(false);
+  }
+
+  function onProgramsButtonKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
+    if (event.key !== 'ArrowDown') return;
+    event.preventDefault();
+    event.stopPropagation();
+    focusMenuOnOpen.current = true;
+    setProgramsOpen(true);
+  }
+
+  function onProgramsMenuKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    const links = Array.from(programsRef.current?.querySelectorAll<HTMLAnchorElement>('a') ?? []);
+    if (links.length === 0) return;
+    const current = links.indexOf(document.activeElement as HTMLAnchorElement);
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp' || event.key === 'Home' || event.key === 'End') {
+      event.preventDefault();
+    }
+    if (event.key === 'ArrowDown') {
+      links[(current + 1) % links.length]?.focus();
+    } else if (event.key === 'ArrowUp') {
+      links[(current <= 0 ? links.length - 1 : current - 1)]?.focus();
+    } else if (event.key === 'Home') {
+      links[0]?.focus();
+    } else if (event.key === 'End') {
+      links[links.length - 1]?.focus();
+    }
   }
 
   // --- existing scroll effect, preserved exactly ---
@@ -146,12 +169,12 @@ export default function Navbar() {
             <div className="mx-auto flex h-10 max-w-7xl items-center justify-center px-4">
               <p className="text-center text-xs font-medium text-white sm:text-sm" style={{color:"white"}}>
                 <span className="sm:hidden">
-                  Next Bootcamp: <span className="font-semibold">{nextBatch}</span>
+                  Next Bootcamp: <span className="font-semibold" suppressHydrationWarning>{nextBatch}</span>
                 </span>
 
                 <span className="hidden sm:inline">
                   • Next Bootcamp Starts{" "}
-                  <span className="font-bold">{nextBatch}</span> • Reserve Your Seat Today
+                  <span className="font-bold" suppressHydrationWarning>{nextBatch}</span> • Reserve Your Seat Today
                 </span>
               </p>
             </div>
@@ -191,11 +214,22 @@ export default function Navbar() {
               {/* Desktop Nav */}
               <div className="hidden lg:flex items-center gap-1">
                 {/* Programs dropdown */}
-                <div className="relative">
+                <div
+                  className="relative"
+                  ref={programsRef}
+                  onMouseEnter={() => setProgramsOpen(true)}
+                  onMouseLeave={closeProgramsIfUnfocused}
+                  onKeyDown={onProgramsMenuKeyDown}
+                >
                   <button
+                    ref={programsButtonRef}
+                    type="button"
                     className="flex items-center gap-1 rounded-full px-3.5 py-2 text-[14px] font-medium text-slate-600 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-900"
-                    onMouseEnter={() => setProgramsOpen(true)}
-                    onMouseLeave={() => setProgramsOpen(false)}
+                    aria-expanded={programsOpen}
+                    aria-haspopup="true"
+                    aria-controls="programs-menu"
+                    onClick={() => setProgramsOpen((open) => !open)}
+                    onKeyDown={onProgramsButtonKeyDown}
                   >
                     Programs
                     <ChevronDown
@@ -207,13 +241,12 @@ export default function Navbar() {
                   <AnimatePresence>
                     {programsOpen && (
                       <motion.div
+                        id="programs-menu"
                         initial={{ opacity: 0, y: 8, scale: 0.98 }}
                         animate={{ opacity: 1, y: 10, scale: 1 }}
                         exit={{ opacity: 0, y: 8, scale: 0.98 }}
                         transition={{ duration: 0.18, ease: 'easeOut' }}
                         className="absolute left-0 top-full w-[420px] rounded-[20px] border border-slate-200/70 bg-white p-3 shadow-xl"
-                        onMouseEnter={() => setProgramsOpen(true)}
-                        onMouseLeave={() => setProgramsOpen(false)}
                       >
                         <div className="grid grid-cols-2 gap-2">
                           {programs.map((p) => {

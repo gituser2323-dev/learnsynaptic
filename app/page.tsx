@@ -27,6 +27,7 @@ import { StatCard } from '@/components/StatCard';
 import { HomepageGalleryStrip } from '@/components/HomepageGalleryStrip';
 import { MeetTheTeam } from '@/components/MeetTheTeam';
 import { HomepageVideoTeaser } from '@/components/HomepageVideoTeaser';
+import { LiveCohortLabel } from '@/components/LiveCohortLabel';
 import { CompetitiveComparisonTable } from '@/components/ProgramComparisonTable';
 import Image from 'next/image';
 
@@ -65,14 +66,12 @@ const programs = [
     rating: 4.9,
     reviews: 128,
     duration: '6 Months',
-    batchDate: 'Jul 14, 2026',
     builds: [
       'AI-powered e-commerce app with React & Node.js',
       'Automated CI/CD pipeline deployed on AWS',
       'Containerised microservices with Docker & Kubernetes',
     ],
     href: '/programs/full-stack-devops',
-    seatLabel: '4 seats left',
   },
   {
     tag: 'High Demand',
@@ -81,14 +80,12 @@ const programs = [
     rating: 4.8,
     reviews: 96,
     duration: '3 Months',
-    batchDate: 'Aug 5, 2026',
     builds: [
       'Custom AI chatbot with your own knowledge base',
       'RAG-powered document Q&A system',
       'Freelance-ready portfolio with 3 client projects',
     ],
     href: '/programs/genai-builder',
-    seatLabel: '8 seats left',
   },
   {
     tag: 'Career Booster',
@@ -97,14 +94,12 @@ const programs = [
     rating: 4.8,
     reviews: 84,
     duration: '5 Months',
-    batchDate: 'Jul 21, 2026',
     builds: [
       'Predictive ML model with 90%+ accuracy on real data',
       'Interactive Power BI dashboard from scratch',
       'NLP sentiment analysis pipeline end-to-end',
     ],
     href: '/programs/data-science',
-    seatLabel: '6 seats left',
   },
   {
     tag: 'Best for Beginners',
@@ -113,14 +108,12 @@ const programs = [
     rating: 4.7,
     reviews: 156,
     duration: '8 Weeks',
-    batchDate: 'Jul 7, 2026',
     builds: [
       'First Python automation script (0 experience needed)',
       'AI chatbot using the ChatGPT API',
       'Personal productivity tool with AI integration',
     ],
     href: '/programs/bootcamp',
-    seatLabel: '12 seats left',
   },
 ];
 
@@ -471,7 +464,9 @@ to-[#0D47D9]
                     >
                       <span style={{ color: 'var(--ls-muted)' }}>
                         Next batch:{' '}
-                        <strong style={{ color: 'var(--ls-text)' }}>{program.batchDate}</strong>
+                        <strong style={{ color: 'var(--ls-text)' }}>
+                          <LiveCohortLabel />
+                        </strong>
                       </span>
                     </div>
 

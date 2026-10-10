@@ -13,6 +13,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useLeadModal } from "./lead-modal";
+import { getLiveCohort } from "@/lib/cohortDate";
 
 const careers = [
   "AI Full Stack + Devops",
@@ -58,48 +59,6 @@ function AnimatedHeadline() {
     </div>
   );
 }
-
-export function getBatchDates() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth();
-
-  const getBatchMondays = (y: number, m: number) => {
-    const mondays: Date[] = [];
-    const date = new Date(y, m, 1);
-
-    while (date.getMonth() === m) {
-      if (date.getDay() === 1) {
-        mondays.push(new Date(date));
-      }
-      date.setDate(date.getDate() + 1);
-    }
-
-    return { first: mondays[0], third: mondays[2] };
-  };
-
-  const { first, third } = getBatchMondays(year, month);
-
-  let nextBatch: Date;
-
-  if (today <= first) {
-    nextBatch = first;
-  } else if (today <= third) {
-    nextBatch = third;
-  } else {
-    const nextMonth =
-      month === 11 ? getBatchMondays(year + 1, 0) : getBatchMondays(year, month + 1);
-    nextBatch = nextMonth.first;
-  }
-
-  return nextBatch.toLocaleDateString("en-IN", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-const nextBatch = getBatchDates();
 
 const trustStats = [
   { icon: Star, value: "4.5/5 Rating", label: "Google Reviews", color: "text-yellow-500" },
@@ -165,6 +124,7 @@ function TechMarquee() {
 export default function Hero() {
 
 const { openModal } = useLeadModal();
+  const nextBatch = getLiveCohort().longLabel;
 
 
   // pt-[88px] on the section clears a typical fixed navbar (logo + nav
@@ -180,7 +140,7 @@ const { openModal } = useLeadModal();
               <Calendar className="h-4 w-4 shrink-0" />
               <span>
                 Admissions Open • Next Batch Starts{" "}
-                <span className="font-bold">{nextBatch}</span>
+                <span className="font-bold" suppressHydrationWarning>{nextBatch}</span>
               </span>
             </div> */}
 
@@ -244,8 +204,8 @@ const { openModal } = useLeadModal();
               <div className="mt-3 flex items-center justify-center gap-2 sm:justify-center lg:justify-start">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green-600" />
                 <p className="text-[13px] text-slate-700">
-                  Limited live-cohort seats for the{" "}
-                  <span className="font-semibold">{nextBatch}</span> batch
+                  Next live cohort starts{" "}
+                  <span className="font-semibold" suppressHydrationWarning>{nextBatch}</span>
                 </p>
               </div>
             </div>
