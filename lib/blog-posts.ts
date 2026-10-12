@@ -887,3 +887,19 @@ export const blogPosts: BlogPost[] = [
 export function getPostBySlug(slug: string): BlogPost | undefined {
   return blogPosts.find((p) => p.slug === slug);
 }
+
+/**
+ * Month-year strings such as "October 2026" parse as local midnight,
+ * which is the previous UTC day. Pin those to 00:00 UTC on the 1st
+ * so sitemap and article dates stay in the stated month.
+ */
+export function blogPostDate(publishDate: string): Date | undefined {
+  const monthYear = /^([A-Za-z]+) (\d{4})$/.exec(publishDate);
+  if (monthYear) {
+    const monthIndex = new Date(`${monthYear[1]} 1, ${monthYear[2]}`).getMonth();
+    if (Number.isNaN(monthIndex)) return undefined;
+    return new Date(Date.UTC(Number(monthYear[2]), monthIndex, 1));
+  }
+  const parsed = new Date(publishDate);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}

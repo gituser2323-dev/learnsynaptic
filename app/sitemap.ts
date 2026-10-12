@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { blogPosts } from "@/lib/blog-posts";
+import { blogPostDate, blogPosts } from "@/lib/blog-posts";
 import { SITE_URL } from "@/config/site";
 
 /**
@@ -47,10 +47,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   const blogEntries: MetadataRoute.Sitemap = blogPosts.map((post) => {
-    const parsed = new Date(post.publishDate);
+    const parsed = blogPostDate(post.publishDate);
     return {
       url: `${SITE_URL}/blog/${post.slug}`,
-      lastModified: Number.isNaN(parsed.getTime()) ? undefined : parsed,
+      lastModified: parsed,
       changeFrequency: "monthly",
       priority: 0.6,
     };

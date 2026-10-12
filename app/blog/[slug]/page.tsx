@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react';
-import { blogPosts, getPostBySlug, type ContentBlock } from '@/lib/blog-posts';
+import { blogPostDate, blogPosts, getPostBySlug, type ContentBlock } from '@/lib/blog-posts';
 import { SITE_URL } from '@/config/site';
 
 interface Props {
@@ -98,7 +98,7 @@ export default async function BlogPostPage({ params }: Props) {
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.metaDescription,
-    datePublished: new Date(post.publishDate).toISOString(),
+    datePublished: (blogPostDate(post.publishDate) ?? new Date()).toISOString(),
     author: { '@type': 'Organization', name: 'LearnSynaptic', url: SITE_URL },
     publisher: { '@type': 'Organization', name: 'LearnSynaptic', url: SITE_URL },
     mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
