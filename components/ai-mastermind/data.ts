@@ -133,7 +133,7 @@ export interface MastermindReview {
 /** Only add REAL, consented learner reviews here. The section stays hidden while this is empty. */
 export const reviews: MastermindReview[] = [];
 
-export const heroVideoSrc = "/ai-mastermind/assets/hero.mp4";
+export const heroVideoSrc = "/ai-mastermind/assets/HORIZONTAL.mp4";
 export const heroVideoPoster = "/ai-mastermind/assets/hero-poster.jpg";
 
 export const galleryPhotos = [
