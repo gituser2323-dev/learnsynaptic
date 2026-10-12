@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ArrowRight, Clock } from 'lucide-react';
 import { blogPosts, getPostBySlug, type ContentBlock } from '@/lib/blog-posts';
+import { SITE_URL } from '@/config/site';
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -20,6 +21,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical: `/blog/${slug}` },
     title: post.title,
     description: post.metaDescription,
+    keywords: post.keywords,
+    openGraph: {
+      title: post.title,
+      description: post.metaDescription,
+      type: 'article',
+      url: `/blog/${slug}`,
+    },
   };
 }
 
@@ -85,8 +93,24 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getPostBySlug(slug);
   if (!post) notFound();
 
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.metaDescription,
+    datePublished: new Date(post.publishDate).toISOString(),
+    author: { '@type': 'Organization', name: 'LearnSynaptic', url: SITE_URL },
+    publisher: { '@type': 'Organization', name: 'LearnSynaptic', url: SITE_URL },
+    mainEntityOfPage: `${SITE_URL}/blog/${post.slug}`,
+    keywords: post.keywords?.join(', '),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <section className="ls-section" style={{ background: 'var(--ls-hero-bg)' }}>
         <div className="ls-container">

@@ -14,6 +14,10 @@ export const metadata: Metadata = {
     'GenAI tutorial',
     'tech career advice Pune',
     'learn AI India',
+    'why LearnSynaptic',
+    'agentic AI learning path',
+    'AI engineer jobs India',
+    'AI academy Pune',
   ],
 };
 

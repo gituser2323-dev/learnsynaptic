@@ -12,6 +12,8 @@ export interface BlogPost {
   readTime: string;
   publishDate: string;
   category: string;
+  /** Search phrases this article should rank for. */
+  keywords?: string[];
   cta: {
     label: string;
     description: string;
@@ -22,6 +24,267 @@ export interface BlogPost {
 }
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: 'why-learnsynaptic',
+    title: 'Why LearnSynaptic: AI and GenAI Training Built for India',
+    metaDescription:
+      'Why learners choose LearnSynaptic for AI, GenAI, and full-stack training. Pune-based programs, project portfolios, and a path from beginner to AI engineer roles across India.',
+    excerpt:
+      'LearnSynaptic trains students and working professionals in AI, GenAI, and full-stack engineering from Pune, with programs built around the work companies actually hire for.',
+    readTime: '7 min read',
+    publishDate: 'October 2026',
+    category: 'Learning Guide',
+    keywords: [
+      'why LearnSynaptic',
+      'LearnSynaptic',
+      'LearnSynaptic review',
+      'AI training India',
+      'GenAI course Pune',
+    ],
+    cta: {
+      label: 'See the programs',
+      description: 'Compare the bootcamp, GenAI Builder, full-stack, and data science tracks.',
+      buttonText: 'View Programs',
+      href: '/programs',
+    },
+    content: [
+      {
+        type: 'p',
+        text: 'People searching for an AI course in India usually have the same problem. There are plenty of tutorial playlists, and very few places that tell you what to build, in what order, and how that work maps to a job. LearnSynaptic exists for that gap. It is a Pune-based training academy for students and working professionals across India, with programs in AI, generative AI, full-stack development, and data science.',
+      },
+      {
+        type: 'h2',
+        text: 'What LearnSynaptic Actually Teaches',
+      },
+      {
+        type: 'p',
+        text: 'The curriculum follows the tools teams use in product work, not a survey of every model paper published this year. Depending on the track, that means Python, APIs, React and Node, LangChain, retrieval-augmented generation, prompt design, Docker, and cloud deployment. The point of each module is a project you can show: a chatbot, a RAG application, an automated workflow, or a full-stack app with an AI feature in it.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'AI Beginner Bootcamp — 8 weeks for people with little or no coding background: Python, the ChatGPT API, prompt engineering, and small automations.',
+          'GenAI Builder — 3 months for people who want to build generative AI applications, including LangChain and RAG, and start taking freelance or product work.',
+          'AI Full Stack Dev + DevOps — 6 months for React, Node.js, Docker, AWS, and AI features inside production-style web apps.',
+          'Data Science AI/ML — 5 months for Python, machine learning, deep learning, NLP, and reporting tools used in analyst and ML roles.',
+        ],
+      },
+      {
+        type: 'h2',
+        text: 'Who It Is For',
+      },
+      {
+        type: 'p',
+        text: 'The batches are built for two groups. Final-year students and fresh graduates who need a portfolio before they apply. And working professionals — developers, analysts, testers, support engineers — who want to move into AI or GenAI work without quitting their job for a year. Sessions are scheduled so a full-time job and a program can coexist. Counselling starts with the role you want in the next 12 months, then picks the track that matches that role.',
+      },
+      {
+        type: 'h2',
+        text: 'Why the Format Matters',
+      },
+      {
+        type: 'p',
+        text: 'A certificate by itself does not get shortlisted. Hiring managers look for evidence that you can take a vague requirement and turn it into a working system. LearnSynaptic’s classes are live, the projects are reviewed, and the placement support is tied to that portfolio: resume, GitHub, and how you explain the system in an interview. The academy is based in Kothrud, Pune, and takes learners from across India, so the same path is available whether you attend from Pune or from another city.',
+      },
+      {
+        type: 'p',
+        text: 'If you are comparing options, start with the outcome. A complete beginner should not begin in the six-month full-stack program. A developer who already writes APIs should not spend eight weeks on introductory Python. The useful question is not “which course is popular.” It is “which track gets me to the first role I am actually applying for.”',
+      },
+    ],
+  },
+  {
+    slug: 'genai-and-agentic-ai-learning-path',
+    title: 'GenAI and Agentic AI: A Learning Path for 2026',
+    metaDescription:
+      'A practical learning path for generative AI and agentic AI in 2026. What to study first, which projects to build, and how LearnSynaptic’s GenAI track is ordered.',
+    excerpt:
+      'Generative AI and agentic AI are not the same skill. This is the order to learn them in, and the projects that make the path visible to employers.',
+    readTime: '8 min read',
+    publishDate: 'October 2026',
+    category: 'AI Engineering',
+    keywords: [
+      'GenAI learning path',
+      'agentic AI course',
+      'generative AI course India',
+      'how to learn agentic AI',
+      'RAG LangChain tutorial',
+    ],
+    cta: {
+      label: 'GenAI Builder program',
+      description: 'LangChain, RAG, chatbots, and a portfolio you can take into product or freelance work.',
+      buttonText: 'View GenAI Builder',
+      href: '/programs/genai-builder',
+    },
+    content: [
+      {
+        type: 'p',
+        text: 'Search interest in generative AI and agentic AI has split into two different jobs, and most learning plans still treat them as one buzzword. Generative AI is the layer that produces text, code, images, or structured output from a model. Agentic AI is the layer that lets software decide which step to take next: call a tool, read a file, query a database, check the result, and try again. Companies hiring in 2026 want people who can build the first and design the second without the system running away.',
+      },
+      {
+        type: 'h2',
+        text: 'Learn Generative AI Before Agents',
+      },
+      {
+        type: 'p',
+        text: 'Agents fail in confusing ways if you do not already understand prompts, context windows, embeddings, and retrieval. Start with the model as an API. Send a prompt, constrain the output, handle errors, and put the call behind your own backend so keys never ship to the browser. Then add retrieval: chunk documents, embed them, search the relevant chunks, and pass only those chunks into the prompt. That pattern — retrieval-augmented generation — is still the most common GenAI feature inside real products, because most companies need the model to answer from their data, not from the public internet.',
+      },
+      {
+        type: 'ol',
+        items: [
+          'Python and HTTP, well enough to call an API and parse JSON.',
+          'Prompt design: instructions, examples, and output formats you can validate.',
+          'One model API (for example the ChatGPT API) called from a small backend.',
+          'Embeddings and a vector search step, then a RAG app over a document set you control.',
+          'A framework such as LangChain only after you have built the same flow once by hand.',
+        ],
+      },
+      {
+        type: 'h2',
+        text: 'What Agentic AI Adds',
+      },
+      {
+        type: 'p',
+        text: 'An agent is a loop. The model proposes an action, your code runs a tool, the tool result goes back into the conversation, and the model decides whether it is done. Useful tools are narrow: search the knowledge base, create a ticket, read a calendar, draft an email for a human to send. The engineering work is not “let the model do anything.” It is choosing the tools, limiting how many steps the loop may take, logging every action, and deciding which steps need a person to approve them.',
+      },
+      {
+        type: 'p',
+        text: 'A hiring manager can see this skill in one project. A support assistant that answers from your docs (RAG), then opens a ticket only when the user confirms (a tool with a human check), is more convincing than a demo that claims to be autonomous. Evaluation matters as much as the demo: a small set of questions with known answers, so you can tell when a prompt change made the assistant worse.',
+      },
+      {
+        type: 'h2',
+        text: 'A Path You Can Finish',
+      },
+      {
+        type: 'p',
+        text: 'If you are new to code, eight weeks of Python, prompts, and a first API project is the right start. If you can already write functions and call an API, go straight to a GenAI build: LangChain or an equivalent, a RAG system, and one agent with two or three tools and a stop condition. LearnSynaptic’s GenAI Builder track is organised in that order, and the full-stack program is the right next step if you also need React, Node, Docker, and deployment. The industry will keep renaming the tools. The durable skill is the same: get the right context into the model, take a constrained action out of it, and show your work.',
+      },
+    ],
+  },
+  {
+    slug: 'ai-engineer-demand-india',
+    title: 'AI Engineer Demand in India: Skills Companies Hire For',
+    metaDescription:
+      'What AI engineer demand looks like in India in 2026. The roles teams are opening, the skills they screen for, and how to build a portfolio that matches the job description.',
+    excerpt:
+      'AI engineer openings in India cluster around a few concrete skills: APIs, RAG, evaluation, and shipping AI inside a product. Here is how to read a job description.',
+    readTime: '8 min read',
+    publishDate: 'October 2026',
+    category: 'Industry Insights',
+    keywords: [
+      'AI engineer jobs India',
+      'AI engineer demand',
+      'AI engineer skills 2026',
+      'generative AI jobs India',
+      'how to become an AI engineer',
+    ],
+    cta: {
+      label: 'Pick a track',
+      description: 'Match a program to the AI, GenAI, full-stack, or data role you are applying for.',
+      buttonText: 'Explore Programs',
+      href: '/programs',
+    },
+    content: [
+      {
+        type: 'p',
+        text: 'AI engineer is now a regular title on Indian job boards, and it does not mean one thing. Some postings want a machine-learning specialist who trains models. Many more want a software engineer who can put a generative model inside a product: an API, a retrieval step, a user interface, and enough evaluation to know the feature works. Reading the description carefully matters more than collecting another certificate with “AI” in the name.',
+      },
+      {
+        type: 'h2',
+        text: 'The Roles Behind the Title',
+      },
+      {
+        type: 'ul',
+        items: [
+          'GenAI or applied AI engineer — build chat, search, and workflow features on top of a model API. Python or JavaScript, RAG, prompt and output checks, and a deployed demo.',
+          'AI full-stack engineer — the same product skills plus React, Node, authentication, and cloud deployment. Common in product companies and IT services teams modernising an existing app.',
+          'ML or data science engineer — classical modelling, feature work, NLP, and reporting. Still hired, and still a different interview from a GenAI product role.',
+          'Agent and automation engineer — tool use, multi-step workflows, logging, and human approval. Often sits next to internal operations, support, or sales teams.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Demand is coming from product startups, global capability centres, and services firms that have to deliver AI features for clients. The shared requirement is not a research paper. It is a person who can take a messy internal document set or a business workflow and ship something a colleague can use next week.',
+      },
+      {
+        type: 'h2',
+        text: 'What Interviews Actually Test',
+      },
+      {
+        type: 'p',
+        text: 'Screens are getting more specific. Expect to explain how you would ground an answer in company documents, what you would do when the model invents a fact, how you keep an API key off the client, and how you would measure quality on twenty real questions. For agent roles, expect a question about runaway loops: how many steps you allow, which tools are read-only, and when a human has to confirm. For full-stack roles, the AI question sits beside the usual ones about React state, API design, and how you deploy.',
+      },
+      {
+        type: 'h2',
+        text: 'How to Prepare Without Chasing Every New Model',
+      },
+      {
+        type: 'p',
+        text: 'Pick the column you are applying to and build two projects in it. For GenAI roles, a RAG assistant over your own notes plus one small agent that calls a real tool and stops. For full-stack roles, the same assistant inside a web app with login and a deployed URL. For data roles, a model or NLP pipeline with a clear dataset, a metric, and a notebook someone else can rerun. LearnSynaptic’s tracks are split the same way, so the portfolio matches the posting instead of a generic “I learned AI” line on a resume.',
+      },
+      {
+        type: 'p',
+        text: 'The hiring bar will keep moving as models get cheaper. The engineers who stay in demand are the ones who can integrate, evaluate, and explain a system. That is a learnable path, and it is shorter when the projects look like the job.',
+      },
+    ],
+  },
+  {
+    slug: 'pune-ai-academy',
+    title: 'Pune AI Academy: Learn GenAI and Agentic AI at LearnSynaptic',
+    metaDescription:
+      'LearnSynaptic is a Pune AI academy in Kothrud training students across India in GenAI, agentic AI, full-stack development, and data science. See how the programs are structured.',
+    excerpt:
+      'Looking for an AI academy in Pune? LearnSynaptic trains from Kothrud for learners across India, with GenAI, agentic AI, and engineering tracks aimed at real roles.',
+    readTime: '7 min read',
+    publishDate: 'October 2026',
+    category: 'Learning Guide',
+    keywords: [
+      'AI academy Pune',
+      'Pune AI academy',
+      'GenAI course Pune',
+      'agentic AI training Pune',
+      'AI classes in Pune',
+    ],
+    cta: {
+      label: 'Talk to the team',
+      description: 'Ask which Pune batch and which track fits your current skills.',
+      buttonText: 'Contact LearnSynaptic',
+      href: '/contact',
+    },
+    content: [
+      {
+        type: 'p',
+        text: 'Pune already has a deep software industry, and the hiring around it has shifted toward people who can ship AI features, not only maintain existing apps. LearnSynaptic is an AI academy based in Kothrud, Pune, built for that shift. Learners in the city can attend from a known local base, and batches are open to students and professionals across India who want the same curriculum.',
+      },
+      {
+        type: 'h2',
+        text: 'What You Can Study in Pune',
+      },
+      {
+        type: 'p',
+        text: 'The academy runs four programs, plus a one-day AI Mastermind for people who want a structured look at generative AI before they commit to a longer track. The longer programs are the ones that produce a portfolio.',
+      },
+      {
+        type: 'ul',
+        items: [
+          'Beginners start with Python, prompts, and a first API project in the 8-week bootcamp.',
+          'GenAI and agentic AI learners build LangChain-style applications, RAG systems, and tool-using workflows in the GenAI Builder program.',
+          'Engineers who need a job-ready web stack add React, Node.js, Docker, and AWS in the full-stack and DevOps program, with AI features inside the apps.',
+          'Analysts and ML-track learners go through Python, machine learning, deep learning, and NLP in the data science specialisation.',
+        ],
+      },
+      {
+        type: 'h2',
+        text: 'Why a Local Academy Still Matters',
+      },
+      {
+        type: 'p',
+        text: 'Recorded courses are easy to start and easy to abandon. A cohort in Pune gives you a schedule, reviewed projects, and people who will ask what you are applying for. That matters if you are a final-year student at a Pune college, or a working developer in Kothrud, Hinjewadi, Magarpatta, or Baner trying to move into an AI engineer role without disappearing from your job for a year. The same support is available to learners joining from other cities.',
+      },
+      {
+        type: 'p',
+        text: 'LearnSynaptic’s classroom address is Success Square, Karve Road, Paschimanagri, Kothrud, Pune 411038. Counselling is the right first step: bring your current skills and the role you want, and the team will say whether you should start in the bootcamp or go directly to GenAI, full-stack, or data science. The goal is a portfolio a Pune employer, or any employer in India, can click through.',
+      },
+    ],
+  },
   {
     slug: 'mern-developer-to-ai-developer-skills-gap',
     title: 'MERN Developer to AI Developer: The Skills Gap Nobody Talks About',
