@@ -63,10 +63,11 @@ const API_DOCS_CSP_DIRECTIVES = [
 /**
  * RC-2 Enterprise Security Hardening — every one of these APIs was
  * grepped for a real caller across app/ and components/ first
- * (`navigator.clipboard`/`requestFullscreen`/`autoplay`/etc.); only
- * `clipboard-write` has one (Security Settings' own "copy recovery
- * codes" button — see app/admin/(dashboard)/settings/security/page.tsx),
- * so it's the one entry allowed for `self`. Every other directive here
+ * (`navigator.clipboard`/`requestFullscreen`/`autoplay`/etc.).
+ * `clipboard-write` is the Security Settings "copy recovery codes"
+ * button (app/admin/(dashboard)/settings/security/page.tsx). `autoplay`
+ * is the muted homepage hero video. Both are limited to `self`.
+ * Every other directive here
  * denies a capability this app genuinely never uses, closing off real
  * attack surface (a compromised third-party script — GA4/Meta Pixel's
  * own tags are the only ones this app loads at all — gains nothing
@@ -85,7 +86,7 @@ const PERMISSIONS_POLICY = [
   "magnetometer=()",
   "gyroscope=()",
   "accelerometer=()",
-  "autoplay=()",
+  "autoplay=(self)",
   "encrypted-media=()",
   "fullscreen=(self)",
   "picture-in-picture=()",

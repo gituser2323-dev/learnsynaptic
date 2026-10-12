@@ -8,10 +8,8 @@ import {
   Download,
   User,
 } from "lucide-react";
-import Image from "next/image";
-
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLeadModal } from "./lead-modal";
 import { getLiveCohort } from "@/lib/cohortDate";
 
@@ -125,6 +123,15 @@ export default function Hero() {
 
 const { openModal } = useLeadModal();
   const nextBatch = getLiveCohort().longLabel;
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = heroVideoRef.current;
+    if (!video) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      video.pause();
+    }
+  }, []);
 
 
   // pt-[88px] on the section clears a typical fixed navbar (logo + nav
@@ -243,14 +250,18 @@ const { openModal } = useLeadModal();
           <div className="mt-2 lg:mt-0">
             <div className="overflow-hidden rounded-2xl border bg-white shadow-2xl sm:rounded-3xl">
               <div className="relative aspect-video">
-                {/* Testimonial video assets (/videos/testimonial.mp4, /student.jpg) are not in
-                    public/ — use the existing learn.jpeg still rather than 404 media URLs. */}
-                <Image
-                  src="/learn.jpeg"
-                  alt="LearnSynaptic learners"
-                  fill
-                  className="rounded-2xl object-cover sm:rounded-3xl"
-                  sizes="(max-width: 1024px) 100vw, 560px"
+                <video
+                  ref={heroVideoRef}
+                  className="absolute inset-0 h-full w-full rounded-2xl object-cover sm:rounded-3xl"
+                  src="/ai-mastermind/assets/HORIZONTAL.mp4"
+                  poster="/ai-mastermind/assets/hero-poster.jpg"
+                  controls
+                  playsInline
+                  muted
+                  loop
+                  autoPlay
+                  preload="metadata"
+                  aria-label="LearnSynaptic session preview"
                 />
               </div>
             </div>
