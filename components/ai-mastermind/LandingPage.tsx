@@ -7,7 +7,7 @@ import "./ai-mastermind.css";
 import { RegisterModalProvider, useRegisterModal } from "../ai-bootcamp/RegisterModalContext";
 import { AI_MASTERMIND, getNextSessionLabel } from "@/config/aiMastermind";
 import Image from "next/image";
-import { sessions, audiences, tools, faqs, reviews, sampleReviews, galleryPhotos, pricePoints, certificateSrc, certificatePdf, certificateAlt } from "./data";
+import { sessions, audiences, tools, faqs, reviews, sampleReviews, galleryPhotos, pricePoints, certificateSrc, certificatePdf, certificateAlt, heroVideoSrc, heroVideoPoster } from "./data";
 
 const RegistrationModal = dynamic(() => import("../ai-bootcamp/RegistrationModal").then((m) => m.RegistrationModal));
 const SuccessModal = dynamic(() => import("../ai-bootcamp/SuccessModal").then((m) => m.SuccessModal));
@@ -57,21 +57,34 @@ function Page() {
               <i key={i} className="aim-fx-dust" style={{ left: `${52 + ((i * 37) % 44)}%`, animationDelay: `${(i * 0.9) % 7}s`, animationDuration: `${6 + (i % 5)}s` }} />
             ))}
           </div>
-          <span className="aim-tag">1 DAY ◆ 7 LIVE EXPERT MODULES</span>
-          <h1>1 Day AI Mastermind</h1>
-          <p>
-            Build your own AI-driven apps, automate your work and put AI agents to use. Master AI coding agents,
-            automation, AI agents and data analysis — live, hands-on, in a single day.
-          </p>
-          <dl className="aim-meta">
-            <div><dt>Next Session</dt><dd><NextSessionDate /></dd></div>
-            <div><dt>Format</dt><dd>{AI_MASTERMIND.format}</dd></div>
-            <div><dt>Seat Price</dt><dd>₹{AI_MASTERMIND.priceInr}</dd></div>
-          </dl>
-          <div className="aim-cta-row">
-            <RegisterButton />
-            <CommunityButton />
+          <div className="aim-hero-copy">
+            <span className="aim-tag">1 DAY ◆ 7 LIVE EXPERT MODULES</span>
+            <h1>1 Day AI Mastermind</h1>
+            <p>
+              Build your own AI-driven apps, automate your work and put AI agents to use. Master AI coding agents,
+              automation, AI agents and data analysis — live, hands-on, in a single day.
+            </p>
+            <dl className="aim-meta">
+              <div><dt>Next Session</dt><dd><NextSessionDate /></dd></div>
+              <div><dt>Format</dt><dd>{AI_MASTERMIND.format}</dd></div>
+              <div><dt>Seat Price</dt><dd>₹{AI_MASTERMIND.priceInr}</dd></div>
+            </dl>
+            <div className="aim-cta-row">
+              <RegisterButton />
+              <CommunityButton />
+            </div>
           </div>
+          <figure className="aim-hero-video">
+            <video
+              controls
+              playsInline
+              preload="metadata"
+              poster={heroVideoPoster}
+              aria-label="Preview of the 1 Day AI Mastermind"
+            >
+              <source src={heroVideoSrc} type="video/mp4" />
+            </video>
+          </figure>
         </div>
       </section>
 
