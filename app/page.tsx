@@ -25,7 +25,7 @@ import { TiltCard } from '@/components/ui/TiltCard';
 import { TestimonialCard } from '@/components/TestimonialCard';
 import { StatCard } from '@/components/StatCard';
 import { HomepageGalleryStrip } from '@/components/HomepageGalleryStrip';
-import { MeetTheTeam } from '@/components/MeetTheTeam';
+import { MeetTheTeam, WhoItsForRoadmap } from '@/components/MeetTheTeam';
 import { HomepageVideoTeaser } from '@/components/HomepageVideoTeaser';
 import { LiveCohortLabel } from '@/components/LiveCohortLabel';
 import { CompetitiveComparisonTable } from '@/components/ProgramComparisonTable';
@@ -572,8 +572,10 @@ to-[#0D47D9]
         </div>
       </section>
 
+      <WhoItsForRoadmap />
+
       {/* ── 5. Founder Snippet ───────────────────────────────────────────── */}
-      <section className="ls-section">
+      <section className="ls-section-alt">
         <div className="ls-container">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-10 items-center">
             {/* Text — wider */}
@@ -709,8 +711,7 @@ to-[#0D47D9]
         </div>
       </section>
 
-      {/* ── 5b. Meet the Team ────────────────────────────────────────────── */}
-      {/* <MeetTheTeam /> */}
+      <MeetTheTeam />
 
       {/* ── 6. Testimonials Preview ──────────────────────────────────────── */}
       <section className="ls-section-alt">

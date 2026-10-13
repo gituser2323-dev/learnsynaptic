@@ -1,134 +1,103 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
-import { AnimateOnScroll, StaggerContainer, StaggerItem } from '@/components/ui/AnimateOnScroll';
+import { AnimateOnScroll } from '@/components/ui/AnimateOnScroll';
 
-interface TeamMember {
-  name: string;
-  role: string;
-  cred: string;
-  photo: string | null;
-  initials: string;
-  editPlaceholder?: boolean;
+const teamOne = {
+  src: '/ai-mastermind/Team1.jpeg',
+  width: 1600,
+  height: 694,
+  alt: 'Meet the team. Pratik Sabale, Co-Founder, AI Engineer and SDE. Vivek Vyvhare, AI Business Head. Priya, GenAI Engineer and AI Product Manager.',
+};
+
+const teamTwo = {
+  src: '/ai-mastermind/Team2.png',
+  width: 1905,
+  height: 825,
+  alt: 'Shruti, AI Freelancing Expert. Abhay, Business Coach.',
+};
+
+const growthRoadmap = {
+  src: '/ai-mastermind/AI Growth Roadmap for Every Stage.png',
+  width: 1672,
+  height: 941,
+  alt: 'Who is LearnSynaptic for? Students and freshers build job-ready AI skills and real projects. Working professionals use AI to accelerate their career. Founders and businesses automate workflows and build with AI.',
+};
+
+function Shot({
+  src,
+  width,
+  height,
+  alt,
+}: {
+  src: string;
+  width: number;
+  height: number;
+  alt: string;
+}) {
+  return (
+    <figure
+      className="m-0 overflow-x-auto rounded-2xl border"
+      style={{ borderColor: 'var(--ls-border)', background: 'var(--ls-background)' }}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        width={width}
+        height={height}
+        sizes="(max-width: 1100px) 100vw, 1100px"
+        className="h-auto w-full min-w-[720px] md:min-w-0"
+      />
+    </figure>
+  );
 }
 
-const team: TeamMember[] = [
-  {
-    name: 'Pratik Sabale',
-    role: 'Founder & Lead Instructor',
-    cred: 'Delivered 5+ MERN+AI live cohorts; placed 200+ engineers in their first or next tech role',
-    photo: '/gallery/20-founder-portrait.jpeg',
-    initials: 'PS',
-  },
-  {
-    name: '[EDIT: Name]',
-    role: '[EDIT: Role]',
-    cred: '[EDIT: Add one specific credential — not generic]',
-    photo: null,
-    initials: '??',
-    editPlaceholder: true,
-  },
-  {
-    name: '[EDIT: Name]',
-    role: '[EDIT: Role]',
-    cred: '[EDIT: Add one specific credential — not generic]',
-    photo: null,
-    initials: '??',
-    editPlaceholder: true,
-  },
-];
-
-function MemberCard({ member }: { member: TeamMember }) {
-  const [hovered, setHovered] = useState(false);
-
+export function TeamPortraits() {
   return (
-    <div
-      className="bg-white rounded-2xl border flex flex-col overflow-hidden"
-      style={{
-        borderColor: hovered ? 'rgba(20,71,230,0.18)' : 'var(--ls-border)',
-        boxShadow: hovered ? '0 8px 24px rgba(20,71,230,0.10)' : 'none',
-        transform: hovered ? 'translateY(-3px)' : 'translateY(0)',
-        transition: 'transform 200ms ease-out, box-shadow 200ms ease-out, border-color 200ms ease',
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {/* Photo area */}
-      <div
-        className="relative w-full overflow-hidden"
-        style={{ aspectRatio: '1/1', background: 'var(--ls-blue-tint)' }}
-      >
-        {member.photo ? (
-          <Image
-            src={member.photo}
-            alt={`${member.name} — ${member.role}`}
-            fill
-            sizes="(max-width: 768px) 100vw, 33vw"
-            className="object-cover object-center"
-          />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-            <div
-              className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold text-white"
-              style={{ background: 'var(--ls-blue-primary)' }}
-            >
-              {member.initials}
-            </div>
-            <span
-              className="text-xs font-medium px-2.5 py-1 rounded-full"
-              style={{ background: 'white', color: 'var(--ls-muted)', border: '1px solid var(--ls-border)' }}
-            >
-              [EDIT: real photo]
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Card body */}
-      <div className="p-6 flex flex-col flex-1">
-        <p
-          className="font-bold text-base mb-0.5"
-          style={{ color: 'var(--ls-text)' }}
-        >
-          {member.name}
-        </p>
-        <p
-          className="text-sm font-medium mb-3"
-          style={{ color: 'var(--ls-blue-primary)' }}
-        >
-          {member.role}
-        </p>
-        <p
-          className="text-sm leading-relaxed"
-          style={{ color: member.editPlaceholder ? 'var(--ls-border)' : 'var(--ls-muted)' }}
-        >
-          {member.cred}
-        </p>
-      </div>
+    <div className="flex flex-col gap-5">
+      <Shot {...teamOne} />
+      <Shot {...teamTwo} />
     </div>
   );
 }
 
+export function GrowthRoadmapImage() {
+  return <Shot {...growthRoadmap} />;
+}
+
 export function MeetTheTeam() {
   return (
-    <section className="ls-section-alt">
+    <section className="ls-section" aria-labelledby="meet-the-team-heading">
       <div className="ls-container">
-        <AnimateOnScroll className="text-center mb-12">
-          <span className="ls-badge mb-4 inline-flex">The team</span>
-          <h2 className="mb-3">Built by people who are still building</h2>
-          <p style={{ maxWidth: 540, margin: '0 auto', color: 'var(--ls-muted)' }}>
-            We&apos;re practitioners first, educators second — still writing code, still running
-            live projects, still in the field alongside you.
+        <AnimateOnScroll className="mb-10 max-w-2xl">
+          <span className="ls-badge mb-4 inline-flex">Meet the team</span>
+          <h2 id="meet-the-team-heading" className="mb-3">
+            The people who teach the cohorts
+          </h2>
+          <p style={{ color: 'var(--ls-muted)', maxWidth: 640 }}>
+            Five practitioners in the live sessions: engineering, product, freelancing, and business coaching.
           </p>
         </AnimateOnScroll>
+        <TeamPortraits />
+      </div>
+    </section>
+  );
+}
 
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {team.map((member,index) => (
-            <StaggerItem key={`${member.name}-${index}`}>              <MemberCard member={member} />
-            </StaggerItem>
-          ))}
-        </StaggerContainer>
+export function WhoItsForRoadmap() {
+  return (
+    <section className="ls-section" aria-labelledby="who-its-for-heading">
+      <div className="ls-container">
+        <AnimateOnScroll className="mb-10 max-w-2xl">
+          <span className="ls-badge mb-4 inline-flex">Who it&apos;s for</span>
+          <h2 id="who-its-for-heading" className="mb-3">
+            A path for every stage
+          </h2>
+          <p style={{ color: 'var(--ls-muted)', maxWidth: 640 }}>
+            Students building a first portfolio, professionals adding AI to the job they already have, and founders automating real work.
+          </p>
+        </AnimateOnScroll>
+        <GrowthRoadmapImage />
       </div>
     </section>
   );

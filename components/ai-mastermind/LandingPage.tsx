@@ -7,6 +7,7 @@ import "./ai-mastermind.css";
 import { RegisterModalProvider, useRegisterModal } from "../ai-bootcamp/RegisterModalContext";
 import { AI_MASTERMIND, getNextSessionLabel } from "@/config/aiMastermind";
 import Image from "next/image";
+import { GrowthRoadmapImage, TeamPortraits } from "@/components/MeetTheTeam";
 import { sessions, audiences, tools, faqs, reviews, sampleReviews, galleryPhotos, pricePoints, certificateSrc, certificatePdf, certificateAlt, heroVideoSrc, heroVideoPoster } from "./data";
 
 const RegistrationModal = dynamic(() => import("../ai-bootcamp/RegistrationModal").then((m) => m.RegistrationModal));
@@ -112,6 +113,15 @@ function Page() {
       </section>
 
       <section className="aim-section">
+        <p className="aim-eyebrow">MEET THE TEAM</p>
+        <h2>Who you&apos;ll learn with</h2>
+        <p className="aim-sub">The practitioners teaching the live day — engineering, product, freelancing, and business.</p>
+        <div className="mt-8">
+          <TeamPortraits />
+        </div>
+      </section>
+
+      <section className="aim-section">
         <p className="aim-eyebrow">REAL PEOPLE. REAL LEARNING.</p>
         <h2>A look inside our sessions &amp; community</h2>
         <div className="aim-gallery">
@@ -173,6 +183,9 @@ function Page() {
       <section className="aim-section">
         <p className="aim-eyebrow">AI FOR ALL STAGES</p>
         <h2>Who is this for?</h2>
+        <div className="mt-8">
+          <GrowthRoadmapImage />
+        </div>
         <div className="aim-grid">
           {audiences.map((a) => (
             <div key={a.t} className="aim-card"><h3>{a.t}</h3><p>{a.d}</p></div>
